@@ -10,6 +10,15 @@ from typing import Iterable
 from app import db
 from app.models.video import Video
 
+VALID_VIDEO_STATUSES = {
+    "PROCESSANDO",
+    "PROCESSANDO_IA",
+    "PROCESSADO",
+    "ERRO_ARQUIVO",
+    "ERRO_IA",
+    "SEM_ANALISE",
+}
+
 
 def create_video(*, filename: str) -> Video:
     """
@@ -79,6 +88,9 @@ def update_status(video: Video, status: str) -> Video:
     Returns:
         Video: The updated Video object
     """
+    if status not in VALID_VIDEO_STATUSES:
+        raise ValueError(f"Status de vídeo inválido: {status}")
+
     video.status = status
     db.session.commit()
     return video

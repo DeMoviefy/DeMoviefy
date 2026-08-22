@@ -18,6 +18,7 @@ from app.config.paths import (
 )
 from app.config.versioning import build_version_payload
 from app.repositories.video_repository import (
+    VALID_VIDEO_STATUSES,
     create_video,
     delete_video,
     get_video,
@@ -592,7 +593,11 @@ def update_video_status(video_id: int):
     if not video:
         return jsonify({"error": "Vídeo não encontrado"}), 404
 
-    update_status(video, str(status))
+    status = str(status)
+    if status not in VALID_VIDEO_STATUSES:
+        return jsonify({"error": "Status de vídeo inválido"}), 400
+
+    update_status(video, status)
     return jsonify(_serialize_video(video))
 
 

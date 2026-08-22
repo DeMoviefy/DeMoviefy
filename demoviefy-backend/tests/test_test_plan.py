@@ -16,6 +16,7 @@ import unittest
 from unittest.mock import patch
 
 from app import create_app, db
+from app.models.video import Video
 from app.repositories.video_repository import create_video, update_status
 
 
@@ -110,11 +111,12 @@ class DeMoviefyTestPlan(unittest.TestCase):
             update_status(video, status)
             return video.id
 
-    def upload(self, filename="video_teste.mp4"):
+    def upload(self, filename="video_teste.mp4", **fields):
         """Send a minimal in-memory multipart file to the real upload route."""
+        fields["file"] = (BytesIO(b"test video"), filename)
         return self.client.post(
             "/videos",
-            data={"file": (BytesIO(b"test video"), filename)},
+            data=fields,
             content_type="multipart/form-data",
         )
 
@@ -235,3 +237,51 @@ class DeMoviefyTestPlan(unittest.TestCase):
             (self.root / second_payload["video"]["filename"]).read_bytes(),
             b"test video",
         )
+
+    def test_sec01_sanitizes_traversal_filename(self):
+        response = self.upload("../../outside.mp4")
+
+        self.assertEqual(response.status_code, 200)
+        stored_filename = response.get_json()["video"]["filename"]
+        stored_path = self.root / stored_filename
+        self.assertEqual(stored_path.parent, self.root)
+        self.assertNotIn("..", Path(stored_filename).parts)
+        self.assertTrue(stored_path.exists())
+        self.assertFalse((self.root.parent / "outside.mp4").exists())
+
+    def test_sec02_rejects_invalid_processing_parameters(self):
+        invalid_requests = (
+            {"frame_stride": "0"},
+            {"max_frames": "0"},
+            {"confidence_threshold": "2"},
+            {"clip_start_sec": "10", "clip_end_sec": "5"},
+        )
+
+        for fields in invalid_requests:
+            with self.subTest(fields=fields):
+                response = self.upload(**fields)
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(self.started_processing, [])
+
+    def test_sec03_rejects_unknown_status_without_changing_video(self):
+        video_id = self.create_video(status="PROCESSADO")
+
+        response = self.client.patch(
+            f"/videos/{video_id}",
+            json={"status": "ADMIN"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        with self.app.app_context():
+            video = db.session.get(Video, video_id)
+            self.assertEqual(video.status, "PROCESSADO")
+
+    def test_sec04_returns_not_found_for_unknown_video(self):
+        for endpoint in (
+            "/videos/999999",
+            "/videos/999999/file",
+            "/videos/999999/analysis",
+            "/videos/999999/transcription",
+        ):
+            with self.subTest(endpoint=endpoint):
+                self.assertEqual(self.client.get(endpoint).status_code, 404)
