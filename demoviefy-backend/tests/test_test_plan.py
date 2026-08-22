@@ -44,6 +44,15 @@ class DeMoviefyTestPlan(unittest.TestCase):
         self.root = Path(self.temp_dir.name)
         self.started_processing = []
 
+        def allocate_video_path(filename):
+            source = Path(filename)
+            candidate = self.root / filename
+            suffix = 1
+            while candidate.exists():
+                candidate = self.root / f"{source.stem}_{suffix}{source.suffix}"
+                suffix += 1
+            return candidate
+
         # Patch dependencies where the controller *uses* them, rather than at
         # their original module. This is the reliable unittest.mock pattern for
         # names imported with ``from module import name``.
@@ -57,6 +66,7 @@ class DeMoviefyTestPlan(unittest.TestCase):
             patch("app.controllers.video_controller.transcription_file_path", lambda video_id: self.root / f"transcription-{video_id}.json"),
             patch("app.controllers.video_controller.ensure_storage_dirs", lambda: self.root.mkdir(exist_ok=True)),
             patch("app.controllers.video_controller.to_repo_relative", lambda path: str(path)),
+            patch("app.controllers.video_controller.unique_video_file_path", allocate_video_path),
             patch("app.controllers.video_controller._resolve_ai_config", lambda *_: dict(AI_CONFIG)),
             patch("app.controllers.video_controller.save_ai_config", lambda *_args, **_kwargs: dict(AI_CONFIG)),
             patch("app.controllers.video_controller.save_processing_state", lambda *_args, **_kwargs: None),
@@ -203,3 +213,25 @@ class DeMoviefyTestPlan(unittest.TestCase):
         self.assertEqual([response.status_code for response in responses], [200, 200, 200])
         self.assertEqual(len(self.started_processing), 3)
         self.assertEqual(len(set(self.started_processing)), 3)
+
+    def test_ct09_keeps_duplicate_filenames_in_separate_files(self):
+        first_response = self.upload("same_name.mp4")
+        second_response = self.upload("same_name.mp4")
+
+        self.assertEqual(first_response.status_code, 200)
+        self.assertEqual(second_response.status_code, 200)
+        first_payload = first_response.get_json()
+        second_payload = second_response.get_json()
+
+        self.assertNotEqual(
+            first_payload["video"]["filename"],
+            second_payload["video"]["filename"],
+        )
+        self.assertEqual(
+            (self.root / first_payload["video"]["filename"]).read_bytes(),
+            b"test video",
+        )
+        self.assertEqual(
+            (self.root / second_payload["video"]["filename"]).read_bytes(),
+            b"test video",
+        )

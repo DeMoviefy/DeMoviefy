@@ -13,6 +13,7 @@ from app.config.paths import (
     ensure_storage_dirs,
     to_repo_relative,
     transcription_file_path,
+    unique_video_file_path,
     video_file_path,
 )
 from app.config.versioning import build_version_payload
@@ -281,11 +282,12 @@ def upload_video():
         return jsonify({"error": str(exc)}), 400
 
     ensure_storage_dirs()
-    filepath = video_file_path(filename)
+    filepath = unique_video_file_path(filename)
+    stored_filename = filepath.name
     file.save(filepath)
-    current_app.logger.info("upload_video:saved filename=%s path=%s", filename, filepath)
+    current_app.logger.info("upload_video:saved filename=%s stored_filename=%s path=%s", filename, stored_filename, filepath)
 
-    new_video = create_video(filename=filename)
+    new_video = create_video(filename=stored_filename)
     save_ai_config(
         new_video.id,
         task_type=ai_config["task_type"],
