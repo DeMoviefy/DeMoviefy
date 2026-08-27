@@ -19,6 +19,7 @@ interface ProcessingState {
     videos: VideoRecord[];
     stats: VideoStats;
     loading: boolean;
+    initialized: boolean;
 
     refresh: () => Promise<void>;
     startPolling: () => void;
@@ -50,6 +51,7 @@ export const useProcessingStore = create<ProcessingState>((set, get) => ({
     },
 
     loading: false,
+    initialized: false,
 
     refresh: async () => {
         if (get().loading) {
@@ -62,20 +64,25 @@ export const useProcessingStore = create<ProcessingState>((set, get) => ({
             const videos = (await VideoService.listVideos()).map(normalizeVideoRecord);
 
             const previousStats = get().stats;
+            const wasInitialized = get().initialized;
+
             const stats = deriveStats(videos);
 
-            set({videos, stats,});
+            set({videos, stats, initialized: true,});
+            
+            if (wasInitialized) {
 
-            if (stats.processed > previousStats.processed && stats.total == previousStats.total) {
-                toast.success("Reprocessamento concluído");
-            }
+                if (stats.processed > previousStats.processed && stats.total == previousStats.total) {
+                    toast.success("Reprocessamento concluído");
+                }
 
-            else if (stats.processed > previousStats.processed) {
-                toast.success("Processamento concluído");
-            }
+                else if (stats.processed > previousStats.processed) {
+                    toast.success("Processamento concluído");
+                }
 
-            else if (stats.errors > previousStats.errors) {
-                toast.error("Erro no processamento");
+                else if (stats.errors > previousStats.errors) {
+                    toast.error("Erro no processamento");
+                }
             }
 
             const hasRunningProcessing = videos.some(
