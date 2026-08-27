@@ -1,4 +1,5 @@
-// VideoDashboard.tsx, versão ajustada
+// src/pages/Upload/components/VideoDashboard.tsx
+
 import { useEffect, useRef, useState } from "react";
 import { useVideoListStore } from "src/pages/Upload/stores/useVideoListStore";
 import { useCatalogStore } from "src/core/stores/useAICatalogStore";
