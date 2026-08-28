@@ -17,6 +17,7 @@ VALID_VIDEO_STATUSES = {
     "ERRO_ARQUIVO",
     "ERRO_IA",
     "SEM_ANALISE",
+    "CANCELADO",
 }
 
 

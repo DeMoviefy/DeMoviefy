@@ -587,6 +587,30 @@ def reprocess_video_by_id(video_id: int):
     return jsonify({"message": "Reprocessamento iniciado", "video": _serialize_video(video)})
 
 
+def cancel_video_processing_by_id(video_id: int):
+    """Cancel queued or running work without deleting the video or artifacts."""
+    video = get_video(video_id)
+    if not video:
+        return jsonify({"error": "Vídeo não encontrado"}), 404
+
+    if video.status not in {"PROCESSANDO", "PROCESSANDO_IA"}:
+        return jsonify({"error": "Este vídeo não está em processamento."}), 409
+
+    if not get_job_queue().cancel(video.id, video.job_id):
+        return jsonify({"error": "O job de processamento não está mais ativo."}), 409
+
+    processing = load_processing_state(video.id)
+    update_status(video, "CANCELADO")
+    save_processing_state(
+        video.id,
+        progress=processing.get("processing_progress", 0),
+        stage="cancelled",
+        eta_seconds=None,
+        message="Cancelamento solicitado. O vídeo e análises concluídas serão mantidos.",
+    )
+    return jsonify({"message": "Processamento cancelado", "video": _serialize_video(video)})
+
+
 def delete_video_by_id(video_id: int):
     video = get_video(video_id)
     if not video:

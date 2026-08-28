@@ -1,11 +1,17 @@
 // src/pages/Upload/components/ProcessingQueuePanel.tsx
 
+import { useState } from "react";
+import { toast } from "sonner";
+import { VideoService } from "src/pages/Upload/services/videoService";
 import { useVideoListStore } from "src/pages/Upload/stores/useVideoListStore";
+import { getApiErrorMessage } from "src/pages/Upload/utils/helpers";
 import "/src/pages/Upload/styles/ProcessingQueuePanel.css";
 
 export function ProcessingQueuePanel() {
     
   const videos = useVideoListStore((state) => state.videos);
+  const fetchVideos = useVideoListStore((state) => state.fetchVideos);
+  const [cancellingVideoId, setCancellingVideoId] = useState<number | null>(null);
   const processingVideos = videos.filter(
     (v) => v.status === "PROCESSANDO" || v.status === "PROCESSANDO_IA"
   );
@@ -22,6 +28,19 @@ export function ProcessingQueuePanel() {
         </div>
       </div>
     );
+  }
+
+  async function cancelProcessing(videoId: number) {
+    setCancellingVideoId(videoId);
+    try {
+      await VideoService.cancelProcessing(videoId);
+      toast.success("Processamento cancelado. O vídeo foi mantido.");
+      await fetchVideos();
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Não foi possível cancelar o processamento."));
+    } finally {
+      setCancellingVideoId(null);
+    }
   }
 
   return (
@@ -73,6 +92,14 @@ export function ProcessingQueuePanel() {
               <div className="progress-stage">
                 {video.processing.processing_message}
               </div>
+              <button
+                type="button"
+                className="cancel-processing-button"
+                disabled={cancellingVideoId === video.id}
+                onClick={() => void cancelProcessing(video.id)}
+              >
+                {cancellingVideoId === video.id ? "Cancelando..." : "Cancelar processamento"}
+              </button>
             </div>
           </div>
         ))}

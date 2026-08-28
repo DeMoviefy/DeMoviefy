@@ -1,6 +1,7 @@
 from flask import Blueprint
 
 from app.controllers.video_controller import (
+    cancel_video_processing_by_id,
     delete_video_by_id,
     delete_video_analysis_by_id,
     delete_video_transcription_by_id,
@@ -38,4 +39,5 @@ video_bp.add_url_rule("/videos/<int:video_id>/transcription", view_func=delete_v
 video_bp.add_url_rule("/videos/<int:video_id>/transcription/generate", view_func=generate_video_transcription_by_id, methods=["POST"])
 video_bp.add_url_rule("/videos/<int:video_id>/ai-config", view_func=update_video_ai_config, methods=["PUT"])
 video_bp.add_url_rule("/videos/<int:video_id>/reprocess", view_func=reprocess_video_by_id, methods=["POST"])
+video_bp.add_url_rule("/videos/<int:video_id>/cancel", view_func=cancel_video_processing_by_id, methods=["POST"])
 video_bp.add_url_rule("/", view_func=home, methods=["GET"])

@@ -1,12 +1,12 @@
 from app import db
 from app.config.paths import annotated_video_path, annotated_video_temp_path, video_file_path, ensure_storage_dirs
 from app.repositories.video_repository import get_video, update_status
-from app.services.frame_ai_service import analyze_video_frames, save_analysis
+from app.services.frame_ai_service import ProcessingCancelled, analyze_video_frames, save_analysis
 from app.services.transcription_service import save_transcription, transcribe_video_with_timestamps
-from app.services.video_artifact_service import delete_analysis, load_ai_config, save_processing_state
+from app.services.video_artifact_service import load_ai_config, save_processing_state
 
 
-def process_video(flask_app, video_id):
+def process_video(flask_app, video_id, *, cancellation_requested=None):
     with flask_app.app_context():
         flask_app.logger.info("process_video:start video_id=%s", video_id)
 
@@ -38,14 +38,8 @@ def process_video(flask_app, video_id):
             annotated_path = annotated_video_path(video_id)
             annotated_temp_path = annotated_video_temp_path(video_id)
 
-            # Remove the previous analysis/preview so the UI clearly reflects
-            # that a fresh processing cycle is underway.
-            delete_analysis(video_id)
-            if annotated_path.exists():
-                annotated_path.unlink()
-            annotated_browser_path = annotated_path.parent / f"{annotated_path.stem}.browser{annotated_path.suffix}"
-            if annotated_browser_path.exists():
-                annotated_browser_path.unlink()
+            # Keep completed artifacts until the replacement analysis finishes.
+            # This makes cancellation safe during reprocessing.
             if annotated_temp_path.exists():
                 annotated_temp_path.unlink()
             last_reported_progress = {"value": 5}
@@ -85,6 +79,7 @@ def process_video(flask_app, video_id):
                 clip_end_sec=ai_config.get("clip_end_sec"),
                 annotated_output_path=str(annotated_path),
                 progress_callback=report_analysis_progress,
+                cancellation_requested=cancellation_requested,
                 logger=flask_app.logger,
             )
             summary["selected_model"] = ai_config
@@ -104,6 +99,22 @@ def process_video(flask_app, video_id):
                 video.filename,
                 analysis_path,
             )
+        except ProcessingCancelled:
+            db.session.rollback()
+            video = get_video(video_id)
+            if video:
+                update_status(video, "CANCELADO")
+            save_processing_state(
+                video_id,
+                progress=0,
+                stage="cancelled",
+                eta_seconds=None,
+                message="Processamento cancelado. O vídeo e análises concluídas foram mantidos.",
+            )
+            annotated_temp_path = annotated_video_temp_path(video_id)
+            if annotated_temp_path.exists():
+                annotated_temp_path.unlink()
+            flask_app.logger.info("process_video:cancelled video_id=%s", video_id)
         except Exception:
             db.session.rollback()
             video = get_video(video_id)

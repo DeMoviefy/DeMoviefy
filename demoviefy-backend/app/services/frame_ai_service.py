@@ -459,6 +459,11 @@ def _annotate_frame_by_task(frame: np.ndarray, result: Any, task_type: str) -> n
 # MAIN ANALYSIS FUNCTION
 # ============================================================================
 
+
+class ProcessingCancelled(Exception):
+    """Raised when a caller requests cooperative cancellation."""
+
+
 def analyze_video_frames(
     *,
     video_path: str,
@@ -471,6 +476,7 @@ def analyze_video_frames(
     clip_end_sec: float | None = None,
     annotated_output_path: str | None = None,
     progress_callback: Any | None = None,
+    cancellation_requested: Any | None = None,
     logger: Any | None = None,
 ) -> dict[str, Any]:
     """
@@ -601,6 +607,13 @@ def analyze_video_frames(
         )
 
     while True:
+        if cancellation_requested is not None and cancellation_requested():
+            capture.release()
+            if writer is not None:
+                writer.release()
+            if temp_annotated_path is not None and temp_annotated_path.exists():
+                temp_annotated_path.unlink()
+            raise ProcessingCancelled("Processamento cancelado pelo usuário.")
         if processed_frames >= max_frames:
             break
 

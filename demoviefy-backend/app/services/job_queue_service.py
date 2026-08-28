@@ -14,6 +14,7 @@ class JobStatus(str, Enum):
     RETRYING = "retrying"
     COMPLETED = "completed"
     FAILED = "failed"
+    CANCELLED = "cancelled"
 
 
 @dataclass
@@ -25,6 +26,7 @@ class VideoJob:
     status: JobStatus = JobStatus.PENDING
     error: str | None = None
     created_at: float = field(default_factory=time.time)
+    cancellation_requested: threading.Event = field(default_factory=threading.Event, repr=False)
 
     def retry_delay_seconds(self) -> int:
         return min(2 ** (self.attempt - 1), 60)
@@ -71,6 +73,16 @@ class JobQueueService:
                 return None
             return {"id": job.job_id, "status": job.status, "attempt": job.attempt, "max_attempts": job.max_attempts, "error": job.error}
 
+    def cancel(self, video_id: int, job_id: str | None) -> bool:
+        """Request cooperative cancellation of a video's active job."""
+        with self._lock:
+            job = self._jobs_by_video.get(video_id)
+            if job is None or (job_id is not None and job.job_id != job_id):
+                return False
+            job.cancellation_requested.set()
+            job.status = JobStatus.CANCELLED
+            return True
+
     def stop(self, timeout: float = 5) -> None:
         self._shutdown.set()
         for worker in self._workers:
@@ -92,17 +104,25 @@ class JobQueueService:
                 self.jobs.task_done()
 
     def _execute(self, job: VideoJob) -> None:
+        if job.cancellation_requested.is_set():
+            job.status = JobStatus.CANCELLED
+            self._finish(job)
+            return
         job.status = JobStatus.RUNNING
         try:
             with self.app.app_context():
                 from app.services.video_service import process_video
-                process_video(self.app, job.video_id)
-            job.status = JobStatus.COMPLETED
+                process_video(self.app, job.video_id, cancellation_requested=job.cancellation_requested.is_set)
+            job.status = JobStatus.CANCELLED if job.cancellation_requested.is_set() else JobStatus.COMPLETED
             job.error = None
-            self.app.logger.info("job:completed id=%s video_id=%s", job.job_id, job.video_id)
+            self.app.logger.info("job:finished id=%s video_id=%s status=%s", job.job_id, job.video_id, job.status)
             self._finish(job)
         except Exception as exc:
             job.error = str(exc)
+            if job.cancellation_requested.is_set():
+                job.status = JobStatus.CANCELLED
+                self._finish(job)
+                return
             if job.attempt >= job.max_attempts or self._shutdown.is_set():
                 job.status = JobStatus.FAILED
                 self.app.logger.exception("job:failed id=%s video_id=%s", job.job_id, job.video_id)
