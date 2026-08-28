@@ -5,6 +5,8 @@ import { useVideoPlayer } from "src/pages/Video/hooks/useVideoPlayer";
 import { useVideoDetailStore } from "src/pages/Video/stores/useVideoDetailStore";
 import { useAnalysisStore } from "src/pages/Video/stores/useAnalysisStore";
 import { useTranscriptionStore } from "src/pages/Video/stores/useTranscriptionStore";
+import { useProcessingStore } from "src/core/stores/useProcessingStore";
+import { useVideoWorkbenchSync } from "src/pages/Video/hooks/useVideoWorkbenchSync";
 
 import { WorkbenchHeader } from "src/pages/Video/components/WorkbenchHeader";
 import { VideoConfigPanel } from "src/pages/Video/components/VideoConfigPanel";
@@ -33,7 +35,15 @@ export const VideoWorkbench = memo(function VideoWorkbench({
   onReprocess,
 }: VideoWorkbenchProps) {
 
-  const video = useVideoDetailStore((state) => state.video);
+    const detailVideo = useVideoDetailStore((state) => state.video);
+
+    const processingVideo = useProcessingStore((state) =>
+        state.videos.find((video) => video.id === detailVideo?.id)
+    );
+
+    const video = processingVideo ?? detailVideo;
+
+    useVideoWorkbenchSync(video);
 
   const {
     analysis, analysisState, analysisMessage, selectedAnalysisVariantId, analysisDraft,
@@ -80,7 +90,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
             message={analysisMessage}
             variants={analysisVariants}
             selectedVariantId={selectedAnalysisVariantId}
-            onVariantChange={setSelectedAnalysisVariantId}
+            onVariantChange={(id) => setSelectedAnalysisVariantId(id, video)}
           />
 
           <AnalysisResults
@@ -104,7 +114,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
               analysisDraft={analysisDraft}
               hasMultipleVariants={hasMultipleAnalysisVariants}
               onDraftChange={setAnalysisDraft}
-              onDelete={() => onDeleteAnalysis()}
+              onDelete={() => onDeleteAnalysis(video)}
             />
 
             <TranscriptionEditor
