@@ -75,6 +75,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
 
       <div className="inspector-grid">
         <div className="media-panel">
+
           <VideoPreviewPanel
             video={currentVideo}
             analysisState={analysisState}
@@ -83,6 +84,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
             annotatedVideoSrc={annotatedVideoSrc}
             videoRef={videoRef}
           />
+
         </div>
 
         <div className="analysis-panel">
@@ -90,8 +92,16 @@ export const VideoWorkbench = memo(function VideoWorkbench({
             message={analysisMessage}
             variants={analysisVariants}
             selectedVariantId={selectedAnalysisVariantId}
-            onVariantChange={(id) => setSelectedAnalysisVariantId(id, currentVideo)}
-          />
+            onVariantChange={(id) => {
+                setSelectedAnalysisVariantId(id, currentVideo);
+
+                // Gambiarra para, quando trocar a análise, ele ir para o topo.
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                });
+            }}
+        />
 
           <AnalysisResults
             state={analysisState}
