@@ -2,7 +2,7 @@
 import "/src/pages/Home/Home.css";
 
 export default function Home() {
-//Teste legal
+
   return (
     <section className="home-page">
       {/* Hero Section */}
