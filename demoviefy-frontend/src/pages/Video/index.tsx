@@ -18,6 +18,7 @@ export default function Video() {
         if (useCatalogStore.getState().tasks.length === 0) {
             void useCatalogStore.getState().fetchCatalog();
         }
+
     }, [parsedId, isValidId]);
 
     const {
@@ -46,6 +47,7 @@ export default function Video() {
     }
     return (
         <VideoWorkbench
+            video={video}
             config={videoConfig}
             isBusy={selectedVideoIsBusy}
             onConfigChange={setVideoConfig}

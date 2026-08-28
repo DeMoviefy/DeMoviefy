@@ -107,12 +107,13 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
         analysis: null,
         selectedAnalysisVariantId: null,
         analysisDraft: "{}",
-        analysisState: "error",
+        analysisState: "idle",
       });
+        get().resetArtifactSignature();
+        void get().syncAnalysisWithSelectedVideo(selectedVideo);
+
       toast.success("Análise excluída.");
 
-    get().resetArtifactSignature();
-    void get().syncAnalysisWithSelectedVideo(selectedVideo);
 
     } catch (error) {
       console.error(error);

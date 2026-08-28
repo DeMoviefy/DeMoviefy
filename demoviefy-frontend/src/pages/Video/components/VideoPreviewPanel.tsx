@@ -37,8 +37,8 @@ function getAnnotatedPreviewState(
     };
   }
   return {
-    title: "Vídeo anotado ainda não disponível.",
-    message: "Ainda não existe um preview anotado finalizado para este vídeo. Reprocesse para gerar um MP4 anotado pronto para o navegador.",
+    title: "Vídeo anotado indisponível.",
+    message: "Não há uma análise disponível para este vídeo.",
   };
 }
 
@@ -54,7 +54,7 @@ export function VideoPreviewPanel({
     setAnnotatedPlaybackError(false);
     }, [annotatedVideoSrc, video?.id, video?.status]);
     const isReprocessing = video.status.startsWith("PROCESSANDO");
-    const canTryAnnotated = (hasSelectedAnalysis || video.storage.annotated_exists) && !annotatedPlaybackError;
+    const canTryAnnotated = hasSelectedAnalysis && !annotatedPlaybackError;
     const previewState = getAnnotatedPreviewState(
         annotatedPlaybackError,
         isReprocessing,
@@ -82,11 +82,6 @@ export function VideoPreviewPanel({
             <div className="empty-preview">
             <strong>{previewState.title}</strong>
             <p>{previewState.message}</p>
-            {video.storage.annotated_exists && (
-                <a className="ghost-button inline-link-button" href={annotatedVideoSrc} target="_blank" rel="noreferrer">
-                Abrir vídeo anotado
-                </a>
-            )}
             </div>
           )}
         </article>

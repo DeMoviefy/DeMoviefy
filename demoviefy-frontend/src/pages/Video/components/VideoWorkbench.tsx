@@ -1,8 +1,8 @@
 // src/pages/Video/components/VideoWorkbench.tsx
 
 import { memo } from "react";
+
 import { useVideoPlayer } from "src/pages/Video/hooks/useVideoPlayer";
-import { useVideoDetailStore } from "src/pages/Video/stores/useVideoDetailStore";
 import { useAnalysisStore } from "src/pages/Video/stores/useAnalysisStore";
 import { useTranscriptionStore } from "src/pages/Video/stores/useTranscriptionStore";
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
@@ -17,9 +17,10 @@ import { TranscriptionEditor } from "src/pages/Video/components/TranscriptionEdi
 import { VideoPreviewPanel } from "src/pages/Video/components/VideoPreviewPanel";
 import { WorkbenchEmptyState } from "src/pages/Video/components/WorkbenchEmptyState";
 
-import type { AiConfigPayload } from "src/pages/Upload/types";
+import type { AiConfigPayload, VideoRecord } from "src/pages/Upload/types";
 
 type VideoWorkbenchProps = {
+    video: VideoRecord | null;
   config: AiConfigPayload;
   isBusy: boolean;
   onConfigChange: (config: AiConfigPayload) => void;
@@ -28,6 +29,7 @@ type VideoWorkbenchProps = {
 };
 
 export const VideoWorkbench = memo(function VideoWorkbench({
+    video,
   config,
   isBusy,
   onConfigChange,
@@ -35,15 +37,13 @@ export const VideoWorkbench = memo(function VideoWorkbench({
   onReprocess,
 }: VideoWorkbenchProps) {
 
-    const detailVideo = useVideoDetailStore((state) => state.video);
-
     const processingVideo = useProcessingStore((state) =>
-        state.videos.find((video) => video.id === detailVideo?.id)
+        state.videos.find((item) => item.id === video?.id)
     );
 
-    const video = processingVideo ?? detailVideo;
+    const currentVideo = processingVideo ?? video;
 
-    useVideoWorkbenchSync(video);
+    useVideoWorkbenchSync(currentVideo);
 
   const {
     analysis, analysisState, analysisMessage, selectedAnalysisVariantId, analysisDraft,
@@ -64,19 +64,19 @@ export const VideoWorkbench = memo(function VideoWorkbench({
   const hasSelectedAnalysis = analysis !== null;
 
   const { videoRef, annotatedVideoSrc, originalVideoSrc, seekTo } = useVideoPlayer(
-    video,
+    currentVideo,
     selectedAnalysisVariantId
   );
 
-  if (!video) return <WorkbenchEmptyState />;
+  if (!currentVideo) return <WorkbenchEmptyState />;
   return (
     <section className="surface inspector-panel">
-      <WorkbenchHeader video={video} />
+      <WorkbenchHeader video={currentVideo} />
 
       <div className="inspector-grid">
         <div className="media-panel">
           <VideoPreviewPanel
-            video={video}
+            video={currentVideo}
             analysisState={analysisState}
             hasSelectedAnalysis={hasSelectedAnalysis}
             originalVideoSrc={originalVideoSrc}
@@ -90,19 +90,19 @@ export const VideoWorkbench = memo(function VideoWorkbench({
             message={analysisMessage}
             variants={analysisVariants}
             selectedVariantId={selectedAnalysisVariantId}
-            onVariantChange={(id) => setSelectedAnalysisVariantId(id, video)}
+            onVariantChange={(id) => setSelectedAnalysisVariantId(id, currentVideo)}
           />
 
           <AnalysisResults
             state={analysisState}
             summary={summary}
-            taskLabel={video.ai_config.task_label}
-            modelName={video.ai_config.model_name}
+            taskLabel={currentVideo.ai_config.task_label}
+            modelName={currentVideo.ai_config.model_name}
           />
 
           <div className="editor-grid">
             <VideoConfigPanel
-              video={video}
+              video={currentVideo}
               config={config}
               onConfigChange={onConfigChange}
               isBusy={isBusy}
@@ -114,7 +114,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
               analysisDraft={analysisDraft}
               hasMultipleVariants={hasMultipleAnalysisVariants}
               onDraftChange={setAnalysisDraft}
-              onDelete={() => onDeleteAnalysis(video)}
+              onDelete={() => onDeleteAnalysis(currentVideo)}
             />
 
             <TranscriptionEditor
