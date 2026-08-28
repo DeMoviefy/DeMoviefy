@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { VideoService } from "src/pages/Upload/services/videoService";
 import { getApiErrorMessage, sleep } from "src/pages/Upload/utils/helpers";
 import { useUploadStore } from "src/core/stores/useUploadStore";
-import { useVideoListStore } from "src/pages/Upload/stores/useVideoListStore";
+import { useProcessingStore } from "src/core/stores/useProcessingStore";
 
 export function useUpload() {
   const [file, setFile] = useState<File | null>(null);
@@ -44,7 +44,7 @@ export function useUpload() {
       setUploadClipStart("0");
       setUploadClipEnd("");
 
-      await useVideoListStore.getState().fetchVideos();
+      await useProcessingStore.getState().refresh()
       
       toast.success(response.message);
 
