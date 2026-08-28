@@ -37,13 +37,25 @@ AI_CONFIG = {
 }
 
 
+class FakeJobQueue:
+    """Records queued work without creating worker threads in controller tests."""
+
+    def __init__(self, queued_jobs):
+        self.queued_jobs = queued_jobs
+
+    def enqueue(self, video_id):
+        job_id = f"job-{video_id}"
+        self.queued_jobs.append((video_id, job_id))
+        return job_id
+
+
 class DeMoviefyTestPlan(unittest.TestCase):
     """Each test gets a clean SQLite database and a private temporary folder."""
 
     def setUp(self):
         self.temp_dir = TemporaryDirectory()
         self.root = Path(self.temp_dir.name)
-        self.started_processing = []
+        self.queued_jobs = []
 
         def allocate_video_path(filename):
             source = Path(filename)
@@ -58,8 +70,8 @@ class DeMoviefyTestPlan(unittest.TestCase):
         # their original module. This is the reliable unittest.mock pattern for
         # names imported with ``from module import name``.
         #
-        # The processing thread is replaced by ``list.append``: the test can
-        # prove that work was queued without starting a real AI job.
+        # The queue is replaced by an in-memory recorder, so controller tests
+        # prove scheduling without starting real workers or AI jobs.
         self.patches = [
             patch("app.controllers.video_controller.video_file_path", lambda name: self.root / name),
             patch("app.controllers.video_controller.analysis_file_path", lambda video_id: self.root / f"analysis-{video_id}.json"),
@@ -82,14 +94,14 @@ class DeMoviefyTestPlan(unittest.TestCase):
             patch("app.controllers.video_controller.has_annotated_video", lambda _video_id: False),
             patch("app.controllers.video_controller.has_transcription", lambda _video_id: False),
             patch("app.controllers.video_controller.list_analysis_variants", lambda _video_id: []),
-            patch("app.controllers.video_controller._start_processing_thread", self.started_processing.append),
+            patch("app.controllers.video_controller.get_job_queue", return_value=FakeJobQueue(self.queued_jobs)),
         ]
         for active_patch in self.patches:
             active_patch.start()
 
         self.app = create_app({
             "TESTING": True,
-            "SQLALCHEMY_DATABASE_URI": f"sqlite:///{self.root / 'test.db'}",
+            "SQLALCHEMY_DATABASE_URI": "sqlite://",
         })
         self.client = self.app.test_client()
 
@@ -128,7 +140,7 @@ class DeMoviefyTestPlan(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         payload = response.get_json()
         self.assertEqual(payload["video"]["status"], "PROCESSANDO")
-        self.assertEqual(self.started_processing, [payload["video"]["id"]])
+        self.assertEqual(self.queued_jobs, [(payload["video"]["id"], payload["video"]["job_id"])])
         self.assertEqual((self.root / "video_teste.mp4").read_bytes(), b"test video")
 
     def test_ct02_rejects_unsupported_file_before_saving_or_processing(self):
@@ -137,7 +149,7 @@ class DeMoviefyTestPlan(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("Formato", response.get_json()["error"])
         self.assertFalse((self.root / "documento.txt").exists())
-        self.assertEqual(self.started_processing, [])
+        self.assertEqual(self.queued_jobs, [])
 
     def test_ct03_returns_ready_transcription_for_clean_audio(self):
         # The transcription artifact is mocked at the storage boundary. Keep
@@ -204,8 +216,8 @@ class DeMoviefyTestPlan(unittest.TestCase):
         analysis_response = self.client.put(f"/videos/{video_id}/analysis", json={"top_labels": ["other"]})
         transcription_response = self.client.put(f"/videos/{video_id}/transcription", json={"content": "alterado"})
 
-        self.assertEqual(analysis_response.status_code, 403)
-        self.assertEqual(transcription_response.status_code, 403)
+        self.assertEqual(analysis_response.status_code, 405)
+        self.assertEqual(transcription_response.status_code, 405)
 
     def test_ct08_accepts_multiple_uploads_and_queues_each_request(self):
         # This covers application-level queue initiation. Use a separate load
@@ -213,8 +225,8 @@ class DeMoviefyTestPlan(unittest.TestCase):
         responses = [self.upload(f"video_{index}.mp4") for index in range(3)]
 
         self.assertEqual([response.status_code for response in responses], [200, 200, 200])
-        self.assertEqual(len(self.started_processing), 3)
-        self.assertEqual(len(set(self.started_processing)), 3)
+        self.assertEqual(len(self.queued_jobs), 3)
+        self.assertEqual(len({video_id for video_id, _ in self.queued_jobs}), 3)
 
     def test_ct09_keeps_duplicate_filenames_in_separate_files(self):
         first_response = self.upload("same_name.mp4")
@@ -261,7 +273,7 @@ class DeMoviefyTestPlan(unittest.TestCase):
             with self.subTest(fields=fields):
                 response = self.upload(**fields)
                 self.assertEqual(response.status_code, 400)
-                self.assertEqual(self.started_processing, [])
+                self.assertEqual(self.queued_jobs, [])
 
     def test_sec03_rejects_unknown_status_without_changing_video(self):
         video_id = self.create_video(status="PROCESSADO")

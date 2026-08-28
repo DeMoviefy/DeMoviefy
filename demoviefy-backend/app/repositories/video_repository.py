@@ -96,6 +96,13 @@ def update_status(video: Video, status: str) -> Video:
     return video
 
 
+def update_job_id(video: Video, job_id: str | None) -> Video:
+    """Persist the identifier of the most recently scheduled job."""
+    video.job_id = job_id
+    db.session.commit()
+    return video
+
+
 def delete_video(video: Video) -> None:
     """
     Delete a video record from the database.

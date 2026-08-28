@@ -3,6 +3,7 @@ import os
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import inspect, text
 
 from app.config.ai_settings import load_frame_ai_settings
 from app.config.paths import (
@@ -33,7 +34,9 @@ def create_app(test_config: dict | None = None):
     app.config["FRAME_AI_FRAME_STRIDE"] = ai_settings.frame_stride
     app.config["FRAME_AI_CONFIDENCE"] = ai_settings.confidence
     app.config["FRAME_AI_MAX_FRAMES"] = ai_settings.max_frames
-    app.config["AUTO_TRANSCRIPTION_ENABLED"] = True
+    app.config["AUTO_TRANSCRIPTION_ENABLED"] = os.environ.get("AUTO_TRANSCRIPTION_ENABLED", "false").lower() == "true"
+    app.config["VIDEO_PROCESSING_WORKERS"] = int(os.environ.get("VIDEO_PROCESSING_WORKERS", "3"))
+    app.config["VIDEO_QUEUE_MAX_SIZE"] = int(os.environ.get("VIDEO_QUEUE_MAX_SIZE", "100"))
     app.config["TRANSCRIPTION_MODEL"] = "base"
     app.config["TRANSCRIPTION_LANGUAGE"] = None
     app.config["TRANSCRIPTION_ENV_DIR"] = str(TRANSCRIPTION_ENV_DIR)
@@ -56,6 +59,15 @@ def create_app(test_config: dict | None = None):
         from app.models.video import Video
 
         db.create_all()
+        _migrate_video_job_id()
         migrate_metadata_files(video_ids=[video.id for video in Video.query.all()], logger=app.logger)
 
     return app
+
+
+def _migrate_video_job_id() -> None:
+    """Add the job identifier to databases created before the queue feature."""
+    columns = {column["name"] for column in inspect(db.engine).get_columns("videos")}
+    if "job_id" not in columns:
+        db.session.execute(text("ALTER TABLE videos ADD COLUMN job_id VARCHAR(36)"))
+        db.session.commit()

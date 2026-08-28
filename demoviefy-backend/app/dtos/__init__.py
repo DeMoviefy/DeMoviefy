@@ -1,0 +1,1 @@
+"""Data transfer objects used at the API boundary."""

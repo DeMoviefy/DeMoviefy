@@ -13,13 +13,13 @@ def process_video(flask_app, video_id):
         video = get_video(video_id)
         if not video:
             flask_app.logger.warning("process_video:not_found video_id=%s", video_id)
-            return
+            raise LookupError(f"Vídeo {video_id} não encontrado")
 
         video_path = video_file_path(video.filename)
         if not video_path.exists():
             update_status(video, "ERRO_ARQUIVO")
             flask_app.logger.error("process_video:file_not_found video_id=%s path=%s", video_id, video_path)
-            return
+            raise FileNotFoundError(video_path)
 
         try:
             update_status(video, "PROCESSANDO_IA")
@@ -120,3 +120,4 @@ def process_video(flask_app, video_id):
             if annotated_temp_path.exists():
                 annotated_temp_path.unlink()
             flask_app.logger.exception("process_video:failed video_id=%s", video_id)
+            raise
