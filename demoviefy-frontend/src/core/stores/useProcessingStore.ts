@@ -72,11 +72,7 @@ export const useProcessingStore = create<ProcessingState>((set, get) => ({
 
             if (wasInitialized) {
 
-                if (stats.processed > previousStats.processed && stats.total === previousStats.total) {
-                    toast.success("Reprocessamento concluído");
-                }
-
-                else if (stats.processed > previousStats.processed) {
+                if (stats.processed > previousStats.processed) {
                     toast.success("Processamento concluído");
                 }
 
