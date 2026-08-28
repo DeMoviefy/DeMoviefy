@@ -21,18 +21,21 @@ export default function Video() {
 
     }, [parsedId, isValidId]);
 
-    const {
-        videoConfig,
-        setVideoConfig,
-        handleSaveConfig,
-        handleReprocess,
-    } = useVideoConfig();
 
     const video = useVideoDetailStore((state) => state.video);
     const selectedVideoIsBusy = video?.status.startsWith("PROCESSANDO") ?? false;
 
     const loading = useVideoDetailStore((state) => state.loading);
+    
     const error = useVideoDetailStore((state) => state.error);
+
+    const {
+        videoConfig,
+        setVideoConfig,
+        handleSaveConfig,
+        handleReprocess,
+    } = useVideoConfig(video);
+
 
     if (!isValidId) {
         return <p>ID de vídeo inválido.</p>;
