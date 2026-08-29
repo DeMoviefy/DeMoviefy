@@ -1,10 +1,12 @@
 // src/pages/Video/components/VideoWorkbench.tsx
 
 import { memo } from "react";
+
 import { useVideoPlayer } from "src/pages/Video/hooks/useVideoPlayer";
-import { useVideoDetailStore } from "src/pages/Video/stores/useVideoDetailStore";
 import { useAnalysisStore } from "src/pages/Video/stores/useAnalysisStore";
 import { useTranscriptionStore } from "src/pages/Video/stores/useTranscriptionStore";
+import { useProcessingStore } from "src/core/stores/useProcessingStore";
+import { useVideoWorkbenchSync } from "src/pages/Video/hooks/useVideoWorkbenchSync";
 
 import { WorkbenchHeader } from "src/pages/Video/components/WorkbenchHeader";
 import { VideoConfigPanel } from "src/pages/Video/components/VideoConfigPanel";
@@ -15,9 +17,10 @@ import { TranscriptionEditor } from "src/pages/Video/components/TranscriptionEdi
 import { VideoPreviewPanel } from "src/pages/Video/components/VideoPreviewPanel";
 import { WorkbenchEmptyState } from "src/pages/Video/components/WorkbenchEmptyState";
 
-import type { AiConfigPayload } from "src/pages/Upload/types";
+import type { AiConfigPayload, VideoRecord } from "src/pages/Upload/types";
 
 type VideoWorkbenchProps = {
+    video: VideoRecord | null;
   config: AiConfigPayload;
   isBusy: boolean;
   onConfigChange: (config: AiConfigPayload) => void;
@@ -26,6 +29,7 @@ type VideoWorkbenchProps = {
 };
 
 export const VideoWorkbench = memo(function VideoWorkbench({
+    video,
   config,
   isBusy,
   onConfigChange,
@@ -33,7 +37,13 @@ export const VideoWorkbench = memo(function VideoWorkbench({
   onReprocess,
 }: VideoWorkbenchProps) {
 
-  const video = useVideoDetailStore((state) => state.video);
+    const processingVideo = useProcessingStore((state) =>
+        state.videos.find((item) => item.id === video?.id)
+    );
+
+    const currentVideo = processingVideo ?? video; // Essa linha faz com que o poller seja atualizado.
+
+    useVideoWorkbenchSync(currentVideo);
 
   const {
     analysis, analysisState, analysisMessage, selectedAnalysisVariantId, analysisDraft,
@@ -54,25 +64,27 @@ export const VideoWorkbench = memo(function VideoWorkbench({
   const hasSelectedAnalysis = analysis !== null;
 
   const { videoRef, annotatedVideoSrc, originalVideoSrc, seekTo } = useVideoPlayer(
-    video,
+    currentVideo,
     selectedAnalysisVariantId
   );
 
-  if (!video) return <WorkbenchEmptyState />;
+  if (!currentVideo) return <WorkbenchEmptyState />;
   return (
     <section className="surface inspector-panel">
-      <WorkbenchHeader video={video} />
+      <WorkbenchHeader video={currentVideo} />
 
       <div className="inspector-grid">
         <div className="media-panel">
+
           <VideoPreviewPanel
-            video={video}
+            video={currentVideo}
             analysisState={analysisState}
             hasSelectedAnalysis={hasSelectedAnalysis}
             originalVideoSrc={originalVideoSrc}
             annotatedVideoSrc={annotatedVideoSrc}
             videoRef={videoRef}
           />
+
         </div>
 
         <div className="analysis-panel">
@@ -80,19 +92,27 @@ export const VideoWorkbench = memo(function VideoWorkbench({
             message={analysisMessage}
             variants={analysisVariants}
             selectedVariantId={selectedAnalysisVariantId}
-            onVariantChange={setSelectedAnalysisVariantId}
-          />
+            onVariantChange={(id) => {
+                setSelectedAnalysisVariantId(id, currentVideo);
+
+                // Gambiarra para, quando trocar a análise, ele ir para o topo.
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                });
+            }}
+        />
 
           <AnalysisResults
             state={analysisState}
             summary={summary}
-            taskLabel={video.ai_config.task_label}
-            modelName={video.ai_config.model_name}
+            taskLabel={currentVideo.ai_config.task_label}
+            modelName={currentVideo.ai_config.model_name}
           />
 
           <div className="editor-grid">
             <VideoConfigPanel
-              video={video}
+              video={currentVideo}
               config={config}
               onConfigChange={onConfigChange}
               isBusy={isBusy}
@@ -104,7 +124,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
               analysisDraft={analysisDraft}
               hasMultipleVariants={hasMultipleAnalysisVariants}
               onDraftChange={setAnalysisDraft}
-              onDelete={() => onDeleteAnalysis()}
+              onDelete={() => onDeleteAnalysis(currentVideo)}
             />
 
             <TranscriptionEditor

@@ -1,11 +1,11 @@
 // src/pages/Upload/components/ProcessingQueuePanel.tsx
 
-import { useVideoListStore } from "src/pages/Upload/stores/useVideoListStore";
+import { useProcessingStore } from "src/core/stores/useProcessingStore";
 import "/src/pages/Upload/styles/ProcessingQueuePanel.css";
 
 export function ProcessingQueuePanel() {
     
-  const videos = useVideoListStore((state) => state.videos);
+  const videos = useProcessingStore((state) => state.videos);
   const processingVideos = videos.filter(
     (v) => v.status === "PROCESSANDO" || v.status === "PROCESSANDO_IA"
   );

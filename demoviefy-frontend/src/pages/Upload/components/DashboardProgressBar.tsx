@@ -1,10 +1,11 @@
 // src/pages/Upload/components/DashboardProgressBar.tsx
-import { useVideoListStore } from "src/pages/Upload/stores/useVideoListStore";
+
+import { useProcessingStore } from "src/core/stores/useProcessingStore";
 import { useUploadStore } from "src/core/stores/useUploadStore";
 
 export function DashboardProgressBar() {
   const uploading = useUploadStore((state) => state.uploading);
-  const loadingVideos = useVideoListStore((state) => state.loadingVideos);
+  const loadingVideos = useProcessingStore((state) => state.loading);
 
   const processState = uploading
     ? { text: "Upload em andamento", progress: null }

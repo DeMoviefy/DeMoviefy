@@ -4,9 +4,8 @@ import { create } from "zustand";
 import { VideoService } from "src/pages/Upload/services/videoService";
 import { prettifyJson, getApiErrorMessage, buildArtifactSignature } from "src/pages/Upload/utils/helpers";
 import { toast } from "sonner";
-import { useVideoDetailStore } from "src/pages/Video/stores/useVideoDetailStore";
 import { useTranscriptionStore } from "src/pages/Video/stores/useTranscriptionStore";
-import type { VideoAnalysisResponse } from "src/pages/Upload/types";
+import type { VideoAnalysisResponse, VideoRecord } from "src/pages/Upload/types";
 
 type AnalysisStatus = "idle" | "loading" | "ready" | "pending" | "error";
 
@@ -18,14 +17,14 @@ interface AnalysisState {
   analysisDraft: string;
 
   setAnalysisDraft: (draft: string) => void;
-  setSelectedAnalysisVariantId: (id: string | null) => void;
+  setSelectedAnalysisVariantId: (id: string | null, video: VideoRecord) => void;
 
   // Substitui o useEffect de useAnalysis.ts: chamada explícita sempre que
   // selectedVideo ou selectedAnalysisVariantId mudam.
-  syncAnalysisWithSelectedVideo: () => Promise<void>;
+  syncAnalysisWithSelectedVideo: (video: VideoRecord | null) => Promise<void>;
 
-  onDeleteAnalysis: () => Promise<void>;
-  onDeleteVideo: () => Promise<boolean>;
+  onDeleteAnalysis: (video: VideoRecord) => Promise<void>;
+  onDeleteVideo: (video: VideoRecord) => Promise<boolean>;
 
   resetArtifactSignature: () => void;
 }
@@ -44,15 +43,14 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
 
   setAnalysisDraft: (analysisDraft) => set({ analysisDraft }),
 
-  setSelectedAnalysisVariantId: (id) => {
+  setSelectedAnalysisVariantId: (id, video) => {
     set({ selectedAnalysisVariantId: id });
     // No hook original, mudar o variant disparava o useEffect de novo (estava nas deps).
     // Aqui replicamos isso chamando o sync manualmente após trocar o id.
-    void get().syncAnalysisWithSelectedVideo();
+    void get().syncAnalysisWithSelectedVideo(video);
   },
 
-  syncAnalysisWithSelectedVideo: async () => {
-    const selectedVideo = useVideoDetailStore.getState().video;
+  syncAnalysisWithSelectedVideo: async (selectedVideo) => {
     const { selectedAnalysisVariantId } = get();
 
     if (!selectedVideo) {
@@ -99,9 +97,7 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
     await useTranscriptionStore.getState().fetchTranscription(selectedVideo);
   },
 
-  onDeleteAnalysis: async () => {
-    const selectedVideo = useVideoDetailStore.getState().video;
-    if (!selectedVideo) return;
+  onDeleteAnalysis: async (selectedVideo) => {
 
     const { selectedAnalysisVariantId } = get();
 
@@ -111,13 +107,13 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
         analysis: null,
         selectedAnalysisVariantId: null,
         analysisDraft: "{}",
-        analysisState: "error",
+        analysisState: "idle",
       });
-      toast.success("Análise excluída.");
-      await useVideoDetailStore.getState().fetchVideoById(selectedVideo.id);
+        get().resetArtifactSignature();
+        void get().syncAnalysisWithSelectedVideo(selectedVideo);
 
-        const sync = get().syncAnalysisWithSelectedVideo;
-        void sync();
+      toast.success("Análise excluída.");
+
 
     } catch (error) {
       console.error(error);
@@ -125,9 +121,7 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
     }
   },
 
-  onDeleteVideo: async () => {
-    const selectedVideo = useVideoDetailStore.getState().video;
-    if (!selectedVideo) return false;
+  onDeleteVideo: async (selectedVideo) => {
 
     try {
       await VideoService.deleteVideo(selectedVideo.id);
@@ -138,7 +132,6 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
       useTranscriptionStore.setState({ transcriptionMessage: "Transcrição removida." });
 
       get().resetArtifactSignature();
-      useVideoDetailStore.getState().reset();
       return true;
       
     } catch (error) {

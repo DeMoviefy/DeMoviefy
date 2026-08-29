@@ -32,7 +32,7 @@ export function VideoConfigPanel({
   const onDeleteVideo = useAnalysisStore((state) => state.onDeleteVideo)
 
   const handleDeleteVideo = async () => {
-    const deleted = await onDeleteVideo();
+    const deleted = await onDeleteVideo(video);
 
     if (deleted) {
         navigate("/upload");
