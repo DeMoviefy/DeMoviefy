@@ -41,7 +41,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
         state.videos.find((item) => item.id === video?.id)
     );
 
-    const currentVideo = processingVideo ?? video;
+    const currentVideo = processingVideo ?? video; // Essa linha faz com que o poller seja atualizado.
 
     useVideoWorkbenchSync(currentVideo);
 
