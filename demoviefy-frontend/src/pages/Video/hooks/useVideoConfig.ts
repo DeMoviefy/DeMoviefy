@@ -1,5 +1,6 @@
 // src/pages/Upload/Video/useVideoConfig.ts
 import { useCallback, useEffect, useState } from "react";
+import { useProcessingStore } from "src/core/stores/useProcessingStore";
 import { VideoService } from "src/pages/Upload/services/videoService";
 import { toast } from "sonner";
 import type { AiConfigPayload, VideoRecord } from "src/pages/Upload/types";
@@ -61,6 +62,8 @@ export function useVideoConfig(video: VideoRecord | null) {
 
         try {
             await VideoService.reprocessVideo(video.id, videoConfig);
+            await useProcessingStore.getState().refresh();
+            
             toast("Reprocessamento iniciado.");
         } catch (error) {
             console.error(error);

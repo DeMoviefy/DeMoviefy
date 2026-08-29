@@ -38,6 +38,13 @@ export function useVideoWorkbenchSync(video: VideoRecord | null) {
             void useAnalysisStore.getState().syncAnalysisWithSelectedVideo(video);
         }
 
+        if (finishedProcessing){
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+            });
+        }
+
         previousVideoRef.current = video;
     }, [video]);
 }
