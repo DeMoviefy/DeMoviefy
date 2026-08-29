@@ -62,6 +62,18 @@ def create_app(test_config: dict | None = None):
         _migrate_video_job_id()
         migrate_metadata_files(video_ids=[video.id for video in Video.query.all()], logger=app.logger)
 
+    from flask import jsonify
+
+    @app.errorhandler(ValueError)
+    def handle_value_error(e):
+        app.logger.warning("validation_failed error=%s", e)
+        return jsonify({"error": str(e)}), 400
+
+    @app.errorhandler(FileNotFoundError)
+    def handle_not_found_error(e):
+        app.logger.warning("file_not_found error=%s", e)
+        return jsonify({"error": "Arquivo não encontrado"}), 404
+
     return app
 
 
@@ -71,3 +83,4 @@ def _migrate_video_job_id() -> None:
     if "job_id" not in columns:
         db.session.execute(text("ALTER TABLE videos ADD COLUMN job_id VARCHAR(36)"))
         db.session.commit()
+

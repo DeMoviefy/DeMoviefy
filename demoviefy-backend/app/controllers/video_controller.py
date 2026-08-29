@@ -1,3 +1,4 @@
+from fileinput import filename
 import mimetypes
 from pathlib import Path
 
@@ -25,7 +26,7 @@ from app.repositories.video_repository import (
     update_job_id,
     update_status,
 )
-from app.services.ai_catalog_service import get_model_by_relative_path, list_available_models
+from app.services.ai_catalog_service import get_model_by_relative_path, list_available_models, resolve_ai_config
 from app.services.frame_ai_service import (
     delete_analysis_artifacts,
     delete_analysis_variant,
@@ -55,30 +56,9 @@ from app.validators.video_validators import (
     validate_filename,
 )
 
+from app.dtos.video_dtos import build_storage_payload
 
-def _storage_payload(video_id: int, filename: str) -> dict:
-    video_path = video_file_path(filename)
-    analysis_path = analysis_file_path(video_id)
-    annotated_path = annotated_video_path(video_id)
-    video_exists = video_path.exists()
-    analysis_exists = analysis_path.exists()
-    annotated_exists = has_annotated_video(video_id)
-    transcription_path = transcription_file_path(video_id)
 
-    return {
-        "video_relative_path": to_repo_relative(video_path),
-        "video_absolute_path": str(video_path),
-        "video_exists": video_exists,
-        "analysis_relative_path": to_repo_relative(analysis_path),
-        "analysis_absolute_path": str(analysis_path),
-        "analysis_exists": analysis_exists,
-        "annotated_relative_path": to_repo_relative(annotated_path),
-        "annotated_absolute_path": str(annotated_path),
-        "annotated_exists": annotated_exists,
-        "transcription_relative_path": to_repo_relative(transcription_path),
-        "transcription_absolute_path": str(transcription_path),
-        "transcription_exists": has_transcription(video_id),
-    }
 
 
 def _requested_analysis_variant() -> str | None:
@@ -86,35 +66,6 @@ def _requested_analysis_variant() -> str | None:
     if raw_variant is None:
         return None
     return str(raw_variant).strip() or None
-
-
-def _resolve_ai_config(task_type: str | None, model_reference: str | None) -> dict:
-    settings = load_frame_ai_settings()
-    catalog = list_available_models()
-    fallback_model = get_model_by_relative_path(to_repo_relative(Path(settings.model_path)))
-
-    if model_reference:
-        model = get_model_by_relative_path(model_reference)
-        if model is None:
-            raise ValueError("Modelo de IA não encontrado.")
-    else:
-        requested_task = task_type or settings.task_type
-        model = next((entry for entry in catalog if entry["task_type"] == requested_task), fallback_model)
-
-    if model is None:
-        raise ValueError("Nenhum modelo disponível para a tarefa escolhida.")
-
-    resolved_task = task_type or model["task_type"]
-    if model["task_type"] != resolved_task:
-        raise ValueError("O modelo selecionado não pertence a tarefa escolhida.")
-
-    return {
-        "task_type": resolved_task,
-        "task_label": model["task_label"],
-        "model_path": model["absolute_path"],
-        "model_relative_path": model["relative_path"],
-        "model_name": model["name"],
-    }
 
 
 def _serialize_video(video) -> dict:
@@ -127,7 +78,7 @@ def _serialize_video(video) -> dict:
     item["transcription_url"] = f"/videos/{video.id}/transcription"
     item["ai_config"] = load_ai_config(video.id)
     item["processing"] = load_processing_state(video.id)
-    item["storage"] = _storage_payload(video.id, video.filename)
+    item["storage"] = build_storage_payload(video.id, video.filename)
     return item
 
 
@@ -186,29 +137,22 @@ def upload_video():
     file = request.files["file"]
     filename = secure_filename(file.filename or "")
 
-    try:
-        validate_filename(filename)
-    except ValueError as exc:
-        current_app.logger.warning("upload_video:validation_failed error=%s", exc)
-        return jsonify({"error": str(exc)}), 400
+    validate_filename(filename)
 
     settings = load_frame_ai_settings()
-    try:
-        ai_config = _resolve_ai_config(
-            request.form.get("ai_task") or request.form.get("task_type"),
-            request.form.get("model_path"),
-        )
-        clip_config = parse_clip_selection(request.form)
-        runtime_config = parse_runtime_settings(
-            request.form,
-            defaults={
-                "frame_stride": settings.frame_stride,
-                "max_frames": settings.max_frames,
-                "confidence": settings.confidence,
-            },
-        )
-    except ValueError as exc:
-        return jsonify({"error": str(exc)}), 400
+    ai_config = resolve_ai_config(
+        request.form.get("ai_task") or request.form.get("task_type"),
+        request.form.get("model_path"),
+    )
+    clip_config = parse_clip_selection(request.form)
+    runtime_config = parse_runtime_settings(
+        request.form,
+        defaults={
+            "frame_stride": settings.frame_stride,
+            "max_frames": settings.max_frames,
+            "confidence": settings.confidence,
+        },
+    )
 
     ensure_storage_dirs()
     filepath = unique_video_file_path(filename)
@@ -301,7 +245,7 @@ def get_video_analysis(video_id: int):
 
     selected_variant = _requested_analysis_variant()
     ai_config = load_ai_config(video.id)
-    storage = _storage_payload(video.id, video.filename)
+    storage = build_storage_payload(video.id, video.filename)
     analysis = load_analysis(video_id, selected_variant)
     variants = list_analysis_variants(video.id)
     if analysis is None:
@@ -361,7 +305,7 @@ def get_video_transcription(video_id: int):
     if not video:
         return jsonify({"error": "Vídeo não encontrado"}), 404
 
-    storage = _storage_payload(video.id, video.filename)
+    storage = build_storage_payload(video.id, video.filename)
     transcription = load_transcription(video_id)
     if transcription is None:
         if video.status in {"PROCESSANDO", "PROCESSANDO_IA"}:
@@ -516,13 +460,14 @@ def update_video_ai_config(video_id: int):
         return jsonify({"error": "Vídeo não encontrado"}), 404
 
     payload = request.get_json(silent=True) or {}
-    try:
-        ai_config = _resolve_ai_config(payload.get("task_type"), payload.get("model_path"))
-        settings = load_frame_ai_settings()
-        clip_config = parse_clip_selection(payload)
-        runtime_config = parse_runtime_settings(payload, defaults={"frame_stride": settings.frame_stride, "max_frames": settings.max_frames, "confidence": settings.confidence})
-    except ValueError as exc:
-        return jsonify({"error": str(exc)}), 400
+    ai_config = resolve_ai_config(payload.get("task_type"), payload.get("model_path"))
+    settings = load_frame_ai_settings()
+    clip_config = parse_clip_selection(payload)
+    runtime_config = parse_runtime_settings(payload, defaults={
+        "frame_stride": settings.frame_stride, 
+        "max_frames": settings.max_frames, 
+        "confidence": settings.confidence})
+
 
     saved = save_ai_config(
         video.id,
@@ -546,13 +491,15 @@ def reprocess_video_by_id(video_id: int):
 
     payload = request.get_json(silent=True) or {}
     if payload:
-        try:
-            ai_config = _resolve_ai_config(payload.get("task_type"), payload.get("model_path"))
-            settings = load_frame_ai_settings()
-            clip_config = parse_clip_selection(payload)
-            runtime_config = parse_runtime_settings(payload, defaults={"frame_stride": settings.frame_stride, "max_frames": settings.max_frames, "confidence": settings.confidence})
-        except ValueError as exc:
-            return jsonify({"error": str(exc)}), 400
+
+        ai_config = resolve_ai_config(payload.get("task_type"), payload.get("model_path"))
+        settings = load_frame_ai_settings()
+        clip_config = parse_clip_selection(payload)
+        runtime_config = parse_runtime_settings(payload, defaults={
+            "frame_stride": settings.frame_stride, 
+            "max_frames": settings.max_frames, 
+            "confidence": settings.confidence})
+
         save_ai_config(
             video.id,
             task_type=ai_config["task_type"],

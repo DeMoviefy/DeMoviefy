@@ -1,6 +1,9 @@
 from pathlib import Path
 
-from app.config.paths import MODEL_DIR, to_repo_relative
+
+from pathlib import Path
+from app.config.ai_settings import load_frame_ai_settings
+from app.config.paths import to_repo_relative, MODEL_DIR
 
 
 TASK_DIRECTORY_MAP = {
@@ -60,3 +63,33 @@ def get_model_by_relative_path(relative_path: str | None) -> dict | None:
         if model["relative_path"] == normalized:
             return model
     return None
+
+
+def resolve_ai_config(task_type: str | None, model_reference: str | None) -> dict:
+    """Resolve and validate AI model configuration based on user request and system defaults."""
+    settings = load_frame_ai_settings()
+    catalog = list_available_models()
+    fallback_model = get_model_by_relative_path(to_repo_relative(Path(settings.model_path)))
+
+    if model_reference:
+        model = get_model_by_relative_path(model_reference)
+        if model is None:
+            raise ValueError("Modelo de IA não encontrado.")
+    else:
+        requested_task = task_type or settings.task_type
+        model = next((entry for entry in catalog if entry["task_type"] == requested_task), fallback_model)
+
+    if model is None:
+        raise ValueError("Nenhum modelo disponível para a tarefa escolhida.")
+
+    resolved_task = task_type or model["task_type"]
+    if model["task_type"] != resolved_task:
+        raise ValueError("O modelo selecionado não pertence a tarefa escolhida.")
+
+    return {
+        "task_type": resolved_task,
+        "task_label": model["task_label"],
+        "model_path": model["absolute_path"],
+        "model_relative_path": model["relative_path"],
+        "model_name": model["name"],
+    }

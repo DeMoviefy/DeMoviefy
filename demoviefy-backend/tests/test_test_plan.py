@@ -73,29 +73,37 @@ class DeMoviefyTestPlan(unittest.TestCase):
         # The queue is replaced by an in-memory recorder, so controller tests
         # prove scheduling without starting real workers or AI jobs.
         self.patches = [
-            patch("app.controllers.video_controller.video_file_path", lambda name: self.root / name),
-            patch("app.controllers.video_controller.analysis_file_path", lambda video_id: self.root / f"analysis-{video_id}.json"),
-            patch("app.controllers.video_controller.annotated_video_path", lambda video_id: self.root / f"annotated-{video_id}.mp4"),
-            patch("app.controllers.video_controller.transcription_file_path", lambda video_id: self.root / f"transcription-{video_id}.json"),
-            patch("app.controllers.video_controller.ensure_storage_dirs", lambda: self.root.mkdir(exist_ok=True)),
-            patch("app.controllers.video_controller.to_repo_relative", lambda path: str(path)),
-            patch("app.controllers.video_controller.unique_video_file_path", allocate_video_path),
-            patch("app.controllers.video_controller._resolve_ai_config", lambda *_: dict(AI_CONFIG)),
-            patch("app.controllers.video_controller.save_ai_config", lambda *_args, **_kwargs: dict(AI_CONFIG)),
-            patch("app.controllers.video_controller.save_processing_state", lambda *_args, **_kwargs: None),
-            patch("app.controllers.video_controller.load_ai_config", lambda _video_id: dict(AI_CONFIG)),
-            patch("app.controllers.video_controller.load_processing_state", lambda _video_id: {
-                "processing_progress": 1,
-                "processing_stage": "queued",
-                "processing_eta_seconds": None,
-                "processing_message": "Na fila.",
-            }),
-            patch("app.controllers.video_controller.has_analysis", lambda _video_id: False),
-            patch("app.controllers.video_controller.has_annotated_video", lambda _video_id: False),
-            patch("app.controllers.video_controller.has_transcription", lambda _video_id: False),
-            patch("app.controllers.video_controller.list_analysis_variants", lambda _video_id: []),
-            patch("app.controllers.video_controller.get_job_queue", return_value=FakeJobQueue(self.queued_jobs)),
-        ]
+                patch("app.controllers.video_controller.video_file_path", lambda name: self.root / name),
+                patch("app.controllers.video_controller.analysis_file_path", lambda video_id: self.root / f"analysis-{video_id}.json"),
+                patch("app.controllers.video_controller.annotated_video_path", lambda video_id: self.root / f"annotated-{video_id}.mp4"),
+                patch("app.controllers.video_controller.transcription_file_path", lambda video_id: self.root / f"transcription-{video_id}.json"),
+                patch("app.controllers.video_controller.ensure_storage_dirs", lambda: self.root.mkdir(exist_ok=True)),
+                patch("app.controllers.video_controller.to_repo_relative", lambda path: str(path)),
+                patch("app.controllers.video_controller.unique_video_file_path", allocate_video_path),
+                patch("app.controllers.video_controller.resolve_ai_config", return_value={
+                    "task_type": "object_detection",
+                    "task_label": "Detecção de Objetos",
+                    "model_path": "models/yolo.pt",
+                    "model_relative_path": "models/yolo.pt",
+                    "model_name": "YOLO",
+                }),
+                patch("app.controllers.video_controller.save_ai_config", lambda *_args, **_kwargs: dict(AI_CONFIG)),
+                patch("app.controllers.video_controller.save_processing_state", lambda *_args, **_kwargs: None),
+                patch("app.controllers.video_controller.load_ai_config", lambda _video_id: dict(AI_CONFIG)),
+                patch("app.controllers.video_controller.load_processing_state", lambda _video_id: {
+                    "processing_progress": 1,
+                    "processing_stage": "queued",
+                    "processing_eta_seconds": None,
+                    "processing_message": "Na fila.",
+                }),
+                patch("app.controllers.video_controller.has_analysis", lambda _video_id: False),
+                patch("app.controllers.video_controller.has_annotated_video", lambda _video_id: False),
+                patch("app.controllers.video_controller.has_transcription", lambda _video_id: False),
+                patch("app.controllers.video_controller.list_analysis_variants", lambda _video_id: []),
+                patch("app.controllers.video_controller.get_job_queue", return_value=FakeJobQueue(self.queued_jobs)),
+            ]
+
+
         for active_patch in self.patches:
             active_patch.start()
 
