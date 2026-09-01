@@ -1,204 +1,31 @@
-# 📋 DeMoviefy - Code Organization & Documentation Guide
+# Guia de Organização de Código e Documentação - DeMoviefy
 
-## Overview
+## Visão Geral
 
-This guide provides the complete structure for organizing and documenting DeMoviefy code following the MVC pattern and best practices.
-
----
-
-## Backend Architecture (Python/Flask)
-
-### 1. Models Layer (`app/models/`)
-
-**Purpose**: Define database entities and data structures
-
-**File Template**:
-
-```python
-"""
-[MODEL_NAME] MODEL
-------------------
-Brief description of the model's purpose.
-Part of the MVC pattern (Model-View-Controller).
-"""
-
-from datetime import datetime
-from app import db
-
-class VideoModel(db.Model):
-    """
-    [Model Name] - SQLAlchemy ORM Model
-
-    Detailed description of the model's responsibilities
-    and how it relates to other entities.
-
-    Attributes:
-        field_name (type): Description
-    """
-    __tablename__ = "table_name"
-
-    # Relationship to other models
-    id = db.Column(db.Integer, primary_key=True)
-
-    def to_dict(self) -> dict:
-        """Convert model to dictionary for API responses."""
-        return {}
-```
-
-**Key Points**:
-
-- ✅ Include comprehensive docstrings
-- ✅ Define relationships clearly
-- ✅ Include `to_dict()` serialization methods
-- ✅ Type hints on all methods
+Este guia fornece a estrutura completa para organizar e documentar o código do DeMoviefy, seguindo uma arquitetura em camadas baseada no padrão MVC e nas melhores práticas de clean code.
 
 ---
 
-### 2. Repository Layer (`app/repositories/`)
+## Arquitetura do Backend (Python/Flask)
 
-**Purpose**: Handle all database CRUD operations
+O backend segue um fluxo unidirecional rigoroso para garantir a separação de responsabilidades:
+**Routes** (Rotas) $\rightarrow$ **Controllers** (Controladores) $\rightarrow$ **Services** (Serviços) $\rightarrow$ **Repositories** (Repositórios) $\rightarrow$ **Models** (Modelos)
 
-**File Template**:
+### 1. Camada de Rotas (`app/routes/`)
+**Propósito**: Definir os endpoints da API e mapeá-los para as funções dos controladores.
+- **Responsabilidades**: Definições de URL, atribuição de métodos HTTP, organização de Blueprints.
+- **Restrição**: Sem lógica de negócio ou processamento de requisições. Apenas mapeamento.
 
-```python
-"""
-[NAME] REPOSITORY
------------------
-Repository layer for [Model] CRUD operations.
-Handles all database interactions.
-Part of the MVC pattern (Model-View-Controller).
-"""
+### 2. Camada de Controladores (`app/controllers/`)
+**Propósito**: Manipulação de requisições HTTP e formatação de respostas.
+- **Responsabilidades**: 
+    - Extração de dados do `request`.
+    - Validação básica de entrada (utilizando `app/validators`).
+    - Chamada do **Service** apropriado.
+    - Formatação da resposta JSON final (utilizando `app/dtos`).
+- **Restrição**: Sem acesso direto ao banco de dados. Sem lógica de negócio complexa.
 
-from app import db
-from app.models.model_name import ModelName
-
-def create_[name](*, **kwargs) -> ModelName:
-    """
-    Create a new [name] record.
-
-    Args:
-        **kwargs: Field values for the new record
-
-    Returns:
-        ModelName: The newly created object with assigned ID
-
-    Raises:
-        SQLAlchemy exceptions if database operation fails
-    """
-    obj = ModelName(**kwargs)
-    db.session.add(obj)
-    db.session.commit()
-    return obj
-
-def get_[name](id: int) -> ModelName | None:
-    """Retrieve a single record by ID."""
-    return db.session.get(ModelName, id)
-
-def list_[names]() -> list[ModelName]:
-    """Retrieve all records."""
-    return ModelName.query.all()
-
-def update_[name](obj: ModelName, **kwargs) -> ModelName:
-    """Update specific fields of a record."""
-    for key, value in kwargs.items():
-        if hasattr(obj, key):
-            setattr(obj, key, value)
-    db.session.commit()
-    return obj
-
-def delete_[name](obj: ModelName) -> None:
-    """Delete a record from the database."""
-    db.session.delete(obj)
-    db.session.commit()
-```
-
-**Key Points**:
-
-- ✅ Pure CRUD operations only
-- ✅ No business logic here
-- ✅ Return model instances, not dictionaries
-- ✅ Consistent parameter naming
-
----
-
-### 3. Services Layer (`app/services/`)
-
-**Purpose**: Business logic, validation, and orchestration
-
-**File Template**:
-
-```python
-"""
-[SERVICE_NAME] SERVICE
-----------------------
-Service layer for [feature] business logic.
-Handles validation, orchestration, and complex operations.
-Part of the MVC pattern (Model-View-Controller).
-
-Key Responsibilities:
-- Business logic implementation
-- Input validation
-- Calling multiple repositories
-- Complex calculations/aggregations
-- Error handling
-"""
-
-from app.repositories import video_repository
-from app.models.video import Video
-
-def [operation_name](*, param1: str, param2: int) -> dict:
-    """
-    Brief description of operation.
-
-    Detailed explanation of what this does, including:
-    - Pre-conditions
-    - Side effects
-    - Error scenarios
-
-    Args:
-        param1 (str): Description
-        param2 (int): Description
-
-    Returns:
-        dict: Description of return structure
-
-    Raises:
-        ValueError: When validation fails
-        RuntimeError: When operation fails
-    """
-    # Validation
-    if not param1:
-        raise ValueError("param1 cannot be empty")
-
-    # Business logic
-    video = video_repository.get_video(param2)
-    if not video:
-        raise ValueError(f"Video {param2} not found")
-
-    # Process
-    result = {
-        "success": True,
-        "data": video.to_dict()
-    }
-
-    return result
-```
-
-**Key Points**:
-
-- ✅ Comprehensive docstrings with parameter descriptions
-- ✅ Input validation with meaningful error messages
-- ✅ Single responsibility per function
-- ✅ Clear exception documentation
-
----
-
-### 4. Controllers Layer (`app/controllers/`)
-
-**Purpose**: HTTP request handling and response formatting
-
-**File Template**:
-
+**Modelo de Arquivo**:
 ```python
 """
 [NAME] CONTROLLER
@@ -258,35 +85,229 @@ def create_resource():
         return jsonify({"error": "Internal server error"}), 500
 ```
 
-**Key Points**:
+### 3. Camada de Serviços (`app/services/`)
+**Propósito**: Lógica de negócio, validação e orquestração.
+- **Responsabilidades**: 
+    - Implementação de regras de negócio.
+    - Validação de entrada (nível de domínio).
+    - Chamada de múltiplos repositórios.
+    - Cálculos/agregações complexas.
+    - Integração com APIs externas ou modelos de IA.
+- **Restrição**: Sem dependências de HTTP (`request`, `jsonify` NÃO devem ser usados aqui).
 
-- ✅ Comprehensive docstrings with request/response formats
-- ✅ Validation before service calls
-- ✅ Proper HTTP status codes
-- ✅ Error handling with user-friendly messages
+**Modelo de Arquivo**:
+```python
+"""
+[SERVICE_NAME] SERVICE
+----------------------
+Service layer for [feature] business logic.
+Handles validation, orchestration, and complex operations.
+Part of the MVC pattern (Model-View-Controller).
+
+Key Responsibilities:
+- Business logic implementation
+- Input validation
+- Calling multiple repositories
+- Complex calculations/aggregations
+- Error handling
+"""
+
+from app.repositories import video_repository
+from app.models.video import Video
+
+def [operation_name](*, param1: str, param2: int) -> dict:
+    """
+    Brief description of operation.
+
+    Detailed explanation of what this does, including:
+    - Pre-conditions
+    - Side effects
+    - Error scenarios
+
+    Args:
+        param1 (str): Description
+        param2 (int): Description
+
+    Returns:
+        dict: Description of return structure
+
+    Raises:
+        ValueError: When validation fails
+        RuntimeError: When operation fails
+    """
+    # Validation
+    if not param1:
+        raise ValueError("param1 cannot be empty")
+
+    # Business logic
+    video = video_repository.get_video(param2)
+    if not video:
+        raise ValueError(f"Video {param2} not found")
+
+    # Process
+    result = {
+        "success": True,
+        "data": video.to_dict()
+    }
+
+    return result
+```
+
+### 4. Camada de Repositórios (`app/repositories/`)
+**Propósito**: Manipular todas as operações de CRUD do banco de dados.
+- **Responsabilidades**: 
+    - Consultas puras de SQLAlchemy.
+    - Gerenciamento de sessões do banco de dados.
+    - Retorno de instâncias de modelos.
+- **Restrição**: Sem lógica de negócio aqui.
+
+**Modelo de Arquivo**:
+```python
+"""
+[NAME] REPOSITORY
+-----------------
+Repository layer for [Model] CRUD operations.
+Handles all database interactions.
+Part of the MVC pattern (Model-View-Controller).
+"""
+
+from app import db
+from app.models.model_name import ModelName
+
+def create_[name](*, **kwargs) -> ModelName:
+    """
+    Create a new [name] record.
+
+    Args:
+        **kwargs: Field values for the new record
+
+    Returns:
+        ModelName: The newly created object with assigned ID
+
+    Raises:
+        SQLAlchemy exceptions if database operation fails
+    """
+    obj = ModelName(**kwargs)
+    db.session.add(obj)
+    db.session.commit()
+    return obj
+
+def get_[name](id: int) -> ModelName | None:
+    """Retrieve a single record by ID."""
+    return db.session.get(ModelName, id)
+
+def list_[names]() -> list[ModelName]:
+    """Retrieve all records."""
+    return ModelName.query.all()
+
+def update_[name](obj: ModelName, **kwargs) -> ModelName:
+    """Update specific fields of a record."""
+    for key, value in kwargs.items():
+        if hasattr(obj, key):
+            setattr(obj, key, value)
+    db.session.commit()
+    return obj
+
+def delete_[name](obj: ModelName) -> None:
+    """Delete a record from the database."""
+    db.session.delete(obj)
+    db.session.commit()
+```
+
+### 5. Camada de Modelos (`app/models/`)
+**Propósito**: Definir entidades e estruturas de dados do banco de dados.
+
+**Modelo de Arquivo**:
+```python
+"""
+[MODEL_NAME] MODEL
+------------------
+Brief description of the model's purpose.
+Part of the MVC pattern (Model-View-Controller).
+"""
+
+from datetime import datetime
+from app import db
+
+class VideoModel(db.Model):
+    """
+    [Model Name] - SQLAlchemy ORM Model
+
+    Detailed description of the model's responsibilities
+    and how it relates to other entities.
+
+    Attributes:
+        field_name (type): Description
+    """
+    __tablename__ = "table_name"
+
+    # Relationship to other models
+    id = db.Column(db.Integer, primary_key=True)
+
+    def to_dict(self) -> dict:
+        """Convert model to dictionary for API responses."""
+        return {}
+```
 
 ---
 
-### 5. Configuration (`app/config/`)
+## Camadas de Suporte
 
-**Purpose**: Settings, paths, and constants
+### DTOs (`app/dtos/`)
+**Propósito**: Objetos de Transferência de Dados (Data Transfer Objects) usados para desacoplar Modelos do Banco de Dados de Respostas da API.
+- **Responsabilidades**: Moldar os dados brutos do modelo nos formatos específicos exigidos pelo frontend.
+- **Benefício**: Evita a exposição da estrutura interna do banco de dados ao cliente e permite o versionamento de respostas da API independentemente do esquema do banco.
 
-**Key Files**:
+### Validadores (`app/validators/`)
+**Propósito**: Lógica para garantir que os dados de requisição recebidos estejam sintática e semanticamente corretos.
+- **Responsabilidades**: Verificação de tipos, validação por regex, verificação de campos obrigatórios.
+- **Uso**: Tipicamente chamados no Controlador antes de passar os dados para o Serviço.
 
-- `settings.py`: Application configuration
-- `paths.py`: File system paths
-- `logging.py`: Logger setup
+### Utils (`app/utils/`)
+**Propósito**: Funções auxiliares genéricas e preocupações transversais (cross-cutting concerns).
+- **Responsabilidades**: Operações de sistema de arquivos, manipulações de strings, cálculos comuns e decoradores.
+- **Restrição**: Devem ser sem estado (stateless) e não ter dependências de camadas de alto nível (Controllers/Services).
 
 ---
 
-## Frontend Architecture (React/TypeScript)
+## Matriz de Decisão: Service vs. Repository
 
-### 1. Services (`src/services/`)
+| Pergunta | Repository | Service |
+| :--- | :---: | :---: |
+| Envolve uma consulta SQL ou chamada ao banco? | ✅ | ❌ |
+| Implementa uma regra de negócio ou KPI? | ❌ | ✅ |
+| Chama um modelo de IA ou API externa? | ❌ | ✅ |
+| Filtra/ordena registros brutos do banco? | ✅ | ❌ |
+| Coordena múltiplos repositórios? | ❌ | ✅ |
+| A lógica deve ser agnóstica ao banco de dados? | ❌ | ✅ |
 
-**Purpose**: API communication and external service integrations
+---
 
-**File Template**:
+## Formato Padrão de Erro
 
+Para garantir que o frontend possa tratar erros de forma consistente, todos os controladores devem retornar erros no seguinte formato:
+
+**Erro Simples**:
+```json
+{ "error": "Mensagem de erro amigável para o usuário" }
+```
+
+**Erro Detalhado**:
+```json
+{ 
+  "error": "Falha na validação", 
+  "details": { "field_name": "Este campo é obrigatório" } 
+}
+```
+
+---
+
+## Arquitetura do Frontend (React/TypeScript)
+
+### 1. Serviços (`src/services/`)
+**Propósito**: Comunicação com API e integrações de serviços externos.
+
+**Modelo de Arquivo**:
 ```typescript
 /**
  * API Service for [Feature]
@@ -363,21 +384,10 @@ export class [EntityService] {
 }
 ```
 
-**Key Points**:
+### 2. Componentes (`src/components/`)
+**Propósito**: Blocos de construção de interface (UI) reutilizáveis.
 
-- ✅ Clear TypeScript interfaces
-- ✅ Comprehensive JSDoc comments
-- ✅ Error handling with logging
-- ✅ Static methods for organization
-
----
-
-### 2. Components (`src/components/`)
-
-**Purpose**: Reusable UI building blocks
-
-**File Template**:
-
+**Modelo de Arquivo**:
 ````typescript
 /**
  * [ComponentName] Component
@@ -418,21 +428,10 @@ export const ComponentName: React.FC<ComponentProps> = ({
 };
 ````
 
-**Key Points**:
+### 3. Páginas (`src/pages/`)
+**Propósito**: Componentes de nível de rota.
 
-- ✅ Clear prop documentation
-- ✅ Usage examples in JSDoc
-- ✅ Typed with React.FC
-- ✅ Single responsibility
-
----
-
-### 3. Pages (`src/pages/`)
-
-**Purpose**: Route-level components
-
-**Key Pattern**:
-
+**Padrão Chave**:
 ```typescript
 /**
  * [PageName] Page
@@ -456,11 +455,8 @@ export const [PageName]: React.FC = () => {
 };
 ```
 
----
-
-### 4. Types (`src/features/[feature]/types.ts`)
-
-**Purpose**: Feature-specific TypeScript interfaces
+### 4. Tipos (`src/features/[feature]/types.ts`)
+**Propósito**: Interfaces TypeScript específicas de cada funcionalidade (feature).
 
 ```typescript
 /**
@@ -483,14 +479,10 @@ export interface OperationState {
 }
 ```
 
----
+### 5. Estilização (`src/styles/global.css`)
+**Propósito**: Estilos globais com variáveis CSS.
 
-### 5. Styling (`src/styles/global.css`)
-
-**Purpose**: Global styles with CSS variables
-
-**Structure**:
-
+**Estrutura**:
 ```css
 /* ============================================================================
    SECTION NAME
@@ -516,12 +508,11 @@ export interface OperationState {
 
 ---
 
-## Documentation Best Practices
+## Melhores Práticas de Documentação
 
-### 1. Docstring Standards
+### 1. Padrões de Docstrings
 
 **Python (Backend)**:
-
 ```python
 def function_name(param1: str, param2: int) -> dict:
     """
@@ -550,7 +541,6 @@ def function_name(param1: str, param2: int) -> dict:
 ```
 
 **TypeScript (Frontend)**:
-
 ````typescript
 /**
  * Function description
@@ -573,106 +563,67 @@ export async function functionName(
 }
 ````
 
-### 2. Code Comments
+### 2. Comentários de Código
+- Use `#` (Python) ou `//` (TypeScript) para comentários em linha.
+- Comente o "porquê", não o "o quê".
+- Use separadores de seção para organização.
+- Mantenha os comentários atualizados com as mudanças no código.
 
-- Use `#` (Python) or `//` (TypeScript) for inline comments
-- Comment the "why", not the "what"
-- Use section separators for organization
-- Keep comments up-to-date with code changes
-
-### 3. README Files
-
-Each major component should have a README:
-
-```markdown
-# [Component Name]
-
-Brief description of what this component/module does.
-
-## Overview
-
-Detailed explanation of functionality, architecture, and responsibilities.
-
-## File Structure
-```
-
-path/
-**init**.py
-file1.py
-file2.py
-
-````
-
-## Usage
-
-```python
-from module import function
-result = function(param)
-````
-
-## Testing
-
-How to test this component.
-
-## Dependencies
-
-List external dependencies.
-
-## Future Improvements
-
-Known issues, TODOs, or planned enhancements.
-
-```
+### 3. Arquivos README
+Cada componente principal deve ter um README contendo:
+- Visão Geral e Responsabilidades.
+- Estrutura de Arquivos.
+- Exemplos de Uso.
+- Instruções de Teste.
+- Dependências.
 
 ---
 
-## Quality Checklist
+## Checklist de Qualidade
 
 ### Backend
-- ✅ All functions have docstrings
-- ✅ All parameters have type hints
-- ✅ All return values are documented
-- ✅ Error cases are documented
-- ✅ No hardcoded values (use config)
-- ✅ Proper exception handling
-- ✅ No code duplication
+- [ ] **Arquitetura**: O fluxo Routes $\rightarrow$ Controller $\rightarrow$ Service $\rightarrow$ Repository $\rightarrow$ Model é estritamente respeitado.
+- [ ] **Desacoplamento**: Controladores utilizam **DTOs** para respostas, nunca instâncias brutas de Model.
+- [ ] **Isolamento**: Sem chamadas de `flask.request` ou `jsonify` dentro de Services ou Repositories.
+- [ ] **Validação**: A validação de entrada é tratada em `app/validators` e chamada pelo Controlador.
+- [ ] **Banco de Dados**: Toda a lógica de SQL/ORM está confinada aos **Repositories**.
+- [ ] **Padronização**: Todas as respostas de erro seguem o **Formato Padrão de Erro**.
+- [ ] **Documentação**: Todas as funções possuem type hints e docstrings abrangentes.
+- [ ] **Config**: Sem valores fixos no código (hardcoded), utilize `app/config`.
 
 ### Frontend
-- ✅ All components have JSDoc comments
-- ✅ All props are documented
-- ✅ TypeScript interfaces are defined
-- ✅ Error handling is implemented
-- ✅ Loading states are shown
-- ✅ No console errors/warnings
-- ✅ Responsive design is tested
+- [ ] Todos os componentes possuem comentários JSDoc.
+- [ ] Todas as props estão documentadas.
+- [ ] Interfaces TypeScript estão definidas para todas as respostas de API.
+- [ ] O tratamento de erros está implementado e fornece feedback ao usuário.
+- [ ] Estados de carregamento (loading) são exibidos durante operações assíncronas.
+- [ ] Design responsivo foi testado.
 
-### General
-- ✅ Clear file organization
-- ✅ Meaningful variable names
-- ✅ No dead code
-- ✅ No commented-out code
-- ✅ Consistent code style
-- ✅ Clear commit messages
-- ✅ README documentation
+### Geral
+- [ ] Organização de arquivos clara.
+- [ ] Nomes de variáveis significativos.
+- [ ] Sem código morto ou comentado.
+- [ ] Estilo de código consistente.
+- [ ] Mensagens de commit claras.
+- [ ] Documentação README presente para módulos principais.
 
 ---
 
-## Next Steps
+## Próximos Passos
 
-1. ✅ Add docstrings to all backend functions
-2. ✅ Add JSDoc comments to all frontend components
-3. ✅ Create README files for major modules
-4. ✅ Organize CSS with clear section comments
-5. ⏳ Add unit tests with clear documentation
-6. ⏳ Create API documentation (Swagger/OpenAPI)
-7. ⏳ Add database migration documentation
+1. ✅ Adicionar docstrings a todas as funções do backend.
+2. ✅ Adicionar comentários JSDoc a todos os componentes do frontend.
+3. ✅ Criar arquivos README para módulos principais.
+4. ✅ Organizar CSS com comentários de seção claros.
+5. ⏳ Adicionar testes unitários com documentação clara.
+6. ⏳ Criar documentação de API (Swagger/OpenAPI).
+7. ⏳ Adicionar documentação de migração de banco de dados.
 
 ---
 
-## References
+## Referências
 
 - [Python Docstring Convention (PEP 257)](https://www.python.org/dev/peps/pep-0257/)
 - [JSDoc Reference](https://jsdoc.app/)
 - [Tailwind CSS Documentation](https://tailwindcss.com/)
 - [MVC Pattern](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller)
-```
