@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useVideoDetailStore } from "src/pages/Video/stores/useVideoDetailStore";
+import { useProcessingStore } from "src/core/stores/useProcessingStore";
 import { useVideoConfig } from "src/pages/Video/hooks/useVideoConfig";
 import { useCatalogStore } from "src/core/stores/useAICatalogStore";
 import { VideoWorkbench } from "src/pages/Video/components/VideoWorkbench";
@@ -14,27 +15,29 @@ export default function Video() {
     useEffect(() => {
         if (isValidId) {
             void useVideoDetailStore.getState().fetchVideoById(parsedId);
+            void useProcessingStore.getState().refresh();
         }
         if (useCatalogStore.getState().tasks.length === 0) {
             void useCatalogStore.getState().fetchCatalog();
         }
-        return () => {
-            useVideoDetailStore.getState().stopPolling();
-        };
+
     }, [parsedId, isValidId]);
+
+
+    const video = useVideoDetailStore((state) => state.video);
+    const selectedVideoIsBusy = video?.status.startsWith("PROCESSANDO") ?? false;
+
+    const loading = useVideoDetailStore((state) => state.loading);
+    
+    const error = useVideoDetailStore((state) => state.error);
 
     const {
         videoConfig,
         setVideoConfig,
         handleSaveConfig,
         handleReprocess,
-    } = useVideoConfig();
+    } = useVideoConfig(video);
 
-    const video = useVideoDetailStore((state) => state.video);
-    const selectedVideoIsBusy = video?.status.startsWith("PROCESSANDO") ?? false;
-
-    const loading = useVideoDetailStore((state) => state.loading);
-    const error = useVideoDetailStore((state) => state.error);
 
     if (!isValidId) {
         return <p>ID de vídeo inválido.</p>;
@@ -49,6 +52,7 @@ export default function Video() {
     }
     return (
         <VideoWorkbench
+            video={video}
             config={videoConfig}
             isBusy={selectedVideoIsBusy}
             onConfigChange={setVideoConfig}
