@@ -1,32 +1,37 @@
 import { NavLink } from "react-router-dom";
 
-import demoviefyLight from "src/assets/DeMoviefy-Light.png"
+import demoviefyLight from "src/assets/DeMoviefy-Dark.png"
 
 type HeaderProps = {
   themeLabel: string;
   onToggleTheme: () => void;
 };
 
-export default function Header({/* themeLabel, onToggleTheme */}: HeaderProps) {
-  return (
-    <header className="app-header">
-      <div className="header-brand">
-        
-        <nav className="header-navigation">
-          <NavLink to="/">
-            <img src={demoviefyLight} alt="DeMoviefy" className="h-16 w-auto" />
-          </NavLink>  
+export default function Header({ }: HeaderProps) {
+  return (<header className="border-b border-slate-800">
+    <div className="mx-auto flex h-20 w-full items-center justify-between px-8 lg:px-12">
+      <NavLink to="/">
+        <img
+          src={demoviefyLight}
+          alt="DeMoviefy"
+          className="h-14 w-auto"
+        />
+      </NavLink>
 
-          <NavLink to="/upload" className={({ isActive }) => `header-link${isActive ? " is-active" : ""}`}>
-            Upload
-          </NavLink>
-        </nav>
-      </div>
-        {/*}
-      <button type="button" className="ghost-button theme-toggle" onClick={onToggleTheme}>
-        {themeLabel}
-      </button>
-      {*/}
-    </header>
+      <nav>
+        <NavLink
+          to="/upload"
+          className={({ isActive }) =>
+            `text-sm transition ${isActive
+              ? "text-white"
+              : "text-slate-400 hover:text-white"
+            }`
+          }
+        >
+          Upload
+        </NavLink>
+      </nav>
+    </div>
+  </header>
   );
 }

@@ -1,149 +1,37 @@
 ﻿import { Link } from "react-router-dom";
-import "/src/pages/Home/Home.css";
 
 export default function Home() {
-
   return (
-    <section className="home-page">
-      {/* Hero Section */}
-      <section className="home-hero">
-        <h1>Analise vídeos com IA. Em um só lugar.</h1>
-        <p>
-          Upload, processamento, análise e revisão. Tudo integrado em uma plataforma
-          intuitiva que trabalha para você, não contra você.
-        </p>
+    <main>
+      <section className="grid w-full items-center gap-16 px-8 py-24 lg:grid-cols-2 lg:px-12 lg:py-32">
+        <div>
+          <h1 className="mt-4 text-5xl font-semibold tracking-tight md:text-6xl">
+            Analise seus vídeos.
+            <br />
+            Extraia mais deles.
+          </h1>
 
-        <div className="home-actions">
-          <Link className="primary-button" to="/upload">
+          <p className="mt-6 max-w-xl text-lg leading-8 text-slate-400">
+            O DeMoviefy utiliza inteligência artificial para processar vídeos,
+            detectar informações e gerar resultados estruturados.
+          </p>
+
+          <Link
+            to="/upload"
+            className="mt-8 inline-block rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white hover:bg-blue-500"
+          >
             Começar agora
           </Link>
-          <button type="button" className="ghost-button" disabled>
-            Ver demonstração
-          </button>
         </div>
-        
-        <p className="home-hero-footnote">Nenhum cartão de crédito necessário. Cancele quando quiser.</p>
-      </section>
 
-      {/* Feature: Upload */}
-      <section className="home-feature home-feature--alt">
-        <div className="home-feature-content">
-          <span className="eyebrow">Upload & Configuração</span>
-          <h2>Envie vídeos e deixe a IA trabalhar</h2>
-          <p>
-            Selecione seus arquivos, escolha a tarefa desejada (detecção de objetos, 
-            segmentação ou transcrição) e configure os parâmetros em segundos. 
-            Sem complicações, sem espera.
-          </p>
-          <div className="home-feature-actions">
-            <Link to="/upload" className="home-secondary-button">
-              Experimentar upload
-            </Link>
-          </div>
-        </div>
-        <div className="home-feature-placeholder">
-          <div className="placeholder-box">
-            <span>Área de upload</span>
-            <p>Arraste arquivos ou clique para selecionar</p>
-          </div>
+        <div className="overflow-hidden rounded-lg border border-slate-800">
+          <img
+            src="/public/DeMoviefy-Demo.png"
+            alt="Prévia de um vídeo sendo analisado pelo DeMoviefy"
+            className="w-full"
+          />
         </div>
       </section>
-
-      {/* Feature: Processing */}
-      <section className="home-feature">
-        <div className="home-feature-placeholder">
-          <div className="placeholder-box">
-            <span>Processamento em tempo real</span>
-            <p>Acompanhe o progresso de cada vídeo</p>
-          </div>
-        </div>
-        <div className="home-feature-content">
-          <span className="eyebrow">Acompanhamento</span>
-          <h2>Monitore tudo em tempo real</h2>
-          <p>
-            Barra de progresso visual, estimativas de tempo, mensagens detalhadas. 
-            Você sempre sabe exatamente o que está acontecendo com seus vídeos.
-          </p>
-          <div className="home-feature-actions">
-            <Link to="/upload" className="home-secondary-button">
-              Ver dashboard
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Feature: Results */}
-      <section className="home-feature home-feature--alt">
-        <div className="home-feature-content">
-          <span className="eyebrow">Análise & Exportação</span>
-          <h2>Extraia insights em segundos</h2>
-          <p>
-            Objetos detectados, confiança de cada detection, frames processados. 
-            Exporte JSON, anotações visuais ou revisar diretamente no painel.
-          </p>
-          <div className="home-feature-actions">
-            <Link to="/upload" className="home-secondary-button">
-              Explorar resultados
-            </Link>
-          </div>
-        </div>
-        <div className="home-feature-placeholder">
-          <div className="placeholder-box">
-            <span>Visualização de análise</span>
-            <p>Dados estruturados e exportáveis</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Use Cases Grid */}
-      <section className="home-capabilities">
-        <span className="eyebrow">O que você pode fazer</span>
-        <h2>Casos de uso</h2>
-        
-        <div className="home-capabilities-grid">
-          <div className="capability-card">
-            <div className="capability-icon">🎬</div>
-            <h3>Detecção de objetos</h3>
-            <p>Identifique e localize objetos em cada frame de forma automática.</p>
-          </div>
-          <div className="capability-card">
-            <div className="capability-icon">🎭</div>
-            <h3>Segmentação de instâncias</h3>
-            <p>Separe elementos visuais distintos para análise detalhada.</p>
-          </div>
-          <div className="capability-card">
-            <div className="capability-icon">🎯</div>
-            <h3>Pose estimation</h3>
-            <p>Reconheça e analise silhuetas e movimentos corporais.</p>
-          </div>
-          <div className="capability-card">
-            <div className="capability-icon">🎤</div>
-            <h3>Transcrição de áudio</h3>
-            <p>Converta falas em texto com alta precisão e sem necessidade de edição manual.</p>
-          </div>
-          <div className="capability-card">
-            <div className="capability-icon">📊</div>
-            <h3>Relatórios estruturados</h3>
-            <p>Resuma os resultados em formatos prontos para análise e compartilhamento.</p>
-          </div>
-          <div className="capability-card">
-            <div className="capability-icon">⚡</div>
-            <h3>Processamento em lote</h3>
-            <p>Envie múltiplos vídeos e deixe o sistema processar enquanto você trabalha.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="home-cta-section">
-        <h2>Pronto para começar?</h2>
-        <p>Experimente grátis. Sem cartão de crédito. Comece em segundos.</p>
-        <Link className="primary-button" to="/upload">
-          Ir para dashboard
-        </Link>
-      </section>
-    </section>
+    </main>
   );
 }
-
-

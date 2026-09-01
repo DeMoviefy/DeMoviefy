@@ -38,7 +38,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
       window.localStorage.setItem("demoviefy-theme", theme);
     } catch (error) {
       console.warn("Não foi possível persistir o tema atual.", error);
-    }
+    } 
   }, [theme]);
 
   const themeLabel = useMemo(
