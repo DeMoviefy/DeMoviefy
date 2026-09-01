@@ -6,9 +6,18 @@ Handles all database interactions for video records.
 Part of the MVC pattern (Model-View-Controller).
 """
 
-from typing import Iterable
 from app import db
 from app.models.video import Video
+
+VALID_VIDEO_STATUSES = {
+    "PROCESSANDO",
+    "PROCESSANDO_IA",
+    "PROCESSADO",
+    "ERRO_ARQUIVO",
+    "ERRO_IA",
+    "SEM_ANALISE",
+    "CANCELADO",
+}
 
 
 def create_video(*, filename: str) -> Video:
@@ -79,7 +88,17 @@ def update_status(video: Video, status: str) -> Video:
     Returns:
         Video: The updated Video object
     """
+    if status not in VALID_VIDEO_STATUSES:
+        raise ValueError(f"Status de vídeo inválido: {status}")
+
     video.status = status
+    db.session.commit()
+    return video
+
+
+def update_job_id(video: Video, job_id: str | None) -> Video:
+    """Persist the identifier of the most recently scheduled job."""
+    video.job_id = job_id
     db.session.commit()
     return video
 
@@ -88,9 +107,9 @@ def delete_video(video: Video) -> None:
     """
     Delete a video record from the database.
     
-    Permanently removes a video record from the database. Note that this
-    only removes the database record - associated files (video file, analysis,
-    annotations) must be deleted separately via file system operations.
+    Permanently removes a video record from the database. This repository
+    manages only the ORM row; associated files and metadata should be cleaned
+    up by the service layer or controller before the record is removed.
     
     Args:
         video (Video): The video object to delete

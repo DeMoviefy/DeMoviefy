@@ -1,5 +1,6 @@
 import os
 import shutil
+import uuid
 from pathlib import Path
 
 
@@ -37,6 +38,20 @@ def ensure_storage_dirs() -> None:
 
 def video_file_path(filename: str) -> Path:
     return UPLOADS_DIR / filename
+
+
+def unique_video_file_path(filename: str) -> Path:
+    """Return an available path without changing the original filename format."""
+    candidate = video_file_path(filename)
+    if not candidate.exists():
+        return candidate
+
+    source = Path(filename)
+    while True:
+        unique_name = f"{source.stem}_{uuid.uuid4().hex[:12]}{source.suffix}"
+        candidate = video_file_path(unique_name)
+        if not candidate.exists():
+            return candidate
 
 
 def analysis_file_path(video_id: int) -> Path:

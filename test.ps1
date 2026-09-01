@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidatePattern('^CT0[1-8]$')]
+    [ValidatePattern('^(CT0[1-9]|SEC0[1-4])$')]
     [string]$Test,
     [switch]$All,
     [switch]$Frontend
@@ -24,7 +24,7 @@ function Invoke-TestPlan {
             & $python -m unittest discover -s tests -p test_test_plan.py -k $Scenario.ToLower() -v
         }
         else {
-            Write-Host "Running the complete official test plan (CT01-CT08)..." -ForegroundColor Cyan
+            Write-Host "Running the complete test plan (CT01-CT09 and SEC01-SEC04)..." -ForegroundColor Cyan
             & $python -m unittest discover -s tests -p test_test_plan.py -v
         }
 
@@ -55,7 +55,7 @@ function Invoke-FrontendBuild {
 if (-not $All -and -not $Test -and -not $Frontend) {
     Write-Host ""
     Write-Host "DeMoviefy Test Menu" -ForegroundColor Cyan
-    Write-Host "1) Run the full test plan (CT01-CT08)"
+    Write-Host "1) Run the full test plan (CT01-CT09 and SEC01-SEC04)"
     Write-Host "2) Run one test scenario"
     Write-Host "3) Run the full plan and build the frontend"
     Write-Host "0) Exit"
@@ -64,9 +64,9 @@ if (-not $All -and -not $Test -and -not $Frontend) {
     switch (Read-Host "Choose an option") {
         "1" { $All = $true }
         "2" {
-            $Test = (Read-Host "Enter CT01 through CT08").ToUpper()
-            if ($Test -notmatch '^CT0[1-8]$') {
-                throw "Invalid scenario. Enter a value from CT01 to CT08."
+            $Test = (Read-Host "Enter CT01 through CT09 or SEC01 through SEC04").ToUpper()
+            if ($Test -notmatch '^(CT0[1-9]|SEC0[1-4])$') {
+                throw "Invalid scenario. Enter CT01 through CT09 or SEC01 through SEC04."
             }
         }
         "3" { $All = $true; $Frontend = $true }

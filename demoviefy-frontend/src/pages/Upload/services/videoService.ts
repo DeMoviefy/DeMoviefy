@@ -115,6 +115,10 @@ export class VideoService {
         await api.post(`/videos/${id}/reprocess`, config);
     }
 
+    static async cancelProcessing(id: number): Promise<void> {
+        await api.post(`/videos/${id}/cancel`);
+    }
+
     static async deleteAnalysis(id: number, variantId: string | null): Promise<void> {
         await api.delete(`/videos/${id}/analysis`, {
             params: variantId ? { variant: variantId } : undefined,

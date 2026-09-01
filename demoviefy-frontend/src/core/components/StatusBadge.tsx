@@ -7,6 +7,7 @@ const STATUS_LABELS: Record<string, string> = {
   PROCESSANDO_IA: "Analisando",
   PROCESSADO: "Concluído",
   SEM_ANALISE: "Sem análise",
+  CANCELADO: "Cancelado",
   ERRO_ARQUIVO: "Erro no arquivo",
   ERRO_IA: "Erro na análise",
 };
@@ -17,7 +18,9 @@ export function StatusBadge({ status }: StatusBadgeProps) {
   const tone =
     normalized === "PROCESSADO"
       ? "success"
-      : normalized.startsWith("ERRO")
+      : normalized === "CANCELADO"
+        ? "warning"
+        : normalized.startsWith("ERRO")
         ? "danger"
         : "warning";
 

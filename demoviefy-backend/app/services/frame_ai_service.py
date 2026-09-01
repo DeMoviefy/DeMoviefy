@@ -34,6 +34,8 @@ from app.config.paths import ensure_storage_dirs
 from app.config.paths import ffmpeg_path as resolve_ffmpeg_path
 from app.config.paths import ffprobe_path as resolve_ffprobe_path
 
+from app.utils.file_utils import unlink_with_retries, copy_with_retries
+
 
 # ============================================================================
 # HELPER FUNCTIONS - Model Loading & Compatibility
@@ -217,8 +219,8 @@ def _normalize_annotated_mp4(
 
         if result.returncode == 0 and normalized_temp.exists():
             if output_path.exists():
-                _unlink_with_retries(output_path, logger=logger)
-            _copy_with_retries(normalized_temp, output_path, logger=logger)
+                unlink_with_retries(output_path, logger=logger)
+            copy_with_retries(normalized_temp, output_path, logger=logger)
             if logger:
                 logger.info("frame_ai:mp4_normalize_success path=%s", output_path)
             return True
@@ -251,42 +253,10 @@ def _normalize_annotated_mp4(
                     logger.warning("frame_ai:normalized_temp_cleanup_failed path=%s error=%s", normalized_temp, str(exc))
 
 
-def _unlink_with_retries(path: Path, *, logger: Any | None = None, attempts: int = 20, delay_seconds: float = 0.5) -> None:
-    last_error: Exception | None = None
-    for attempt in range(attempts):
-        if not path.exists():
-            return
-        try:
-            path.unlink()
-            return
-        except PermissionError as exc:
-            last_error = exc
-            time.sleep(delay_seconds)
-        except FileNotFoundError:
-            return
-    if last_error is not None:
-        raise last_error
-    if logger:
-        logger.warning("frame_ai:unlink_retry_exhausted path=%s", path)
 
 
-def _copy_with_retries(source_path: Path, destination_path: Path, *, logger: Any | None = None, attempts: int = 20, delay_seconds: float = 0.5) -> None:
-    last_error: Exception | None = None
-    for attempt in range(attempts):
-        try:
-            shutil.copy2(source_path, destination_path)
-            return
-        except PermissionError as exc:
-            last_error = exc
-            time.sleep(delay_seconds)
-    if last_error is not None:
-        raise last_error
-    if logger:
-        logger.warning(
-            "frame_ai:copy_retry_exhausted source=%s destination=%s",
-            source_path,
-            destination_path,
-        )
+
+
 
 
 def _probe_video_stream(file_path: Path, logger: Any | None = None) -> dict[str, str] | None:
@@ -459,6 +429,11 @@ def _annotate_frame_by_task(frame: np.ndarray, result: Any, task_type: str) -> n
 # MAIN ANALYSIS FUNCTION
 # ============================================================================
 
+
+class ProcessingCancelled(Exception):
+    """Raised when a caller requests cooperative cancellation."""
+
+
 def analyze_video_frames(
     *,
     video_path: str,
@@ -471,6 +446,7 @@ def analyze_video_frames(
     clip_end_sec: float | None = None,
     annotated_output_path: str | None = None,
     progress_callback: Any | None = None,
+    cancellation_requested: Any | None = None,
     logger: Any | None = None,
 ) -> dict[str, Any]:
     """
@@ -601,6 +577,13 @@ def analyze_video_frames(
         )
 
     while True:
+        if cancellation_requested is not None and cancellation_requested():
+            capture.release()
+            if writer is not None:
+                writer.release()
+            if temp_annotated_path is not None and temp_annotated_path.exists():
+                temp_annotated_path.unlink()
+            raise ProcessingCancelled("Processamento cancelado pelo usuário.")
         if processed_frames >= max_frames:
             break
 
@@ -850,14 +833,14 @@ def _promote_variant_to_canonical(video_id: int, variant_id: str) -> bool:
     if variant_annotated_path.exists():
         shutil.copy2(variant_annotated_path, canonical_annotated_path)
     elif canonical_annotated_path.exists():
-        _unlink_with_retries(canonical_annotated_path)
+        unlink_with_retries(canonical_annotated_path)
 
     variant_browser_path = _variant_browser_path(variant_annotated_path)
     canonical_browser_path = _variant_browser_path(canonical_annotated_path)
     if variant_browser_path.exists():
         shutil.copy2(variant_browser_path, canonical_browser_path)
     elif canonical_browser_path.exists():
-        _unlink_with_retries(canonical_browser_path)
+        unlink_with_retries(canonical_browser_path)
 
     return True
 
@@ -939,7 +922,7 @@ def delete_analysis_variant(video_id: int, variant_id: str) -> bool:
     for path in paths_to_delete:
         if path.exists():
             try:
-                _unlink_with_retries(path)
+                unlink_with_retries(path)
             except Exception:
                 pass
 
@@ -959,7 +942,7 @@ def delete_analysis_variant(video_id: int, variant_id: str) -> bool:
             ):
                 if path.exists():
                     try:
-                        _unlink_with_retries(path)
+                        unlink_with_retries(path)
                     except Exception:
                         pass
 
@@ -989,6 +972,6 @@ def delete_analysis_artifacts(video_id: int) -> None:
     for path in paths_to_delete:
         if path.exists():
             try:
-                _unlink_with_retries(path)
+                unlink_with_retries(path)
             except Exception:
                 pass

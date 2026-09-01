@@ -5,7 +5,7 @@ Defines the Video database model for the MVC pattern.
 This module represents the video entity stored in the database.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from app import db
 
 
@@ -20,6 +20,7 @@ class Video(db.Model):
         id (int): Unique primary key identifier for the video
         filename (str): Name of the uploaded video file
         status (str): Current processing status (e.g., "PROCESSANDO", "CONCLUIDO", "ERRO")
+        job_id (str): UUID of the current processing job (if any)
         created_at (DateTime): Timestamp when the video was uploaded
     """
     __tablename__ = "videos"
@@ -30,7 +31,8 @@ class Video(db.Model):
     # Video Metadata
     filename = db.Column(db.String(255), nullable=False)
     status = db.Column(db.String(50), default="PROCESSANDO")
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    job_id = db.Column(db.String(36), nullable=True, unique=True, index=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def to_dict(self) -> dict:
         """
@@ -50,5 +52,6 @@ class Video(db.Model):
             "id": self.id,
             "filename": self.filename,
             "status": self.status,
+            "job_id": self.job_id,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
