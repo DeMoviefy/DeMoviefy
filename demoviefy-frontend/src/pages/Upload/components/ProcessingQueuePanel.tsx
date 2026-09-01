@@ -10,7 +10,12 @@ import "/src/pages/Upload/styles/ProcessingQueuePanel.css";
 export function ProcessingQueuePanel() {
   const videos = useProcessingStore((state) => state.videos);
   
+<<<<<<< Updated upstream
 
+=======
+  // Mantém os seus estados e a função de atualizar a tela para o cancelamento
+  const refresh = useProcessingStore((state) => state.refresh);
+>>>>>>> Stashed changes
   const [cancellingVideoId, setCancellingVideoId] = useState<number | null>(null);
 
   const processingVideos = videos.filter(
@@ -36,7 +41,11 @@ export function ProcessingQueuePanel() {
     try {
       await VideoService.cancelProcessing(videoId);
       toast.success("Processamento cancelado. O vídeo foi mantido.");
+<<<<<<< Updated upstream
       await useProcessingStore.getState().refresh();
+=======
+      await refresh();
+>>>>>>> Stashed changes
     } catch (error) {
       toast.error(getApiErrorMessage(error, "Não foi possível cancelar o processamento."));
     } finally {
