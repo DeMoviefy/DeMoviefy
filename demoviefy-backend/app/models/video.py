@@ -5,7 +5,7 @@ Defines the Video database model for the MVC pattern.
 This module represents the video entity stored in the database.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from app import db
 
 
@@ -32,7 +32,7 @@ class Video(db.Model):
     filename = db.Column(db.String(255), nullable=False)
     status = db.Column(db.String(50), default="PROCESSANDO")
     job_id = db.Column(db.String(36), nullable=True, unique=True, index=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def to_dict(self) -> dict:
         """

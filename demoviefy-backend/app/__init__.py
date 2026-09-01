@@ -51,7 +51,12 @@ def create_app(test_config: dict | None = None):
     db.init_app(app)
     ensure_storage_dirs()
 
+    from .routes.ai_routes import ai_bp
+    from .routes.system_routes import system_bp
     from .routes.video_routes import video_bp
+
+    app.register_blueprint(ai_bp)
+    app.register_blueprint(system_bp)
     app.register_blueprint(video_bp)
 
     # Criar banco automaticamente

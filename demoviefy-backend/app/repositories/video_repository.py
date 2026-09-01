@@ -6,7 +6,6 @@ Handles all database interactions for video records.
 Part of the MVC pattern (Model-View-Controller).
 """
 
-from typing import Iterable
 from app import db
 from app.models.video import Video
 
@@ -108,9 +107,9 @@ def delete_video(video: Video) -> None:
     """
     Delete a video record from the database.
     
-    Permanently removes a video record from the database. Note that this
-    only removes the database record - associated files (video file, analysis,
-    annotations) must be deleted separately via file system operations.
+    Permanently removes a video record from the database. This repository
+    manages only the ORM row; associated files and metadata should be cleaned
+    up by the service layer or controller before the record is removed.
     
     Args:
         video (Video): The video object to delete
