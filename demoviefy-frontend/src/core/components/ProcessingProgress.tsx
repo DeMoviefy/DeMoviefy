@@ -1,3 +1,5 @@
+// src/core/components/ProcessingProgress.tsx
+
 import { memo } from "react";
 
 type ProcessingProgressProps = {

@@ -2,16 +2,20 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { VideoService } from "src/pages/Upload/services/videoService";
-import { useVideoListStore } from "src/pages/Upload/stores/useVideoListStore";
-import { getApiErrorMessage } from "src/pages/Upload/utils/helpers";
+import { useProcessingStore } from "src/core/stores/useProcessingStore"; // <-- Mudança da main
+import { VideoService } from "src/pages/Upload/services/videoService"; // <-- Sua mudança
+import { useVideoListStore } from "src/pages/Upload/stores/useVideoListStore"; // <-- Sua mudança (necessário para o fetchVideos)
+import { getApiErrorMessage } from "src/pages/Upload/utils/helpers"; // <-- Sua mudança
 import "/src/pages/Upload/styles/ProcessingQueuePanel.css";
 
 export function ProcessingQueuePanel() {
-    
-  const videos = useVideoListStore((state) => state.videos);
+  // Pega a lista de vídeos usando a nova store da main
+  const videos = useProcessingStore((state) => state.videos);
+  
+  // Mantém os seus estados e a função de atualizar a tela para o cancelamento
   const fetchVideos = useVideoListStore((state) => state.fetchVideos);
   const [cancellingVideoId, setCancellingVideoId] = useState<number | null>(null);
+
   const processingVideos = videos.filter(
     (v) => v.status === "PROCESSANDO" || v.status === "PROCESSANDO_IA"
   );
