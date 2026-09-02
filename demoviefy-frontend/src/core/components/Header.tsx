@@ -8,13 +8,14 @@ type HeaderProps = {
 };
 
 export default function Header({ }: HeaderProps) {
-  return (<header className="border-b border-slate-800">
-    <div className="mx-auto flex h-20 w-full items-center justify-between px-8 lg:px-12">
+  return (
+  <header className="sticky top-0 z-50 border-b border-slate-800">
+    <div className="mx-auto flex h-24 w-full items-center justify-between px-8 lg:px-12">
       <NavLink to="/">
         <img
           src={demoviefyLight}
           alt="DeMoviefy"
-          className="h-14 w-auto"
+          className="h-18 w-auto"
         />
       </NavLink>
 
@@ -22,7 +23,7 @@ export default function Header({ }: HeaderProps) {
         <NavLink
           to="/upload"
           className={({ isActive }) =>
-            `text-sm transition ${isActive
+            `text-base transition ${isActive
               ? "text-white"
               : "text-slate-400 hover:text-white"
             }`

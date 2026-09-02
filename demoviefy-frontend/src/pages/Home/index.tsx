@@ -3,15 +3,15 @@
 export default function Home() {
   return (
     <main>
-      <section className="grid w-full items-center gap-16 px-8 py-24 lg:grid-cols-2 lg:px-12 lg:py-32">
+      <section className="grid w-full items-center gap-16 px-8 py-24 lg:grid-cols-2 lg:gap-24 lg:px-16 lg:py-32">
         <div>
-          <h1 className="mt-4 text-5xl font-semibold tracking-tight md:text-6xl">
+          <h1 className="text-5xl font-semibold tracking-tight md:text-6xl lg:text-7xl">
             Analise seus vídeos.
             <br />
             Extraia mais deles.
           </h1>
 
-          <p className="mt-6 max-w-xl text-lg leading-8 text-slate-400">
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-400 lg:text-xl">
             O DeMoviefy utiliza inteligência artificial para processar vídeos,
             detectar informações e gerar resultados estruturados.
           </p>
