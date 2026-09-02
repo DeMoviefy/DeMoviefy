@@ -20,7 +20,10 @@ export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
         onClick={onClose}
         aria-hidden="true"
       />
-      <aside className={`dashboard-sidebar ${open ? "open" : ""}`}>
+      <aside
+        className={`fixed left-0 top-20 z-40 h-[calc(100vh-5rem)] w-72 border-r border-slate-800 bg-slate-950 transition-transform ${open ? "translate-x-0" : "-translate-x-full"
+          }`}
+      >
         <div className="dashboard-sidebar-header">
           <h2>Biblioteca</h2>
           <button
@@ -32,9 +35,9 @@ export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
           </button>
         </div>
         <VideoLibrary
-            videos={videos}
-            loading={loading}
-            onNavigate={onClose}
+          videos={videos}
+          loading={loading}
+          onNavigate={onClose}
         />
       </aside>
     </>

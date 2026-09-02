@@ -9,23 +9,34 @@ interface StatsPanelProps {
 
 export function StatsPanel({ total, processing, processed, errors }: StatsPanelProps) {
   return (
-    <div className="dashboard-stats">
-      <div className="stat-card">
-        <span>Total</span>
-        <strong>{total}</strong>
+    <section className="grid grid-cols-2 gap-x-8 gap-y-6 border-b border-slate-800 pb-8 md:grid-cols-4">
+      <div>
+        <span className="text-sm text-slate-400">Vídeos</span>
+        <strong className="mt-1 block text-2xl font-semibold">
+          {total}
+        </strong>
       </div>
-      <div className="stat-card">
-        <span>Em processamento</span>
-        <strong>{processing}</strong>
+
+      <div>
+        <span className="text-sm text-slate-400">Processando</span>
+        <strong className="mt-1 block text-2xl font-semibold">
+          {processing}
+        </strong>
       </div>
-      <div className="stat-card">
-        <span>Concluídos</span>
-        <strong>{processed}</strong>
+
+      <div>
+        <span className="text-sm text-slate-400">Concluídos</span>
+        <strong className="mt-1 block text-2xl font-semibold">
+          {processed}
+        </strong>
       </div>
-      <div className="stat-card">
-        <span>Com erro</span>
-        <strong>{errors}</strong>
+
+      <div>
+        <span className="text-sm text-slate-400">Erros</span>
+        <strong className="mt-1 block text-2xl font-semibold">
+          {errors}
+        </strong>
       </div>
-    </div>
-  )
+    </section>
+  );
 }

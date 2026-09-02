@@ -9,7 +9,7 @@ import "/src/pages/Upload/styles/ProcessingQueuePanel.css";
 
 export function ProcessingQueuePanel() {
   const videos = useProcessingStore((state) => state.videos);
-  
+
 
   const [cancellingVideoId, setCancellingVideoId] = useState<number | null>(null);
 
@@ -19,7 +19,7 @@ export function ProcessingQueuePanel() {
 
   if (processingVideos.length === 0) {
     return (
-      <div className="processing-queue-panel">
+      <div className="flex flex-col gap-6">
         <div className="panel-header">
           <h3>Fila de Processamento</h3>
         </div>
@@ -45,48 +45,55 @@ export function ProcessingQueuePanel() {
   }
 
   return (
-    <div className="processing-queue-panel">
-      <div className="panel-header">
-        <h3>Fila de Processamento</h3>
-        <span className="queue-count">{processingVideos.length}</span>
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+        <h2 className="text-2xl font-semibold">
+          Fila de processamento
+        </h2>
+
+        {processingVideos.length > 0 && (
+          <span className="text-sm text-slate-400">
+            {processingVideos.length} em andamento
+          </span>
+        )}
       </div>
 
       <div className="queue-list">
         {processingVideos.map((video) => (
-          <div key={video.id} className="queue-item">
+          <div
+            key={video.id}
+            className="border-b border-slate-800 py-5 last:border-b-0"
+          >
             {/* Video Info */}
             <div className="queue-info">
               <div className="video-name" title={video.filename}>
                 {video.filename}
               </div>
-              <div className="video-meta">
-                <span className="task-badge">{video.ai_config.task_label}</span>
-                <span className="model-badge">{video.ai_config.model_name}</span>
+              <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-400">
+                <span>{video.ai_config.task_label}</span>
+                <span>{video.ai_config.model_name}</span>
               </div>
             </div>
 
             {/* Progress */}
             <div className="queue-progress">
-              <div className="progress-bar">
+              <div className="mt-4 h-1 w-full bg-slate-800">
                 <div
-                  className="progress-fill"
-                  style={{ width: `${video.processing.processing_progress}%` }}
-                  role="progressbar"
-                  aria-valuenow={video.processing.processing_progress}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
+                  className="h-full bg-blue-600 transition-all"
+                  style={{
+                    width: `${video.processing.processing_progress}%`,
+                  }}
                 />
               </div>
 
-              <div className="progress-info">
-                <span className="progress-percent">
+              <div className="mt-2 flex justify-between text-xs text-slate-400">
+                <span>{video.processing.processing_message}</span>
+
+                <span>
                   {video.processing.processing_progress}%
+                  {video.processing.processing_eta_seconds !== null &&
+                    ` · ~${video.processing.processing_eta_seconds}s`}
                 </span>
-                {video.processing.processing_eta_seconds !== null && (
-                  <span className="progress-eta">
-                    ~{video.processing.processing_eta_seconds}s
-                  </span>
-                )}
               </div>
 
               {/* Stage Indicator */}
@@ -95,11 +102,13 @@ export function ProcessingQueuePanel() {
               </div>
               <button
                 type="button"
-                className="cancel-processing-button"
+                className="mt-3 text-xs text-red-400 hover:text-red-300 disabled:opacity-50"
                 disabled={cancellingVideoId === video.id}
                 onClick={() => void cancelProcessing(video.id)}
               >
-                {cancellingVideoId === video.id ? "Cancelando..." : "Cancelar processamento"}
+                {cancellingVideoId === video.id
+                  ? "Cancelando..."
+                  : "Cancelar processamento"}
               </button>
             </div>
           </div>

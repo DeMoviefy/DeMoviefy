@@ -61,17 +61,26 @@ export function NewVideoPanel() {
     : [];
 
   return (
-    <div className="new-video-panel">
+    <div className="flex flex-col gap-8">
       {/* Header */}
-      <div className="panel-header">
-        <h3>+ Novo Vídeo</h3>
+      <div>
+        <h2 className="text-2xl font-semibold">
+          Novo vídeo
+        </h2>
+
+        <p className="mt-2 text-sm text-slate-400">
+          Envie um vídeo e escolha como ele será analisado.
+        </p>
       </div>
 
       {/* Dropzone */}
       <div
-        className={`file-dropzone ${isDragging ? "dragging" : ""} ${
-          file ? "has-file" : ""
+        className={`flex min-h-40 cursor-pointer items-center justify-center border border-dashed p-8 text-center transition ${
+          isDragging
+            ? "border-blue-500 bg-blue-500/5"
+            : "border-slate-700 hover:border-slate-500"
         }`}
+
         onDrop={handleDrop}
         onDragOver={(e) => {
           e.preventDefault();
@@ -97,21 +106,27 @@ export function NewVideoPanel() {
           aria-hidden="true"
         />
 
-        {file ? (
-          <div className="file-selected">
-            <span className="file-icon">🎬</span>
-            <span className="file-name">{file.name}</span>
-            <span className="file-size">
-              {(file.size / (1024 * 1024)).toFixed(2)} MB
-            </span>
-          </div>
-        ) : (
-          <div className="file-placeholder">
-            <span className="drop-icon">📁</span>
-            <span className="drop-text">Arraste vídeo aqui</span>
-            <span className="drop-hint">ou clique para selecionar</span>
-          </div>
-        )}
+      {file ? (
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-sm font-medium">
+            {file.name}
+          </span>
+
+          <span className="text-sm text-slate-400">
+            {(file.size / (1024 * 1024)).toFixed(2)} MB
+          </span>
+        </div>
+      ) : (
+        <div>
+          <p className="font-medium">
+            Arraste seu vídeo aqui
+          </p>
+
+          <p className="mt-2 text-sm text-slate-400">
+            ou clique para selecionar um arquivo
+          </p>
+        </div>
+      )}
       </div>
 
       {/* Configuration Section */}
@@ -123,7 +138,7 @@ export function NewVideoPanel() {
               id="task-select"
               value={uploadTask}
               onChange={(e) => handleUploadTaskChange(e.target.value)}
-              className="form-select"
+              className="mt-2 w-full border border-slate-700 bg-transparent px-3 py-2.5 text-sm outline-none transition focus:border-blue-500"
             >
               <option value="">Selecione uma tarefa</option>
               {tasks.map((task) => (
@@ -141,7 +156,7 @@ export function NewVideoPanel() {
                 id="model-select"
                 value={uploadModelPath}
                 onChange={(e) => setUploadModelPath(e.target.value)}
-                className="form-select"
+                className="mt-2 w-full border border-slate-700 bg-transparent px-3 py-2.5 text-sm outline-none transition focus:border-blue-500"
               >
                 <option value="">Selecione um modelo</option>
                 {filteredModels.map((model) => (
@@ -164,7 +179,7 @@ export function NewVideoPanel() {
                 max="30"
                 value={uploadFrameStride}
                 onChange={(e) => setUploadFrameStride(e.target.value)}
-                className="form-input"
+                className="mt-2 w-full border border-slate-700 bg-transparent px-3 py-2.5 text-sm outline-none transition focus:border-blue-500"
               />
             </div>
 
@@ -178,7 +193,7 @@ export function NewVideoPanel() {
                 step="0.05"
                 value={uploadConfidenceThreshold}
                 onChange={(e) => setUploadConfidenceThreshold(e.target.value)}
-                className="form-input"
+                className="mt-2 w-full border border-slate-700 bg-transparent px-3 py-2.5 text-sm outline-none transition focus:border-blue-500"
               />
             </div>
 
@@ -191,7 +206,7 @@ export function NewVideoPanel() {
                 max="600"
                 value={uploadMaxFrames}
                 onChange={(e) => setUploadMaxFrames(e.target.value)}
-                className="form-input"
+                className="mt-2 w-full border border-slate-700 bg-transparent px-3 py-2.5 text-sm outline-none transition focus:border-blue-500"
               />
             </div>
           </div>
@@ -206,7 +221,7 @@ export function NewVideoPanel() {
                 min="0"
                 value={uploadClipStart}
                 onChange={(e) => setUploadClipStart(e.target.value)}
-                className="form-input"
+                className="mt-2 w-full border border-slate-700 bg-transparent px-3 py-2.5 text-sm outline-none transition focus:border-blue-500"
               />
             </div>
 
@@ -218,7 +233,7 @@ export function NewVideoPanel() {
                 min="0"
                 value={uploadClipEnd}
                 onChange={(e) => setUploadClipEnd(e.target.value)}
-                className="form-input"
+                className="mt-2 w-full border border-slate-700 bg-transparent px-3 py-2.5 text-sm outline-none transition focus:border-blue-500"
                 placeholder="Vídeo inteiro"
               />
             </div>
@@ -228,7 +243,7 @@ export function NewVideoPanel() {
           <button
             onClick={() => handleUpload(uploadTask, uploadModelPath)}
             disabled={!uploadTask || !uploadModelPath || uploading}
-            className="primary-button full-width"
+            className="w-full bg-blue-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
             aria-busy={uploading}
           >
             {uploading ? "Enviando..." : "Enviar Vídeo"}

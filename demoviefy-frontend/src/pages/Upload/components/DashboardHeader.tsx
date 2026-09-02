@@ -6,17 +6,15 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ onToggleSidebar }: DashboardHeaderProps) {
   return (
-    <header className="dashboard-header">
+    <div className="flex items-center border-b border-slate-800 px-8 py-5 lg:px-12">
       <button
-        className="menu-toggle"
+        type="button"
         onClick={onToggleSidebar}
-        aria-label="Abrir menu"
-        title="Biblioteca de vídeos"
+        className="text-sm text-slate-400 hover:text-white"
+        aria-label="Abrir biblioteca de vídeos"
       >
-        ☰  
+        Biblioteca
       </button>
-      <h1 className="dashboard-title">DeMoviefy</h1>
-      <div style={{ flex: 1 }} />
-    </header>
-  )
+    </div>
+  );
 }
