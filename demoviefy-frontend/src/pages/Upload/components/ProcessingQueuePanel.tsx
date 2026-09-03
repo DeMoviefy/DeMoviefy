@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
 import { VideoService } from "src/pages/Upload/services/videoService";
 import { getApiErrorMessage } from "src/pages/Upload/utils/helpers";
-import "/src/pages/Upload/styles/ProcessingQueuePanel.css";
 
 export function ProcessingQueuePanel() {
   const videos = useProcessingStore((state) => state.videos);
@@ -19,12 +18,16 @@ export function ProcessingQueuePanel() {
   if (processingVideos.length === 0) {
     return (
       <div className="flex flex-col gap-6">
-        <div className="panel-header">
-          <h3>Fila de Processamento</h3>
+        <div className="border-b border-slate-800 pb-4">
+          <h2 className="text-2xl font-semibold">
+            Fila de processamento
+          </h2>
         </div>
-        <div className="empty-state">
-          <span className="empty-icon">✓</span>
-          <p>Nenhum vídeo em processamento</p>
+
+        <div className="py-8 text-center">
+          <p className="text-sm text-slate-400">
+            Nenhum vídeo em processamento
+          </p>
         </div>
       </div>
     );
@@ -57,15 +60,15 @@ export function ProcessingQueuePanel() {
         )}
       </div>
 
-      <div className="queue-list">
+      <div className="flex flex-col">
         {processingVideos.map((video) => (
           <div
             key={video.id}
             className="border-b border-slate-800 py-5 last:border-b-0"
           >
             {/* Video Info */}
-            <div className="queue-info">
-              <div className="video-name" title={video.filename}>
+            <div>
+              <div className="truncate text-sm font-medium" title={video.filename}>
                 {video.filename}
               </div>
               <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-400">
@@ -75,8 +78,8 @@ export function ProcessingQueuePanel() {
             </div>
 
             {/* Progress */}
-            <div className="queue-progress">
-              <div className="mt-4 h-1 w-full bg-slate-800">
+            <div className="mt-4">
+              <div className="h-1 w-full bg-slate-800">
                 <div
                   className="h-full bg-blue-600 transition-all"
                   style={{

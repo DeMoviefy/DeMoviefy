@@ -26,7 +26,7 @@ export default function Home() {
 
         <div className="overflow-hidden rounded-lg border border-slate-800">
           <img
-            src="/public/DeMoviefy-Demo.png"
+            src="src/assets/DeMoviefy-Demo.png"
             alt="Prévia de um vídeo sendo analisado pelo DeMoviefy"
             className="w-full"
           />
