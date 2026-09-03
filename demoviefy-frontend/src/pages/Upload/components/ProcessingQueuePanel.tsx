@@ -10,7 +10,6 @@ import "/src/pages/Upload/styles/ProcessingQueuePanel.css";
 export function ProcessingQueuePanel() {
   const videos = useProcessingStore((state) => state.videos);
 
-
   const [cancellingVideoId, setCancellingVideoId] = useState<number | null>(null);
 
   const processingVideos = videos.filter(

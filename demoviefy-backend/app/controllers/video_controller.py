@@ -451,6 +451,7 @@ def update_video_status(video_id: int):
         return jsonify({"error": "Status de vídeo inválido"}), 400
 
     update_status(video, status)
+    current_app.logger.info("action:update_status video_id=%s new_status=%s", video_id, status)
     return jsonify(_serialize_video(video))
 
 
@@ -555,6 +556,7 @@ def cancel_video_processing_by_id(video_id: int):
         eta_seconds=None,
         message="Cancelamento solicitado. O vídeo e análises concluídas serão mantidos.",
     )
+    current_app.logger.info("action:cancel_processing video_id=%s", video_id)
     return jsonify({"message": "Processamento cancelado", "video": _serialize_video(video)})
 
 
@@ -571,6 +573,7 @@ def delete_video_by_id(video_id: int):
     delete_analysis_artifacts(video.id)
     delete_transcription(video_id)
     delete_metadata(video_id)
+    current_app.logger.info("action:delete_video video_id=%s filename=%s", video_id, video.filename)
     return jsonify({"message": "Vídeo removido com sucesso"})
 
 
