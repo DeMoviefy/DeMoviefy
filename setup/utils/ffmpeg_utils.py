@@ -73,13 +73,13 @@ def download_ffmpeg() -> bool:
                 print(f"[setup] dnf install failed: {exc}")
         try:
             print("[setup] Downloading static ffmpeg tarball for Linux...")
-            url = "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz"
+            url = "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz"
             archive_fd, archive_path = tempfile.mkstemp(suffix=".tar.xz")
             os.close(archive_fd)
             urllib.request.urlretrieve(url, archive_path)
             import tarfile
             with tarfile.open(archive_path, "r:xz") as tf:
-                members = [m for m in tf.getnames() if m.endswith("/ffmpeg") or m.endswith("/ffprobe")]
+                members = [m for m in tf.getnames() if m.endswith("/bin/ffmpeg") or m.endswith("/bin/ffprobe")]
                 if not members:
                     print("[setup] ffmpeg not found in tarball!")
                     return False
