@@ -16,7 +16,7 @@ export default function UseCases() {
             <div className="mt-16 grid gap-8 md:grid-cols-3 lg:mt-20">
 
                 <div>
-                    <div className="overflow-hidden rounded-lg border border-neutral-800">
+                    <div className="overflow-hidden rounded-lg">
                         <img
                             src="src/assets/DeMoviefy-Demo.png"
                             alt="Análise de conteúdo no DeMoviefy"
@@ -35,7 +35,7 @@ export default function UseCases() {
                 </div>
 
                 <div>
-                    <div className="overflow-hidden rounded-lg border border-neutral-800">
+                    <div className="overflow-hidden rounded-lg">
                         <img
                             src="src/assets/DeMoviefy-Demo.png"
                             alt="Transcrição de vídeo no DeMoviefy"
@@ -56,7 +56,7 @@ export default function UseCases() {
 
 
                 <div>
-                    <div className="overflow-hidden rounded-lg border border-neutral-800">
+                    <div className="overflow-hidden rounded-lg">
                         <img
                             src="src/assets/DeMoviefy-Demo.png"
                             alt="Novos recursos do DeMoviefy"

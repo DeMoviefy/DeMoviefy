@@ -13,7 +13,7 @@ export default function FeaturesSection() {
           </p>
 
           {/* TODO: Quando trocar o placeholder da imagem, pegar uma que tenha um tamanho horizontal bom e um vertical pequeno, para ficar com as proporções legais. */}
-          <div className="mt-10 max-w-xl overflow-hidden rounded-lg border border-neutral-200">
+          <div className="mt-10 max-w-xl overflow-hidden rounded-lg">
             <img
               src="src/assets/DeMoviefy-Demo.png"
               alt="Interface do DeMoviefy"
