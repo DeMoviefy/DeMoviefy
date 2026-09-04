@@ -1,10 +1,11 @@
 ﻿import { Link } from "react-router-dom";
+import HowItWorks from "src/pages/Home/HowItWorks";
 
 export default function Home() {
   return (
     <main>
-      <section className="grid w-full items-center gap-16 px-8 py-24 lg:grid-cols-2 lg:gap-24 lg:px-16 lg:py-32">
-        <div>
+        <section className="grid w-full items-center gap-16 px-8 pb-20 pt-12 lg:grid-cols-2 lg:gap-24 lg:px-16 lg:pb-20 lg:pt-16">   
+          <div>
           <h1 className="text-5xl font-semibold tracking-tight md:text-6xl lg:text-7xl">
             Analise seus vídeos.
             <br />
@@ -31,7 +32,11 @@ export default function Home() {
             className="w-full"
           />
         </div>
+        
       </section>
+
+      <HowItWorks/>
+
     </main>
   );
 }

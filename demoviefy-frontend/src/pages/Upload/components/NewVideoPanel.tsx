@@ -4,8 +4,6 @@ import { useUpload } from "src/pages/Upload/hooks/useUpload";
 import { useUploadStore } from "src/core/stores/useUploadStore";
 import { useCatalogStore } from "src/core/stores/useAICatalogStore";
 
-import "/src/pages/Upload/styles/NewVideoPanel.css";
-
 export function NewVideoPanel() {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
