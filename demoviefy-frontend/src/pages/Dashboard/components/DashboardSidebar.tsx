@@ -1,50 +1,22 @@
-// src/pages/Dashboard/components/DashboardSidebar.tsx
-
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
-import { VideoLibrary } from "src/pages/Dashboard/components/VideoLibrary"
+import { VideoLibrary } from "src/pages/Dashboard/components/VideoLibrary";
 
-interface DashboardSidebarProps {
-  open: boolean
-  onClose: () => void
-}
-
-export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
-
+export function DashboardSidebar() {
   const videos = useProcessingStore((state) => state.videos);
   const loading = useProcessingStore((state) => state.loading);
 
   return (
-    <>
-      <div
-        className={`sidebar-overlay ${open ? "show" : ""}`}
-        onClick={onClose}
-        aria-hidden="true"
-      />
-      <aside
-        className={`fixed left-0 top-20 z-40 h-[calc(100vh-5rem)] w-72 border-r border-slate-800 bg-slate-950 transition-transform ${open ? "translate-x-0" : "-translate-x-full"
-          }`}
-      >
-        <div className="flex items-center justify-between border-b border-slate-800 px-6 py-5">
-          <h2 className="font-semibold">
-            Biblioteca
-          </h2>
+    <aside className="h-full w-72 shrink-0 border-r border-neutral-200 bg-white">
+      <div className="px-6 py-6">
+        <h2 className="text-lg font-semibold tracking-tight text-neutral-900">
+          Biblioteca
+        </h2>
+        <p className="mt-1 text-sm text-neutral-500">
+          Vídeos analisados
+        </p>
+      </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-sm text-slate-400 hover:text-white"
-            aria-label="Fechar biblioteca"
-          >
-            Fechar
-          </button>
-        </div>
-        
-        <VideoLibrary
-          videos={videos}
-          loading={loading}
-          onNavigate={onClose}
-        />
-      </aside>
-    </>
-  )
+      <VideoLibrary videos={videos} loading={loading} />
+    </aside>
+  );
 }
