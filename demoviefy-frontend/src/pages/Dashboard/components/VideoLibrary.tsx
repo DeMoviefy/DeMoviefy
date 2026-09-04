@@ -1,11 +1,11 @@
-// src/pages/Upload/components/VideoLibrary.tsx
+// src/pages/Dashboard/components/VideoLibrary.tsx
 
 import { memo } from "react";
 import { Link } from "react-router-dom";
 
 import { StatusBadge } from "src/core/components/StatusBadge";
 import { ProcessingProgress } from "src/core/components/ProcessingProgress";
-import type { VideoRecord } from "src/pages/Upload/types"
+import type { VideoRecord } from "src/pages/Dashboard/types"
 
 type VideoLibraryProps = {
     videos: VideoRecord[];

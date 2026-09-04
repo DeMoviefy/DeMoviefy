@@ -1,4 +1,4 @@
-// src/pages/Upload/utils/helpers.ts
+// src/pages/Dashboard/utils/helpers.ts
 
 import type { AxiosError } from "axios";
 
@@ -7,7 +7,7 @@ import type {
     AITaskOption, 
     VideoRecord,
     VideoAnalysisVariant
-} from "src/pages/Upload/types";
+} from "src/pages/Dashboard/types";
 
 // Transforma em JSON
 

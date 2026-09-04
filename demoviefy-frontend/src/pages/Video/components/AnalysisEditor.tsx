@@ -1,4 +1,4 @@
-// src/pages/Upload/components/AnalysisEditor.tsx
+// src/pages/Dashboard/components/AnalysisEditor.tsx
 
 import { ConfirmationDialog } from "src/core/components/ConfirmationDialog"
 

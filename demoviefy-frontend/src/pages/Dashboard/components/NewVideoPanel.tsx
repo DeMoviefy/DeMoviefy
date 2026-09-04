@@ -1,6 +1,6 @@
-// src/pages/Upload/components/NewVideoPanel.tsx
+// src/pages/Dashboard/components/NewVideoPanel.tsx
 import { useCallback, useRef, useState, useEffect } from "react";
-import { useUpload } from "src/pages/Upload/hooks/useUpload";
+import { useUpload } from "src/pages/Dashboard/hooks/useUpload";
 import { useUploadStore } from "src/core/stores/useUploadStore";
 import { useCatalogStore } from "src/core/stores/useAICatalogStore";
 

@@ -1,4 +1,4 @@
-// -src/pages/Upload/constants.ts
+// -src/pages/Dashboard/constants.ts
 
 export const DEFAULT_PROCESSING = {
   processing_progress: 0,

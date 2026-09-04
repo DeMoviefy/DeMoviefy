@@ -1,4 +1,4 @@
-// src/pages/Upload/components/DashboardProgressBar.tsx
+// src/pages/Dashboard/components/DashboardProgressBar.tsx
 
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
 import { useUploadStore } from "src/core/stores/useUploadStore";

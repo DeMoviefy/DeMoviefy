@@ -1,4 +1,4 @@
-// src/pages/Upload/components/DashboardHeader.tsx
+// src/pages/Dashboard/components/DashboardHeader.tsx
 
 interface DashboardHeaderProps {
   onToggleSidebar: () => void;

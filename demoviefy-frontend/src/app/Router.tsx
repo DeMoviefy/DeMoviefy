@@ -1,13 +1,13 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import Home from "src/pages/Home";
-import Upload from "src/pages/Upload";
+import Dashboard from "src/pages/Dashboard";
 import Video from "src/pages/Video";
 
 // Define os títulos das páginas com base nas rotas
 const titlesMap: Record<string, string> = {
     "/": "DeMoviefy",
-    "/upload": "DeMoviefy - Painel",
+    "/dashboard": "DeMoviefy - Painel",
 };
 
 // Aplica o título na página caso ela esteja declarada acima. Caso não, o valor padrão ("DeMoviefy") será vinculado.
@@ -36,7 +36,7 @@ export default function Router() {
             <TitleManager />
             <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/upload" element={<Upload />} />
+                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/video/:id" element={<Video />} />
                 <Route path="*" element={<Navigate replace to="/" />} />
             </Routes>

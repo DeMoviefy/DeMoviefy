@@ -1,7 +1,7 @@
-// src/pages/Upload/components/VideoPreviewPanel.tsx
+// src/pages/Dashboard/components/VideoPreviewPanel.tsx
 
 import { useState, useEffect, type RefObject } from "react"
-import type { VideoRecord } from "src/pages/Upload/types"
+import type { VideoRecord } from "src/pages/Dashboard/types"
 
 interface VideoPreviewPanelProps {
   video: VideoRecord

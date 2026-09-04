@@ -19,7 +19,7 @@ export default function Home() {
           </p>
 
           <Link
-            to="/upload"
+            to="/dashboard"
             className="mt-8 inline-block rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white hover:bg-blue-500"
           >
             Começar agora

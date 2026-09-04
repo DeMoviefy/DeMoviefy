@@ -1,7 +1,7 @@
-// src/pages/Upload/components/DashboardSidebar.tsx
+// src/pages/Dashboard/components/DashboardSidebar.tsx
 
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
-import { VideoLibrary } from "src/pages/Upload/components/VideoLibrary"
+import { VideoLibrary } from "src/pages/Dashboard/components/VideoLibrary"
 
 interface DashboardSidebarProps {
   open: boolean

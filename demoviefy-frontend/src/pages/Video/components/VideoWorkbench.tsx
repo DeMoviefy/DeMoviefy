@@ -17,7 +17,7 @@ import { TranscriptionEditor } from "src/pages/Video/components/TranscriptionEdi
 import { VideoPreviewPanel } from "src/pages/Video/components/VideoPreviewPanel";
 import { WorkbenchEmptyState } from "src/pages/Video/components/WorkbenchEmptyState";
 
-import type { AiConfigPayload, VideoRecord } from "src/pages/Upload/types";
+import type { AiConfigPayload, VideoRecord } from "src/pages/Dashboard/types";
 
 type VideoWorkbenchProps = {
     video: VideoRecord | null;

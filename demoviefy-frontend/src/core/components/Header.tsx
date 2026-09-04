@@ -21,7 +21,7 @@ export default function Header({ }: HeaderProps) {
 
         <nav>
           <NavLink
-            to="/upload"
+            to="/dashboard"
             className={({ isActive }) =>
               `text-base transition ${isActive
                 ? "text-neutral-900"
@@ -29,7 +29,7 @@ export default function Header({ }: HeaderProps) {
               }`
             }
           >
-            Upload
+            Dashboard
           </NavLink>
         </nav>
       </div>

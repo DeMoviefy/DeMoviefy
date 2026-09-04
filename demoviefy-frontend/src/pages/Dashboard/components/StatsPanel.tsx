@@ -1,4 +1,4 @@
-// src/pages/Upload/components/StatsPanel.tsx
+// src/pages/Dashboard/components/StatsPanel.tsx
 
 interface StatsPanelProps {
   total: number

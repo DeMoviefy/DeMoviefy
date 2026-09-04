@@ -1,8 +1,8 @@
-// src/pages/Upload/hooks/useUpload.ts
+// src/pages/Dashboard/hooks/useUpload.ts
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { VideoService } from "src/pages/Upload/services/videoService";
-import { getApiErrorMessage, sleep } from "src/pages/Upload/utils/helpers";
+import { VideoService } from "src/pages/Dashboard/services/videoService";
+import { getApiErrorMessage, sleep } from "src/pages/Dashboard/utils/helpers";
 import { useUploadStore } from "src/core/stores/useUploadStore";
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
 

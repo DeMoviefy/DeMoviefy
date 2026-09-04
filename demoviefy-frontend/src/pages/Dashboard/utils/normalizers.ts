@@ -1,12 +1,12 @@
-// src/pages/Upload/utils/normalizers.ts
+// src/pages/Dashboard/utils/normalizers.ts
 
 import type {
     VideoRecord,
     VideoAnalysisResponse,
     VideoAnalysisVariant
-} from "src/pages/Upload/types";
+} from "src/pages/Dashboard/types";
 
-import { DEFAULT_PROCESSING, DEFAULT_AI_CONFIG } from "src/pages/Upload/constants";
+import { DEFAULT_PROCESSING, DEFAULT_AI_CONFIG } from "src/pages/Dashboard/constants";
 
 export function normalizeVideoRecord(video: Partial<VideoRecord>): VideoRecord {
     return {

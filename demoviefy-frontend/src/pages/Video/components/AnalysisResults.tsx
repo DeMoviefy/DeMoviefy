@@ -1,8 +1,8 @@
-// src/pages/Upload/components/AnalysisResults.tsx
+// src/pages/Dashboard/components/AnalysisResults.tsx
 
 import { AnalysisMetrics } from "src/pages/Video/components/AnalysisMetrics"
 import { AnalysisDetectionTable } from "src/pages/Video/components/AnalysisDetectionTable"
-import type { VideoAnalysisResponse } from "src/pages/Upload/types"
+import type { VideoAnalysisResponse } from "src/pages/Dashboard/types"
 type AnalysisResultsProps = {
   state: "idle" | "loading" | "ready" | "pending" | "error"
   summary: NonNullable<VideoAnalysisResponse["analysis"]> | null

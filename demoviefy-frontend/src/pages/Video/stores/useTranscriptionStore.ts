@@ -1,10 +1,10 @@
 // src/pages/Video/stores/useTranscriptionStore.ts
 
 import { create } from "zustand";
-import { VideoService } from "src/pages/Upload/services/videoService";
-import { getApiErrorMessage } from "src/pages/Upload/utils/helpers";
+import { VideoService } from "src/pages/Dashboard/services/videoService";
+import { getApiErrorMessage } from "src/pages/Dashboard/utils/helpers";
 import { useVideoDetailStore } from "src/pages/Video/stores/useVideoDetailStore";
-import type { VideoRecord, VideoTranscriptionResponse } from "src/pages/Upload/types";
+import type { VideoRecord, VideoTranscriptionResponse } from "src/pages/Dashboard/types";
 import { toast } from "sonner";
 
 interface TranscriptionState {

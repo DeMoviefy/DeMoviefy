@@ -1,11 +1,11 @@
 // src/pages/Video/stores/useAnalysisStore.ts
 
 import { create } from "zustand";
-import { VideoService } from "src/pages/Upload/services/videoService";
-import { prettifyJson, getApiErrorMessage, buildArtifactSignature } from "src/pages/Upload/utils/helpers";
+import { VideoService } from "src/pages/Dashboard/services/videoService";
+import { prettifyJson, getApiErrorMessage, buildArtifactSignature } from "src/pages/Dashboard/utils/helpers";
 import { toast } from "sonner";
 import { useTranscriptionStore } from "src/pages/Video/stores/useTranscriptionStore";
-import type { VideoAnalysisResponse, VideoRecord } from "src/pages/Upload/types";
+import type { VideoAnalysisResponse, VideoRecord } from "src/pages/Dashboard/types";
 
 type AnalysisStatus = "idle" | "loading" | "ready" | "pending" | "error";
 

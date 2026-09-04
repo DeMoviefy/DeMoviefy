@@ -1,8 +1,8 @@
-// src/pages/Upload/components/AnalysisHeader.tsx
+// src/pages/Dashboard/components/AnalysisHeader.tsx
 
 import { memo } from "react"
-import { formatVariantLabel } from "src/pages/Upload/utils/helpers"
-import type { VideoAnalysisResponse } from "src/pages/Upload/types"
+import { formatVariantLabel } from "src/pages/Dashboard/utils/helpers"
+import type { VideoAnalysisResponse } from "src/pages/Dashboard/types"
 
 type AnalysisHeaderProps = {
   message: string

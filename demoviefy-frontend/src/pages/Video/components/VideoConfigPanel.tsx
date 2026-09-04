@@ -1,4 +1,4 @@
-// src/pages/Upload/components/VideoConfigPanel.tsx
+// src/pages/Dashboard/components/VideoConfigPanel.tsx
 
 import { useNavigate } from "react-router-dom"
 import { useCatalogStore } from "src/core/stores/useAICatalogStore"
@@ -6,7 +6,7 @@ import { useCatalogStore } from "src/core/stores/useAICatalogStore"
 import { ConfirmationDialog } from "src/core/components/ConfirmationDialog"
 
 import { useAnalysisStore } from "src/pages/Video/stores/useAnalysisStore"
-import type { AiConfigPayload, VideoRecord } from "src/pages/Upload/types"
+import type { AiConfigPayload, VideoRecord } from "src/pages/Dashboard/types"
 
 
 interface VideoConfigPanelProps {
@@ -35,7 +35,7 @@ export function VideoConfigPanel({
     const deleted = await onDeleteVideo(video);
 
     if (deleted) {
-        navigate("/upload");
+        navigate("/dashboard");
     }
   }
 

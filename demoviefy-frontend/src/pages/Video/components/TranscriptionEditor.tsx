@@ -1,7 +1,7 @@
-// src/pages/Upload/components/TranscriptionEditor.tsx
+// src/pages/Dashboard/components/TranscriptionEditor.tsx
 
 import { ConfirmationDialog } from "src/core/components/ConfirmationDialog"
-import { formatTimecode } from "src/pages/Upload/utils/helpers"
+import { formatTimecode } from "src/pages/Dashboard/utils/helpers"
 
 interface TranscriptionSegment {
   id: number
