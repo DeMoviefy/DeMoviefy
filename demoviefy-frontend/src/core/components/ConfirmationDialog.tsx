@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import 'src/core/styles/ConfirmationDialog.css'
-import { Warning } from 'src/assets/Warning'
+import { WarningSVG } from 'src/assets/SVG/WarningSVG'
 
 interface ConfirmationDialogProps {
     title?: string
@@ -28,7 +28,7 @@ export function ConfirmationDialog({
           <div className="dialog-content">
 
             <div className="dialog-icon-container">
-                <Warning />
+                <WarningSVG />
             </div>
 
             <h2>{title}</h2>
