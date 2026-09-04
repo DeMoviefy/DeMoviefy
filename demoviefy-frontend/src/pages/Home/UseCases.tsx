@@ -1,13 +1,13 @@
-export default function HowItWorks() {
+export default function UseCases() {
 
     return (
         <section className="w-full px-8 pb-20 pt-4 lg:px-16 lg:pb-24 lg:pt-8">
             <div className="text-center">
-                <h2 className="mx-auto max-w-8xl text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">
+                <h2 className="mx-auto w-full text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">
                     Feito para aproveitar melhor seus vídeos.
                 </h2>
 
-                <p className="mx-auto mt-6 max-w-8xl text-lg leading-8 text-neutral-400 lg:text-xl">
+                <p className="mx-auto mt-6 w-full text-lg leading-8 text-neutral-400 lg:text-xl">
                     O DeMoviefy reúne ferramentas para transformar diferentes partes do
                     conteúdo audiovisual em informações úteis.
                 </p>

@@ -1,5 +1,6 @@
 ﻿import { Link } from "react-router-dom";
-import HowItWorks from "src/pages/Home/HowItWorks";
+import UseCases from "src/pages/Home/UseCases";
+import FeaturesSection from "src/pages/Home/FeaturesSection";
 
 export default function Home() {
   return (
@@ -35,7 +36,9 @@ export default function Home() {
         
       </section>
 
-      <HowItWorks/>
+      <UseCases/>
+
+      <FeaturesSection/>
 
     </main>
   );
