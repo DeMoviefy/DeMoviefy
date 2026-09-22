@@ -51,21 +51,21 @@ export function VideoAnalysisConfig({
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="group">
+      <div className="group border-t border-neutral-200 pt-8 transition-transform duration-200 hover:translate-x-1">
         <div className="flex items-start gap-3">
           <div className="mt-1 h-5 w-1 shrink-0 bg-transparent transition-colors group-hover:bg-blue-600" />
-
+  
           <div>
             <h3 className="text-base font-semibold text-neutral-900">
               Configuração
             </h3>
-
+  
             <p className="mt-1 text-sm leading-6 text-neutral-500">
               Defina como o vídeo será processado.
             </p>
           </div>
         </div>
-
+  
         <div className="mt-6 grid gap-6 border border-blue-100 bg-blue-50/50 p-6 md:grid-cols-2">
           <div>
             <label
@@ -74,13 +74,15 @@ export function VideoAnalysisConfig({
             >
               Tarefa IA
             </label>
-
+  
             <select
               id="video-analysis-task"
               value={taskType}
               onChange={(e) => onTaskChange(e.target.value)}
               className="mt-2 w-full border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500"
             >
+              <option value="">Selecione uma tarefa</option>
+  
               {tasks.map((task) => (
                 <option key={task.task_type} value={task.task_type}>
                   {task.task_label}
@@ -88,42 +90,46 @@ export function VideoAnalysisConfig({
               ))}
             </select>
           </div>
-
-          <div>
-            <label
-              htmlFor="video-analysis-model"
-              className="text-sm font-medium text-neutral-700"
-            >
-              Modelo
-            </label>
-
-            <select
-              id="video-analysis-model"
-              value={modelPath}
-              onChange={(e) => onModelChange(e.target.value)}
-              className="mt-2 w-full border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500"
-            >
-              {filteredModels.map((model) => (
-                <option key={model.relative_path} value={model.relative_path}>
-                  {model.name}
-                </option>
-              ))}
-            </select>
-          </div>
+  
+          {taskType && (
+            <div>
+              <label
+                htmlFor="video-analysis-model"
+                className="text-sm font-medium text-neutral-700"
+              >
+                Modelo
+              </label>
+  
+              <select
+                id="video-analysis-model"
+                value={modelPath}
+                onChange={(e) => onModelChange(e.target.value)}
+                className="mt-2 w-full border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500"
+              >
+                <option value="">Selecione um modelo</option>
+  
+                {filteredModels.map((model) => (
+                  <option key={model.relative_path} value={model.relative_path}>
+                    {model.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
       </div>
-
-      <div className="group">
+  
+      <div className="group border-t border-neutral-200 pt-8 transition-transform duration-200 hover:translate-x-1">
         <div className="flex items-start gap-3">
           <div className="mt-1 h-5 w-1 shrink-0 bg-transparent transition-colors group-hover:bg-blue-600" />
-
+  
           <div>
             <h3 className="text-base font-semibold text-neutral-900">
               Parâmetros
             </h3>
           </div>
         </div>
-
+  
         <div className="mt-6 grid gap-6 border border-neutral-200 bg-neutral-50 p-6 md:grid-cols-3">
           <div>
             <label
@@ -132,7 +138,7 @@ export function VideoAnalysisConfig({
             >
               Stride
             </label>
-
+  
             <input
               id="video-analysis-stride"
               type="number"
@@ -143,7 +149,7 @@ export function VideoAnalysisConfig({
               className="mt-2 w-full border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500"
             />
           </div>
-
+  
           <div>
             <label
               htmlFor="video-analysis-confidence"
@@ -151,7 +157,7 @@ export function VideoAnalysisConfig({
             >
               Confiança
             </label>
-
+  
             <input
               id="video-analysis-confidence"
               type="number"
@@ -163,7 +169,7 @@ export function VideoAnalysisConfig({
               className="mt-2 w-full border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500"
             />
           </div>
-
+  
           <div>
             <label
               htmlFor="video-analysis-max-frames"
@@ -171,7 +177,7 @@ export function VideoAnalysisConfig({
             >
               Max Frames
             </label>
-
+  
             <input
               id="video-analysis-max-frames"
               type="number"
@@ -184,22 +190,22 @@ export function VideoAnalysisConfig({
           </div>
         </div>
       </div>
-
-      <div className="group">
+  
+      <div className="group border-t border-neutral-200 pt-8 transition-transform duration-200 hover:translate-x-1">
         <div className="flex items-start gap-3">
           <div className="mt-1 h-5 w-1 shrink-0 bg-transparent transition-colors group-hover:bg-blue-600" />
-
+  
           <div>
             <h3 className="text-base font-semibold text-neutral-900">
               Trecho do vídeo
             </h3>
-
+  
             <p className="mt-1 text-sm leading-6 text-neutral-500">
               Opcionalmente, defina o intervalo que será analisado.
             </p>
           </div>
         </div>
-
+  
         <div className="mt-6 grid gap-6 border border-neutral-200 bg-neutral-50 p-6 md:grid-cols-2">
           <div>
             <label
@@ -208,7 +214,7 @@ export function VideoAnalysisConfig({
             >
               Começo (s)
             </label>
-
+  
             <input
               id="video-analysis-clip-start"
               type="number"
@@ -218,7 +224,7 @@ export function VideoAnalysisConfig({
               className="mt-2 w-full border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500"
             />
           </div>
-
+  
           <div>
             <label
               htmlFor="video-analysis-clip-end"
@@ -226,7 +232,7 @@ export function VideoAnalysisConfig({
             >
               Fim (s)
             </label>
-
+  
             <input
               id="video-analysis-clip-end"
               type="number"

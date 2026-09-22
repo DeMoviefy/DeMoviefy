@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { VideoAnalysisConfig } from "src/core/components/VideoAnalysisConfig";
 import { useCatalogStore } from "src/core/stores/useAICatalogStore";
 import { useUploadStore } from "src/core/stores/useUploadStore";
 import { useUpload } from "src/pages/Dashboard/hooks/useUpload";
@@ -66,10 +67,6 @@ export function NewVideoPanel() {
             setFile(e.target.files[0]);
         }
     };
-
-    const filteredModels = uploadTask
-        ? models.filter((model) => model.task_type === uploadTask)
-        : [];
 
     return (
         <section className="flex flex-col gap-8">
@@ -138,201 +135,24 @@ export function NewVideoPanel() {
 
             {file && (
                 <div className="flex flex-col gap-8">
-                    <div className="group border-t border-neutral-200 pt-8 transition-transform duration-200 hover:translate-x-1">
-                        <div className="flex items-start gap-3">
-                            <div className="mt-1 h-5 w-1 shrink-0 bg-transparent transition-colors group-hover:bg-blue-600" />
-
-                            <div>
-                                <h3 className="text-base font-semibold text-neutral-900">
-                                    Configuração
-                                </h3>
-
-                                <p className="mt-1 text-sm leading-6 text-neutral-500">
-                                    Defina como o vídeo será processado.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="mt-6 grid gap-6 border border-blue-100 bg-blue-50/50 p-6 md:grid-cols-2">
-                            <div>
-                                <label
-                                    htmlFor="task-select"
-                                    className="text-sm font-medium text-neutral-700"
-                                >
-                                    Tarefa IA
-                                </label>
-
-                                <select
-                                    id="task-select"
-                                    value={uploadTask}
-                                    onChange={(e) => handleUploadTaskChange(e.target.value)}
-                                    className="mt-2 w-full border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500"
-                                >
-                                    <option value="">Selecione uma tarefa</option>
-
-                                    {tasks.map((task) => (
-                                        <option key={task.task_type} value={task.task_type}>
-                                            {task.task_label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {uploadTask && (
-                                <div>
-                                    <label
-                                        htmlFor="model-select"
-                                        className="text-sm font-medium text-neutral-700"
-                                    >
-                                        Modelo
-                                    </label>
-
-                                    <select
-                                        id="model-select"
-                                        value={uploadModelPath}
-                                        onChange={(e) => setUploadModelPath(e.target.value)}
-                                        className="mt-2 w-full border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500"
-                                    >
-                                        <option value="">Selecione um modelo</option>
-
-                                        {filteredModels.map((model) => (
-                                            <option key={model.id} value={model.relative_path}>
-                                                {model.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    <div className="group border-t border-neutral-200 pt-8 transition-transform duration-200 hover:translate-x-1">
-                        <div className="flex items-start gap-3">
-                            <div className="mt-1 h-5 w-1 shrink-0 bg-transparent transition-colors group-hover:bg-blue-600" />
-
-                            <div>
-                                <h3 className="text-base font-semibold text-neutral-900">
-                                    Parâmetros
-                                </h3>
-                            </div>
-                        </div>
-
-                        <div className="mt-6 grid gap-6 border border-neutral-200 bg-neutral-50 p-6 md:grid-cols-3">
-                            <div>
-                                <label
-                                    htmlFor="stride"
-                                    className="text-sm font-medium text-neutral-700"
-                                >
-                                    Stride
-                                </label>
-
-                                <input
-                                    id="stride"
-                                    type="number"
-                                    min="1"
-                                    max="30"
-                                    value={uploadFrameStride}
-                                    onChange={(e) => setUploadFrameStride(e.target.value)}
-                                    className="mt-2 w-full border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label
-                                    htmlFor="confidence"
-                                    className="text-sm font-medium text-neutral-700"
-                                >
-                                    Confiança
-                                </label>
-
-                                <input
-                                    id="confidence"
-                                    type="number"
-                                    min="0"
-                                    max="1"
-                                    step="0.05"
-                                    value={uploadConfidenceThreshold}
-                                    onChange={(e) =>
-                                        setUploadConfidenceThreshold(e.target.value)
-                                    }
-                                    className="mt-2 w-full border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label
-                                    htmlFor="maxframes"
-                                    className="text-sm font-medium text-neutral-700"
-                                >
-                                    Max Frames
-                                </label>
-
-                                <input
-                                    id="maxframes"
-                                    type="number"
-                                    min="1"
-                                    max="600"
-                                    value={uploadMaxFrames}
-                                    onChange={(e) => setUploadMaxFrames(e.target.value)}
-                                    className="mt-2 w-full border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="group border-t border-neutral-200 pt-8 transition-transform duration-200 hover:translate-x-1">
-                        <div className="flex items-start gap-3">
-                            <div className="mt-1 h-5 w-1 shrink-0 bg-transparent transition-colors group-hover:bg-blue-600" />
-
-                            <div>
-                                <h3 className="text-base font-semibold text-neutral-900">
-                                    Trecho do vídeo
-                                </h3>
-
-                                <p className="mt-1 text-sm leading-6 text-neutral-500">
-                                    Opcionalmente, defina o intervalo que será analisado.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="mt-6 grid gap-6 border border-neutral-200 bg-neutral-50 p-6 md:grid-cols-2">
-                            <div>
-                                <label
-                                    htmlFor="clipstart"
-                                    className="text-sm font-medium text-neutral-700"
-                                >
-                                    Começo (s)
-                                </label>
-
-                                <input
-                                    id="clipstart"
-                                    type="number"
-                                    min="0"
-                                    value={uploadClipStart}
-                                    onChange={(e) => setUploadClipStart(e.target.value)}
-                                    className="mt-2 w-full border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label
-                                    htmlFor="clipend"
-                                    className="text-sm font-medium text-neutral-700"
-                                >
-                                    Fim (s)
-                                </label>
-
-                                <input
-                                    id="clipend"
-                                    type="number"
-                                    min="0"
-                                    value={uploadClipEnd}
-                                    onChange={(e) => setUploadClipEnd(e.target.value)}
-                                    className="mt-2 w-full border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500"
-                                    placeholder="Vídeo inteiro"
-                                />
-                            </div>
-                        </div>
-                    </div>
+                    <VideoAnalysisConfig
+                        taskType={uploadTask}
+                        modelPath={uploadModelPath}
+                        frameStride={uploadFrameStride}
+                        confidenceThreshold={uploadConfidenceThreshold}
+                        maxFrames={uploadMaxFrames}
+                        clipStart={uploadClipStart}
+                        clipEnd={uploadClipEnd}
+                        tasks={tasks}
+                        models={models}
+                        onTaskChange={handleUploadTaskChange}
+                        onModelChange={setUploadModelPath}
+                        onFrameStrideChange={setUploadFrameStride}
+                        onConfidenceChange={setUploadConfidenceThreshold}
+                        onMaxFramesChange={setUploadMaxFrames}
+                        onClipStartChange={setUploadClipStart}
+                        onClipEndChange={setUploadClipEnd}
+                    />
 
                     {/* Enviar vídeo */}
                     <button
@@ -344,19 +164,14 @@ export function NewVideoPanel() {
                                 top: 0,
                                 behavior: "smooth",
                             });
-
-
-
                         }}
                         disabled={uploading}
                         className="w-full cursor-pointer bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         Enviar vídeo
-
                     </button>
 
                     {/* Remover vídeo */}
-
                     <button
                         type="button"
                         onClick={(e) => {
@@ -372,10 +187,8 @@ export function NewVideoPanel() {
                     >
                         Cancelar envio
                     </button>
-
                 </div>
-            )
-            }
+            )}
         </section >
     );
 }
