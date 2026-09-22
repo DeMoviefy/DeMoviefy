@@ -1,9 +1,9 @@
 """
-Helpers for video transcription artifacts.
+Helpers para artefatos de transcrição do vídeo.
 
-This module keeps persistence helpers re-exported, but also provides a
-Whisper-based transcription path with timestamped segments when the optional
-dependency is installed.
+Este módulo reexporta os utilitários de persistência e provê
+o fluxo de transcrição via Whisper (local ou por worker subprocess)
+com suporte a segmentos com timestamps.
 """
 
 import json
@@ -37,10 +37,10 @@ def _transcription_python_candidates() -> list[Path]:
     if override:
         candidates.append(Path(override))
 
-    # Use the current running Python interpreter first (single venv mode).
+    # Usa o interpretador Python atual do backend
     candidates.append(Path(sys.executable))
-    # Allow legacy path from .venv-transcription for backward compatibility,
-    # but not required in the new behavior.
+    
+    # Mantém fallback para o ambiente isolado .venv-transcription
     if os.name == "nt":
         candidates.append(TRANSCRIPTION_ENV_DIR / "Scripts" / "python.exe")
     else:
@@ -88,6 +88,7 @@ def _transcribe_with_local_whisper(
 
     model = _load_whisper_model(model_name)
     result = model.transcribe(video_path, verbose=False, language=language)
+    
     segments = [
         {
             "id": int(segment.get("id", index)),
@@ -98,6 +99,7 @@ def _transcribe_with_local_whisper(
         for index, segment in enumerate(result.get("segments", []))
         if str(segment.get("text", "")).strip()
     ]
+    
     payload = {
         "content": " ".join(segment["text"] for segment in segments).strip(),
         "source": "whisper",
@@ -121,28 +123,27 @@ def _transcribe_with_local_whisper(
 def _transcribe_with_worker(
     *,
     python_executable: Path,
-    video_path: str,
+    video_id: str,
     model_name: str,
     language: str | None,
     logger: Any | None,
 ) -> dict[str, Any]:
+    # Ajustado para usar --video_id conforme a CLI do transcribe_with_whisper.py
     command = [
         str(python_executable),
         str(TRANSCRIPTION_SCRIPT_PATH),
-        "--video",
-        video_path,
+        "--video_id",
+        str(video_id),
         "--model",
         model_name,
     ]
-    if language:
-        command.extend(["--language", language])
 
     if logger:
         logger.info(
-            "transcription:start mode=worker python=%s model=%s language=%s",
+            "transcription:start mode=worker python=%s video_id=%s model=%s",
             python_executable,
+            video_id,
             model_name,
-            language or "auto",
         )
 
     completed = subprocess.run(
@@ -153,20 +154,28 @@ def _transcribe_with_worker(
         encoding="utf-8",
         errors="replace",
     )
+    
     if completed.returncode != 0:
-        details = completed.stderr.strip() or completed.stdout.strip() or "worker sem detalhes"
+        details = completed.stderr.strip() or completed.stdout.strip() or "worker sem detalhes de erro"
         raise RuntimeError(f"Falha no worker de transcrição: {details}")
 
+    # O script grava em disco, mas você pode capturar a saída JSON se o script a imprimir
     try:
-        payload = json.loads(completed.stdout)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError("O worker de transcrição retornou JSON invalido.") from exc
+        # Se o script grava em arquivo e não imprime o JSON no stdout, 
+        # tenta carregar o JSON direto do arquivo gravado
+        transcription_path = Path("uploads/transcriptions") / f"video_{video_id}.json"
+        if transcription_path.exists():
+            with open(transcription_path, "r", encoding="utf-8") as f:
+                payload = json.load(f)
+        else:
+            payload = json.loads(completed.stdout)
+    except Exception as exc:
+        raise RuntimeError("O worker de transcrição não gerou um resultado JSON válido.") from exc
 
     if logger:
         logger.info(
-            "transcription:done mode=worker segments=%s language=%s",
+            "transcription:done mode=worker segments=%s",
             len(payload.get("segments", [])),
-            payload.get("language"),
         )
 
     return payload
@@ -174,7 +183,8 @@ def _transcribe_with_worker(
 
 def transcribe_video_with_timestamps(
     *,
-    video_path: str,
+    video_id: str,
+    video_path: str | None = None,
     model_name: str = "base",
     language: str | None = None,
     logger: Any | None = None,
@@ -182,13 +192,11 @@ def transcribe_video_with_timestamps(
     worker_python = resolve_transcription_python()
     worker_error: Exception | None = None
 
-    # Prefer a dedicated env so the main backend can stay on newer Python
-    # versions while Whisper remains isolated on 3.11/3.12.
     if worker_python is not None and TRANSCRIPTION_SCRIPT_PATH.exists():
         try:
             return _transcribe_with_worker(
                 python_executable=worker_python,
-                video_path=video_path,
+                video_id=video_id,
                 model_name=model_name,
                 language=language,
                 logger=logger,
@@ -198,7 +206,7 @@ def transcribe_video_with_timestamps(
             if logger:
                 logger.warning("transcription:worker_failed reason=%s", exc)
 
-    if _local_whisper_available():
+    if _local_whisper_available() and video_path:
         return _transcribe_with_local_whisper(
             video_path=video_path,
             model_name=model_name,
