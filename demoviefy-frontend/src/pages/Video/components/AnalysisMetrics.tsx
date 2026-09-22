@@ -16,37 +16,72 @@ export const AnalysisMetrics = memo(function AnalysisMetrics({
   modelName,
 }: AnalysisMetricsProps) {
   return (
-    <div className="analysis-metrics">
-      <div className="metric-card">
-        <span>Detecções</span>
-        <strong>{summary.total_detections}</strong>
-      </div>
-      <div className="metric-card">
-        <span>Frames amostrados</span>
-        <strong>{summary.sampled_frames}</strong>
-      </div>
-      <div className="metric-card">
-        <span>Stride / limite</span>
-        <strong>{summary.frame_stride} / {summary.max_frames}</strong>
-      </div>
-      <div className="metric-card">
-        <span>Tarefa</span>
-        <strong>{taskLabel}</strong>
-      </div>
-      <div className="metric-card">
-        <span>Modelo</span>
-        <strong>{modelName}</strong>
-      </div>
-      <div className="metric-card">
-        <span>Trecho</span>
-        <strong>
-          {formatSeconds(summary.clip_start_sec)} -{" "}
-          {summary.clip_end_sec === null ? "fim" : formatSeconds(summary.clip_end_sec)}
+    <div className="grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-3">
+      <div>
+        <span className="text-xs font-medium text-neutral-500">
+          Detecções
+        </span>
+        <strong className="mt-1 block text-xl font-semibold">
+          {summary.total_detections}
         </strong>
       </div>
-      <div className="metric-card">
-        <span>Confiança mínima</span>
-        <strong>
+  
+      <div>
+        <span className="text-xs font-medium text-neutral-500">
+          Frames amostrados
+        </span>
+        <strong className="mt-1 block text-xl font-semibold">
+          {summary.sampled_frames}
+        </strong>
+      </div>
+  
+      <div>
+        <span className="text-xs font-medium text-neutral-500">
+          Stride / limite
+        </span>
+        <strong className="mt-1 block text-sm font-semibold text-neutral-900">
+          {summary.frame_stride} / {summary.max_frames}
+        </strong>
+      </div>
+  
+      <div>
+        <span className="text-xs font-medium text-neutral-500">
+          Tarefa
+        </span>
+        <strong className="mt-1 block truncate text-sm font-semibold text-neutral-900">
+          {taskLabel}
+        </strong>
+      </div>
+  
+      <div>
+        <span className="text-xs font-medium text-neutral-500">
+          Modelo
+        </span>
+        <strong
+          className="mt-1 block truncate text-sm font-semibold text-neutral-900"
+          title={modelName}
+        >
+          {modelName}
+        </strong>
+      </div>
+  
+      <div>
+        <span className="text-xs font-medium text-neutral-500">
+          Trecho
+        </span>
+        <strong className="mt-1 block text-sm font-semibold text-neutral-900">
+          {formatSeconds(summary.clip_start_sec)} -{" "}
+          {summary.clip_end_sec === null
+            ? "fim"
+            : formatSeconds(summary.clip_end_sec)}
+        </strong>
+      </div>
+  
+      <div>
+        <span className="text-xs font-medium text-neutral-500">
+          Confiança mínima
+        </span>
+        <strong className="mt-1 block text-sm font-semibold text-neutral-900">
           {typeof summary.confidence_threshold === "number"
             ? `${(summary.confidence_threshold * 100).toFixed(0)}%`
             : "-"}

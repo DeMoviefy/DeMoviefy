@@ -18,15 +18,21 @@ export const AnalysisHeader = memo(function AnalysisHeader({
   onVariantChange,
 }: AnalysisHeaderProps) {
   return (
-    <div className="analysis-state">
-      <span className="eyebrow">Resumo</span>
-      <p>{message}</p>
+    <div className="pb-5">
+      <p className="text-sm leading-6 text-neutral-600">
+        {message}
+      </p>
+  
       {variants.length > 0 && (
-        <label className="field-block">
-          <span>Versão da análise</span>
+        <label className="mt-4 block max-w-md">
+          <span className="mb-1.5 block text-xs font-medium text-neutral-500">
+            Versão da análise
+          </span>
+  
           <select
             value={selectedVariantId ?? ""}
             onChange={(e) => onVariantChange(e.target.value || null)}
+            className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-700 outline-none transition focus:border-blue-400"
           >
             {variants.map((variant) => (
               <option key={variant.variant_id} value={variant.variant_id}>

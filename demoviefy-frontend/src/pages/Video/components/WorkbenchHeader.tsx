@@ -11,17 +11,23 @@ type WorkbenchHeaderProps = {
 export function WorkbenchHeader({ video }: WorkbenchHeaderProps) {
   return (
     <>
-
-      <div className="section-heading">
-
-        <div>
-          <span className="eyebrow">Análise do vídeo:</span>
-          <h2>{video.filename}</h2>
+      <div className="min-w-0">
+        <span className="text-sm font-medium text-neutral-500">
+          Análise do vídeo
+        </span>
+  
+        <h2
+          className="mt-1 truncate text-2xl font-semibold tracking-tight text-neutral-900"
+          title={video.filename}
+        >
+          {video.filename}
+        </h2>
+  
+        <div className="mt-3">
+          <StatusBadge status={video.status} />
         </div>
-        <StatusBadge status={video.status} /> 
       </div>
-
-
+  
       {video.status.startsWith("PROCESSANDO") && (
         <ProcessingProgress
           progress={video.processing.processing_progress}
@@ -31,5 +37,5 @@ export function WorkbenchHeader({ video }: WorkbenchHeaderProps) {
         />
       )}
     </>
-  )
+  );
 }

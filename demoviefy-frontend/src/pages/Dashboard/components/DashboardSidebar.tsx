@@ -6,7 +6,7 @@ export function DashboardSidebar() {
   const videos = useProcessingStore((state) => state.videos);
 
   return (
-    <aside className="flex h-full w-72 shrink-0 flex-col border-r border-neutral-200 bg-white">
+    <aside className="flex h-full w-72 shrink-0 flex-col">
       <div className="pb-2">
         <h2 className="text-base font-semibold tracking-tight text-neutral-900">
           Biblioteca de vídeos

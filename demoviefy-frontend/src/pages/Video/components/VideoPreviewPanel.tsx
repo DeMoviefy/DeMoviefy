@@ -52,63 +52,42 @@ export function VideoPreviewPanel({
 
   useEffect(() => {
     setAnnotatedPlaybackError(false);
-    }, [annotatedVideoSrc, video?.id, video?.status]);
-    const isReprocessing = video.status.startsWith("PROCESSANDO");
-    const canTryAnnotated = hasSelectedAnalysis && !annotatedPlaybackError;
-    const previewState = getAnnotatedPreviewState(
-        annotatedPlaybackError,
-        isReprocessing,
-        analysisState,
-        hasSelectedAnalysis,
-    );
+  }, [annotatedVideoSrc, video?.id, video?.status]);
+  const isReprocessing = video.status.startsWith("PROCESSANDO");
+  const canTryAnnotated = hasSelectedAnalysis && !annotatedPlaybackError;
+  const previewState = getAnnotatedPreviewState(
+    annotatedPlaybackError,
+    isReprocessing,
+    analysisState,
+    hasSelectedAnalysis,
+  );
 
-    return (
-    <>
-      <div className="preview-grid">
+  return (
+    <div className="flex flex-col gap-6">
+      <article className="overflow-hidden rounded-xl border border-neutral-200 bg-black">
+        {canTryAnnotated ? (
+          <video
+            key={annotatedVideoSrc}
+            className="aspect-video w-full object-contain"
+            controls
+            preload="metadata"
+            src={annotatedVideoSrc}
+            onError={() => setAnnotatedPlaybackError(true)}
+          >
+            Seu navegador não suporta reproduzir este vídeo.
+          </video>
+        ) : (
+          <div className="flex aspect-video flex-col items-center justify-center bg-neutral-50 px-8 text-center">
+            <strong className="text-sm font-semibold text-neutral-900">
+              {previewState.title}
+            </strong>
 
-        <article className="preview-card">
-          {canTryAnnotated ? (
-            <video
-              key={annotatedVideoSrc}
-              className="video-preview"
-              controls
-              preload="metadata"
-              src={annotatedVideoSrc}
-              onError={() => setAnnotatedPlaybackError(true)}
-            >
-              Seu navegador não suporta reproduzir este vídeo.
-            </video>
-          ) : (
-            <div className="empty-preview">
-            <strong>{previewState.title}</strong>
-            <p>{previewState.message}</p>
-            </div>
-          )}
-        </article>
-      </div>
-
-      <div className="info-grid">
-        <div className="info-card">
-          <span>Vídeo salvo em</span>
-          <strong>{video.storage.video_relative_path}</strong>
-          <small>{video.storage.video_absolute_path}</small>
-        </div>
-        <div className="info-card">
-          <span>Resumo salvo em</span>
-          <strong>{video.storage.analysis_relative_path}</strong>
-          <small>{video.storage.analysis_absolute_path}</small>
-        </div>
-        <div className="info-card">
-          <span>Vídeo anotado salvo em</span>
-          <strong>{video.storage.annotated_relative_path}</strong>
-          <small>{video.storage.annotated_absolute_path}</small>
-        </div>
-        <div className="info-card">
-          <span>Transcrição salva em</span>
-          <strong>{video.storage.transcription_relative_path}</strong>
-          <small>{video.storage.transcription_absolute_path}</small>
-        </div>
-      </div>
-    </>
-  )
+            <p className="mt-2 max-w-lg text-sm leading-6 text-neutral-500">
+              {previewState.message}
+            </p>
+          </div>
+        )}
+      </article>
+    </div>
+  );
 }

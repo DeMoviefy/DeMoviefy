@@ -69,13 +69,13 @@ export const VideoWorkbench = memo(function VideoWorkbench({
   );
 
   if (!currentVideo) return <WorkbenchEmptyState />;
+
   return (
-    <section className="surface inspector-panel">
+    <section className="flex w-full flex-col gap-6 py-6">
       <WorkbenchHeader video={currentVideo} />
-
-      <div className="inspector-grid">
-        <div className="media-panel">
-
+  
+      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+        <div className="min-w-0">
           <VideoPreviewPanel
             video={currentVideo}
             analysisState={analysisState}
@@ -84,33 +84,31 @@ export const VideoWorkbench = memo(function VideoWorkbench({
             annotatedVideoSrc={annotatedVideoSrc}
             videoRef={videoRef}
           />
-
         </div>
-
-        <div className="analysis-panel">
+  
+        <div className="min-w-0">
           <AnalysisHeader
             message={analysisMessage}
             variants={analysisVariants}
             selectedVariantId={selectedAnalysisVariantId}
             onVariantChange={(id) => {
-                setSelectedAnalysisVariantId(id, currentVideo);
-
-                // Gambiarra para, quando trocar a análise, ele ir para o topo.
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                });
+              setSelectedAnalysisVariantId(id, currentVideo);
+  
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              });
             }}
-        />
-
+          />
+  
           <AnalysisResults
             state={analysisState}
             summary={summary}
             taskLabel={currentVideo.ai_config.task_label}
             modelName={currentVideo.ai_config.model_name}
           />
-
-          <div className="editor-grid">
+  
+          <div className="mt-6 grid gap-6">
             <VideoConfigPanel
               video={currentVideo}
               config={config}
@@ -119,14 +117,14 @@ export const VideoWorkbench = memo(function VideoWorkbench({
               onSaveConfig={onSaveConfig}
               onReprocess={onReprocess}
             />
-
+  
             <AnalysisEditor
               analysisDraft={analysisDraft}
               hasMultipleVariants={hasMultipleAnalysisVariants}
               onDraftChange={setAnalysisDraft}
               onDelete={() => onDeleteAnalysis(currentVideo)}
             />
-
+  
             <TranscriptionEditor
               transcriptionDraft={transcriptionDraft}
               transcriptionMessage={transcriptionMessage}

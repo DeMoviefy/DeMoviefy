@@ -337,13 +337,14 @@ export function NewVideoPanel() {
                     {/* Enviar vídeo */}
                     <button
                         type="button"
-                        onClick={() => {
+                        onClick={async () => {
+                            await handleUpload(uploadTask, uploadModelPath);
+
                             window.scrollTo({
                                 top: 0,
                                 behavior: "smooth",
                             });
 
-                            handleUpload(uploadTask, uploadModelPath);
 
 
                         }}
