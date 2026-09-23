@@ -35,61 +35,77 @@ export function TranscriptionEditor({
 }: TranscriptionEditorProps) {
 
   return (
-    <section className="editor-card">
-      <div className="section-heading">
+    <section className="group border-t border-neutral-200 pt-8">
+      <div className="flex items-start gap-3">
+        <div className="mt-1 h-5 w-1 shrink-0 bg-transparent transition-colors group-hover:bg-blue-600" />
+  
         <div>
-          <span className="eyebrow">Transcrição</span>
-          <h3>Texto editável</h3>
+          <h3 className="text-base font-semibold text-neutral-900">
+            Transcrição
+          </h3>
+  
+          <p className="mt-1 text-sm leading-6 text-neutral-500">
+            Edite a transcrição associada ao vídeo.
+          </p>
         </div>
       </div>
-      {/* Botão desabilitado pois a funcionalidade ainda não está pronta para ser apresentada
-
-      <div className="action-row action-row-start">
-        Botão desab
-        <button type="button" className="ghost-button" onClick={onGenerate} disabled={isBusy}>
-          {isBusy ? "Transcrição aguardando..." : "Gerar transcrição por IA"}
-        </button>
-        
-      </div>
-      */}
+  
       <textarea
-        className="editor-area transcription-area"
+        className="mt-6 min-h-48 w-full resize-y border border-neutral-200 bg-neutral-50 p-6 text-sm leading-7 text-neutral-900 outline-none transition focus:border-blue-400"
         value={transcriptionDraft}
         onChange={(e) => onDraftChange(e.target.value)}
         placeholder="Cole ou escreva aqui a transcrição do vídeo."
       />
-      <p className="transcription-note">{transcriptionMessage}</p>
+  
+      <p className="mt-2 text-sm text-neutral-500">
+        {transcriptionMessage}
+      </p>
+  
       {segments.length > 0 && (
-        <div className="segment-list">
+        <div className="mt-6 flex flex-col border border-neutral-200 bg-neutral-50">
           {segments.map((segment) => (
             <button
               key={`${segment.id}-${segment.start}`}
               type="button"
-              className="segment-item"
+              className="flex gap-4 border-b border-neutral-200 px-4 py-3 text-left transition-colors last:border-b-0 hover:bg-white"
               onClick={() => onSeek(segment.start)}
             >
-              <span className="segment-time">
+              <span className="shrink-0 text-xs font-medium text-neutral-500">
                 {formatTimecode(segment.start)} - {formatTimecode(segment.end)}
               </span>
-              <span className="segment-text">{segment.text}</span>
+  
+              <span className="text-sm leading-6 text-neutral-700">
+                {segment.text}
+              </span>
             </button>
           ))}
         </div>
       )}
-      <div className="action-row">
+  
+      <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
         <ConfirmationDialog
           title="Excluir transcrição"
           message="Tem certeza que deseja excluir esta transcrição? Essa ação não pode ser desfeita."
           onConfirm={onDelete}
         >
           {(open) => (
-            <button type="button" className="ghost-button danger-button" onClick={open} disabled={isBusy}>
+            <button
+              type="button"
+              className="text-sm font-medium text-neutral-500 transition-colors hover:text-red-600"
+              onClick={open}
+              disabled={isBusy}
+            >
               Excluir transcrição
             </button>
           )}
         </ConfirmationDialog>
-
-        <button type="button" className="primary-button" onClick={onSave} disabled={isBusy}>
+  
+        <button
+          type="button"
+          className="border border-neutral-200 px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
+          onClick={onSave}
+          disabled={isBusy}
+        >
           Salvar transcrição
         </button>
       </div>

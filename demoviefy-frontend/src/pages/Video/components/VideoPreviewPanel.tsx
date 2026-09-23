@@ -1,14 +1,13 @@
 // src/pages/Dashboard/components/VideoPreviewPanel.tsx
 
-import { useState, useEffect, type RefObject } from "react"
+import { useState, useEffect } from "react"
+
 import type { VideoRecord } from "src/core/types/videoTypes"
 
 interface VideoPreviewPanelProps {
   video: VideoRecord
   analysisState: "idle" | "loading" | "ready" | "pending" | "error"
-  originalVideoSrc: string
   annotatedVideoSrc: string
-  videoRef: RefObject<HTMLVideoElement | null>
   hasSelectedAnalysis: boolean
 }
 

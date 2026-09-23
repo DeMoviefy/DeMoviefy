@@ -10,7 +10,6 @@ import { useVideoWorkbenchSync } from "src/pages/Video/hooks/useVideoWorkbenchSy
 
 import { WorkbenchHeader } from "src/pages/Video/components/WorkbenchHeader";
 import { VideoConfigPanel } from "src/pages/Video/components/VideoConfigPanel";
-import { AnalysisEditor } from "src/pages/Video/components/AnalysisEditor";
 import { AnalysisHeader } from "src/pages/Video/components/AnalysisHeader";
 import { AnalysisResults } from "src/pages/Video/components/AnalysisResults";
 import { TranscriptionEditor } from "src/pages/Video/components/TranscriptionEditor";
@@ -46,8 +45,8 @@ export const VideoWorkbench = memo(function VideoWorkbench({
     useVideoWorkbenchSync(currentVideo);
 
   const {
-    analysis, analysisState, analysisMessage, selectedAnalysisVariantId, analysisDraft,
-    setSelectedAnalysisVariantId, setAnalysisDraft,
+    analysis, analysisState, analysisMessage, selectedAnalysisVariantId,
+    setSelectedAnalysisVariantId,
     onDeleteAnalysis,
   } = useAnalysisStore();
 
@@ -59,11 +58,10 @@ export const VideoWorkbench = memo(function VideoWorkbench({
 
   const summary = analysis?.analysis ?? null;
   const analysisVariants = analysis?.available_variants ?? [];
-  const hasMultipleAnalysisVariants = analysisVariants.length > 1;
   const transcriptionSegments = transcription?.transcription.segments ?? [];
   const hasSelectedAnalysis = analysis !== null;
 
-  const { videoRef, annotatedVideoSrc, originalVideoSrc, seekTo } = useVideoPlayer(
+  const { annotatedVideoSrc, seekTo } = useVideoPlayer(
     currentVideo,
     selectedAnalysisVariantId
   );
@@ -80,9 +78,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
             video={currentVideo}
             analysisState={analysisState}
             hasSelectedAnalysis={hasSelectedAnalysis}
-            originalVideoSrc={originalVideoSrc}
             annotatedVideoSrc={annotatedVideoSrc}
-            videoRef={videoRef}
           />
         </div>
   
@@ -91,6 +87,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
             message={analysisMessage}
             variants={analysisVariants}
             selectedVariantId={selectedAnalysisVariantId}
+            onDelete={() => onDeleteAnalysis(currentVideo)}
             onVariantChange={(id) => {
               setSelectedAnalysisVariantId(id, currentVideo);
   
@@ -116,13 +113,6 @@ export const VideoWorkbench = memo(function VideoWorkbench({
               isBusy={isBusy}
               onSaveConfig={onSaveConfig}
               onReprocess={onReprocess}
-            />
-  
-            <AnalysisEditor
-              analysisDraft={analysisDraft}
-              hasMultipleVariants={hasMultipleAnalysisVariants}
-              onDraftChange={setAnalysisDraft}
-              onDelete={() => onDeleteAnalysis(currentVideo)}
             />
   
             <TranscriptionEditor

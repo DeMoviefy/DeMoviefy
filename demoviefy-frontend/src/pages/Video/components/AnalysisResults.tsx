@@ -30,7 +30,7 @@ export function AnalysisResults({
     return null
   }
 
-  // 3. Se deu tudo certo, exibimos os dois componentes que acabamos de criar!
+  // 3. Se deu tudo certo, exibimos as métricas da análise.
   return (
     <AnalysisMetrics
       summary={summary}

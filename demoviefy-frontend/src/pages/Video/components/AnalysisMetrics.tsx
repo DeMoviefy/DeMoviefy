@@ -16,12 +16,12 @@ export const AnalysisMetrics = memo(function AnalysisMetrics({
   modelName,
 }: AnalysisMetricsProps) {
   return (
-    <div className="grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-3">
+    <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3">
       <div>
         <span className="text-xs font-medium text-neutral-500">
           Detecções
         </span>
-        <strong className="mt-1 block text-xl font-semibold">
+        <strong className="mt-1 block text-2xl font-semibold tracking-tight text-neutral-900">
           {summary.total_detections}
         </strong>
       </div>
@@ -30,7 +30,7 @@ export const AnalysisMetrics = memo(function AnalysisMetrics({
         <span className="text-xs font-medium text-neutral-500">
           Frames amostrados
         </span>
-        <strong className="mt-1 block text-xl font-semibold">
+        <strong className="mt-1 block text-2xl font-semibold tracking-tight text-neutral-900">
           {summary.sampled_frames}
         </strong>
       </div>
@@ -39,7 +39,7 @@ export const AnalysisMetrics = memo(function AnalysisMetrics({
         <span className="text-xs font-medium text-neutral-500">
           Stride / limite
         </span>
-        <strong className="mt-1 block text-sm font-semibold text-neutral-900">
+        <strong className="mt-1 block text-base font-semibold text-neutral-900">
           {summary.frame_stride} / {summary.max_frames}
         </strong>
       </div>
