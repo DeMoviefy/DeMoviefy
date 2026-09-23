@@ -36,6 +36,8 @@ from app.config.paths import ffprobe_path as resolve_ffprobe_path
 
 from app.utils.file_utils import unlink_with_retries, copy_with_retries
 
+from app.services.content_rating_service import estimate_rating
+
 
 # ============================================================================
 # HELPER FUNCTIONS - Model Loading & Compatibility
@@ -791,6 +793,7 @@ def analyze_video_frames(
     }
     label_counts = dict(labels_counter.most_common())
     top_labels = list(label_counts.keys())[:10]
+    content_rating = estimate_rating(label_counts)
 
     summary = {
         "video_path": video_path,
@@ -808,6 +811,7 @@ def analyze_video_frames(
         "label_counts": label_counts,
         "avg_confidence_by_label": avg_confidence,
         "top_labels": top_labels,
+        "content_rating": content_rating,
         "annotated_video_path": str(finalized_annotated_path) if finalized_annotated_path else None,
         "annotated_frames_written": annotated_frames_written,
     }
