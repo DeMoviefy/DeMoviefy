@@ -55,14 +55,16 @@ export const VideoWorkbench = memo(function VideoWorkbench({
     transcription, transcriptionDraft, transcriptionMessage,
     setTranscriptionDraft,
     onSaveTranscription, onDeleteTranscription, onGenerateTranscription,
-    selectedLanguage, setLanguage,
+    selectedLanguage, setLanguage, selectedModel, setModel, isGenerating,
+    selectedVariant, setSelectedVariant, transcriptionSegments, updateSegment,
+    isTranslating, translateTranscription,
   } = useTranscriptionStore();
 
   const summary = analysis?.analysis ?? null;
   const analysisVariants = analysis?.available_variants ?? [];
   const hasMultipleAnalysisVariants = analysisVariants.length > 1;
-  const transcriptionSegments = transcription?.transcription.segments ?? [];
   const availableLanguages = transcription?.available_languages ?? [];
+  const transcriptionVariants = transcription?.variants ?? [{ id: "default", label: "Transcrição principal", language: null }];
   const hasSelectedAnalysis = analysis !== null;
 
 
@@ -86,6 +88,31 @@ export const VideoWorkbench = memo(function VideoWorkbench({
             originalVideoSrc={originalVideoSrc}
             annotatedVideoSrc={annotatedVideoSrc}
             videoRef={videoRef}
+            transcriptionPanel={
+              <TranscriptionEditor
+                transcriptionDraft={transcriptionDraft}
+                transcriptionMessage={transcriptionMessage}
+                segments={transcriptionSegments}
+                isBusy={isBusy}
+                onDraftChange={setTranscriptionDraft}
+                onSave={() => onSaveTranscription()}
+                onDelete={() => onDeleteTranscription()}
+                onGenerate={() => onGenerateTranscription()}
+                onSeek={seekTo}
+                selectedLanguage={selectedLanguage}
+                onLanguageChange={setLanguage}
+                availableLanguages={availableLanguages}
+                selectedModel={selectedModel}
+                onModelChange={setModel}
+                isGenerating={isGenerating}
+                variants={transcriptionVariants}
+                selectedVariant={selectedVariant}
+                onVariantChange={setSelectedVariant}
+                onSegmentChange={updateSegment}
+                isTranslating={isTranslating}
+                onTranslate={(language) => void translateTranscription(language)}
+              />
+            }
           />
 
         </div>
@@ -130,20 +157,6 @@ export const VideoWorkbench = memo(function VideoWorkbench({
               onDelete={() => onDeleteAnalysis(currentVideo)}
             />
 
-            <TranscriptionEditor
-              transcriptionDraft={transcriptionDraft}
-              transcriptionMessage={transcriptionMessage}
-              segments={transcriptionSegments}
-              isBusy={isBusy}
-              onDraftChange={setTranscriptionDraft}
-              onSave={() => onSaveTranscription()}
-              onDelete={() => onDeleteTranscription()}
-              onGenerate={() => onGenerateTranscription()}
-              onSeek={seekTo}
-              selectedLanguage={selectedLanguage}
-              onLanguageChange={setLanguage}
-              availableLanguages={availableLanguages}
-            />
           </div>
         </div>
       </div>

@@ -781,6 +781,11 @@ code {
   gap: 16px;
 }
 
+.preview-grid > .editor-card {
+  margin-top: 0;
+  min-width: 0;
+}
+
 .preview-card {
   display: grid;
   gap: 12px;
@@ -878,6 +883,39 @@ code {
   font-family: inherit;
 }
 
+.transcription-readonly {
+  cursor: default;
+  opacity: 0.9;
+}
+
+.transcription-progress {
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 10px;
+  background: rgba(59, 130, 246, 0.07);
+}
+
+.transcription-progress-bar {
+  overflow: hidden;
+}
+
+.transcription-progress-bar span {
+  display: block;
+  width: 38%;
+  height: 100%;
+  animation: transcription-progress-slide 1.4s ease-in-out infinite;
+}
+
+@keyframes transcription-progress-slide {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(360%);
+  }
+}
+
 .action-row {
   display: flex;
   gap: 12px;
@@ -926,6 +964,29 @@ code {
   color: var(--brand-strong);
   font-size: 0.84rem;
   margin-bottom: 6px;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+}
+
+.segment-edit-row {
+  display: grid;
+  grid-template-columns: 90px 90px minmax(0, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.segment-edit-row input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.45);
+  color: inherit;
+  padding: 7px 8px;
 }
 
 .segment-text {

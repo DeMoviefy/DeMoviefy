@@ -124,6 +124,14 @@ export type VideoTranscriptionResponse = {
       text: string;
     }>;
   };
+  available_languages?: string[];
+  selected_variant?: string;
+  variants?: Array<{
+    id: string;
+    label: string;
+    language: string | null;
+    model_name?: string | null;
+  }>;
 };
 
 export type ModelCatalogResponse = {

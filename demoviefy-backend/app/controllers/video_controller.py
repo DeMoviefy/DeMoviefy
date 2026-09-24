@@ -11,6 +11,7 @@ from app.config.paths import (
     annotated_video_path,
     annotated_video_temp_path,
     ensure_storage_dirs,
+    TRANSCRIPTIONS_DIR,
     to_repo_relative,
     transcription_file_path,
     unique_video_file_path,
@@ -38,6 +39,7 @@ from app.services.frame_ai_service import (
 )
 from app.services.job_queue_service import get_job_queue
 from app.services.transcription_service import transcribe_video_with_timestamps, whisper_available
+from app.services.translation_service import translate_segments
 from app.services.video_artifact_service import (
     delete_analysis,
     delete_metadata,
@@ -126,6 +128,7 @@ def _empty_transcription_payload(video, storage: dict, *, status: str, error: st
             "status": status,
             "error": error,
         },
+        "available_languages": ["pt", "en", "es"],
     }
 
 
@@ -306,7 +309,41 @@ def get_video_transcription(video_id: int):
         return jsonify({"error": "Vídeo não encontrado"}), 404
 
     storage = build_storage_payload(video.id, video.filename)
-    transcription = load_transcription(video_id)
+    requested_variant = request.args.get("variant") or None
+    transcriptions_dir = TRANSCRIPTIONS_DIR
+    variant_ids = []
+    if transcriptions_dir.exists():
+        variant_ids = sorted(
+            path.stem.replace(f"video_{video_id}_", "")
+            for path in transcriptions_dir.glob(f"video_{video_id}_*.json")
+        )
+
+    if requested_variant is None:
+        transcription = load_transcription(video_id)
+        if transcription is None and variant_ids:
+            requested_variant = variant_ids[0]
+            transcription = load_transcription(video_id, requested_variant)
+    else:
+        transcription = load_transcription(video_id, requested_variant)
+
+    variants = []
+    default_transcription = load_transcription(video_id)
+    if default_transcription is not None:
+        variants.append({
+            "id": "default",
+            "label": "Transcrição principal",
+            "language": default_transcription.get("language"),
+            "model_name": default_transcription.get("model_name"),
+        })
+    for variant_id in variant_ids:
+        variant_payload = load_transcription(video_id, variant_id) or {}
+        variants.append({
+            "id": variant_id,
+            "label": f"{variant_payload.get('language') or 'auto'} · {variant_payload.get('model_name') or 'manual'}",
+            "language": variant_payload.get("language"),
+            "model_name": variant_payload.get("model_name"),
+        })
+
     if transcription is None:
         if video.status in {"PROCESSANDO", "PROCESSANDO_IA"}:
             return jsonify(
@@ -326,23 +363,14 @@ def get_video_transcription(video_id: int):
             )
         ), 404
 
-    # Identifica SRTs disponíveis no diretório de transcrições
-    available_languages = []
-    transcriptions_dir = Path("uploads/transcriptions")
-    if transcriptions_dir.exists():
-        # Procura arquivos video_{id}_{lang}.srt
-        for srt_file in transcriptions_dir.glob(f"video_{video_id}_*.srt"):
-            # Extrai 'pt' ou 'en' do nome video_{id}_{lang}.srt
-            lang = srt_file.stem.replace(f"video_{video_id}_", "")
-            available_languages.append(lang)
-
     return jsonify(
         {
             "video_id": video.id,
             "filename": video.filename,
             "available": True,
             "transcription": transcription,
-            "available_languages": available_languages,
+            "selected_variant": requested_variant or "default",
+            "variants": variants,
             "storage": storage,
         }
     )
@@ -371,15 +399,18 @@ def generate_video_transcription_by_id(video_id: int):
         )
 
     payload = request.get_json(silent=True) or {}
+    language = payload.get("language") or current_app.config.get("TRANSCRIPTION_LANGUAGE")
+    model_name = str(payload.get("model_name") or current_app.config.get("TRANSCRIPTION_MODEL", "base"))
+    variant = f"{language or 'auto'}-{model_name}"
     try:
         transcription = transcribe_video_with_timestamps(
             video_id=video_id,
             video_path=str(filepath),
-            model_name=str(payload.get("model_name") or current_app.config.get("TRANSCRIPTION_MODEL", "base")),
-            language=payload.get("language") or current_app.config.get("TRANSCRIPTION_LANGUAGE"),
+            model_name=model_name,
+            language=language,
             logger=current_app.logger,
         )
-        saved = save_transcription(video_id, **transcription)
+        saved = save_transcription(video_id, **transcription, variant=variant)
     except Exception as exc:
         current_app.logger.exception("transcription:failed video_id=%s", video_id)
         return jsonify({"error": str(exc)}), 500
@@ -393,12 +424,106 @@ def generate_video_transcription_by_id(video_id: int):
     )
 
 
+def save_video_transcription_by_id(video_id: int):
+    video = get_video(video_id)
+    if not video:
+        return jsonify({"error": "Vídeo não encontrado"}), 404
+
+    payload = request.get_json(silent=True) or {}
+    content = payload.get("content")
+    if not isinstance(content, str):
+        return jsonify({"error": "O campo content precisa ser um texto."}), 400
+
+    variant = payload.get("variant") or None
+    if variant == "default":
+        variant = None
+    existing = load_transcription(video_id, variant) or {}
+    segments = payload.get("segments") or []
+    if not isinstance(segments, list):
+        return jsonify({"error": "O campo segments precisa ser uma lista."}), 400
+
+    normalized_segments = []
+    for index, segment in enumerate(segments):
+        try:
+            start = float(segment["start"])
+            end = float(segment["end"])
+            text = str(segment["text"]).strip()
+        except (KeyError, TypeError, ValueError):
+            return jsonify({"error": f"Segmento {index + 1} inválido."}), 400
+        if start < 0 or end <= start or not text:
+            return jsonify({"error": f"Segmento {index + 1} precisa ter tempos válidos e texto."}), 400
+        normalized_segments.append({
+            "id": int(segment.get("id", index)),
+            "start": round(start, 2),
+            "end": round(end, 2),
+            "text": text,
+        })
+
+    saved = save_transcription(
+        video_id,
+        content=content,
+        source="manual",
+        language=payload.get("language") or existing.get("language"),
+        segments=normalized_segments,
+        model_name=existing.get("model_name"),
+        variant=variant,
+    )
+    return jsonify(
+        {
+            "message": "Transcrição salva com sucesso",
+            "video": _serialize_video(video),
+            "transcription": saved,
+        }
+    )
+
+
+def translate_video_transcription_by_id(video_id: int):
+    video = get_video(video_id)
+    if not video:
+        return jsonify({"error": "Vídeo não encontrado"}), 404
+
+    payload = request.get_json(silent=True) or {}
+    source_variant = payload.get("variant") or None
+    source = load_transcription(video_id, source_variant)
+    target_language = str(payload.get("target_language") or "").strip().lower()
+    source_language = str((source or {}).get("language") or "").strip().lower()
+    if source is None:
+        return jsonify({"error": "A transcrição de origem não foi encontrada."}), 404
+    if not target_language:
+        return jsonify({"error": "Escolha o idioma de destino."}), 400
+    if not source_language:
+        return jsonify({"error": "A transcrição de origem não possui idioma definido."}), 400
+    if source_language == target_language:
+        return jsonify({"error": "A transcrição já está no idioma escolhido."}), 409
+
+    try:
+        segments = translate_segments(source.get("segments", []), source_language, target_language)
+        translated = save_transcription(
+            video_id,
+            content=" ".join(segment["text"] for segment in segments),
+            source="translation",
+            language=target_language,
+            segments=segments,
+            model_name=source.get("model_name"),
+            variant=f"{target_language}-from-{source_variant or 'default'}",
+        )
+    except RuntimeError as exc:
+        current_app.logger.exception("transcription:translation_failed video_id=%s", video_id)
+        return jsonify({"error": str(exc)}), 503
+    except Exception as exc:
+        current_app.logger.exception("transcription:translation_failed video_id=%s", video_id)
+        return jsonify({"error": "Falha inesperada ao criar a tradução."}), 500
+
+    return jsonify({"message": "Tradução gerada com sucesso.", "transcription": translated})
+
+
 def delete_video_transcription_by_id(video_id: int):
     video = get_video(video_id)
     if not video:
         return jsonify({"error": "Vídeo não encontrado"}), 404
 
-    delete_transcription(video_id)
+    variant = request.args.get("variant") or None
+    delete_transcription(video_id, None if variant == "default" else variant)
     return jsonify({"message": "Transcrição removida com sucesso", "video": _serialize_video(video)})
 
 

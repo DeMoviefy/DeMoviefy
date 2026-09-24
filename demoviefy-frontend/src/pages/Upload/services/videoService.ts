@@ -77,11 +77,12 @@ export class VideoService {
         return data;
     }
 
-    static async getTranscription(transcriptionUrl: string): Promise<{
+    static async getTranscription(transcriptionUrl: string, variant?: string): Promise<{
         data: VideoTranscriptionResponse;
         status: number;
     }> {
         const response = await api.get<VideoTranscriptionResponse>(transcriptionUrl, {
+            params: variant && variant !== "default" ? { variant } : undefined,
             validateStatus: (status) => status === 200 || status === 202 || status === 204 || status === 404,
         })
         return { data: response.data, status: response.status }
@@ -125,16 +126,40 @@ export class VideoService {
         })
     }
 
-    static async saveTranscription(id: number, content: string): Promise<void> {
-        await api.put(`/videos/${id}/transcription`, { content, source: "manual" })
+    static async saveTranscription(
+        id: number,
+        content: string,
+        segments: Array<{ id: number; start: number; end: number; text: string }>,
+        variant: string,
+    ): Promise<void> {
+        await api.put(`/videos/${id}/transcription`, { content, source: "manual", segments, variant })
     }
 
-    static async deleteTranscription(id: number): Promise<void> {
-        await api.delete(`/videos/${id}/transcription`)
+    static async deleteTranscription(id: number, variant: string): Promise<void> {
+        await api.delete(`/videos/${id}/transcription`, {
+            params: variant !== "default" ? { variant } : undefined,
+        })
     }
 
-    static async generateTranscription(id: number): Promise<{ message: string }> {
-        const { data } = await api.post<{ message: string }>(`/videos/${id}/transcription/generate`, {})
+    static async translateTranscription(
+        id: number,
+        variant: string,
+        targetLanguage: string,
+    ): Promise<void> {
+        await api.post(`/videos/${id}/transcription/translate`, {
+            variant: variant === "default" ? null : variant,
+            target_language: targetLanguage,
+        })
+    }
+
+    static async generateTranscription(
+        id: number,
+        options: { language: string; modelName: string },
+    ): Promise<{ message: string }> {
+        const { data } = await api.post<{ message: string }>(`/videos/${id}/transcription/generate`, {
+            language: options.language === "auto" ? null : options.language,
+            model_name: options.modelName,
+        })
         return data
     }
 

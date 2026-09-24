@@ -231,8 +231,6 @@ def transcribe_video_with_timestamps(
                 language=language,
                 logger=logger,
             )
-            # Geração de SRTs após transcrição bem sucedida
-            generate_multilingual_srt(video_id=video_id, segments=payload.get("segments", []), proxy_url=proxy_url)
             return payload
         except Exception as exc:
             worker_error = exc
@@ -246,8 +244,6 @@ def transcribe_video_with_timestamps(
             language=language,
             logger=logger,
         )
-        # Geração de SRTs após transcrição bem sucedida
-        generate_multilingual_srt(video_id=video_id, segments=payload.get("segments", []), proxy_url=proxy_url)
         return payload
 
     if worker_error is not None:
