@@ -55,13 +55,16 @@ export const VideoWorkbench = memo(function VideoWorkbench({
     transcription, transcriptionDraft, transcriptionMessage,
     setTranscriptionDraft,
     onSaveTranscription, onDeleteTranscription, onGenerateTranscription,
+    selectedLanguage, setLanguage,
   } = useTranscriptionStore();
 
   const summary = analysis?.analysis ?? null;
   const analysisVariants = analysis?.available_variants ?? [];
   const hasMultipleAnalysisVariants = analysisVariants.length > 1;
   const transcriptionSegments = transcription?.transcription.segments ?? [];
+  const availableLanguages = transcription?.available_languages ?? [];
   const hasSelectedAnalysis = analysis !== null;
+
 
   const { videoRef, annotatedVideoSrc, originalVideoSrc, seekTo } = useVideoPlayer(
     currentVideo,
@@ -137,6 +140,9 @@ export const VideoWorkbench = memo(function VideoWorkbench({
               onDelete={() => onDeleteTranscription()}
               onGenerate={() => onGenerateTranscription()}
               onSeek={seekTo}
+              selectedLanguage={selectedLanguage}
+              onLanguageChange={setLanguage}
+              availableLanguages={availableLanguages}
             />
           </div>
         </div>

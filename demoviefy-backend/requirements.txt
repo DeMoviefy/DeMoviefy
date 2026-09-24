@@ -12,9 +12,12 @@ SQLAlchemy>=2.0.36,<3
 requests==2.32.3
 numpy>=2.0.0
 gdown==6.0.0
+opencv-python>=4.10.0
+ultralytics
 
 # Transcrição e Tradução
 deep-translator==1.11.4
 srt==3.5.3
 openai-whisper>=20231117
 setuptools>=77.0.3
+ffmpeg-python==0.2.0

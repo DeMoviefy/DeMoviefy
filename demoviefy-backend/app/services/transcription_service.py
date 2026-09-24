@@ -21,6 +21,7 @@ from app.services.video_artifact_service import (
     load_transcription,
     save_transcription,
 )
+from app.services.translation_service import translate_segments_to_srt
 
 
 def _local_whisper_available() -> bool:
@@ -181,6 +182,34 @@ def _transcribe_with_worker(
     return payload
 
 
+def generate_multilingual_srt(
+    video_id: str,
+    segments: list[dict],
+    languages: list[str] = ["pt", "en"],
+    proxy_url: str | None = None,
+) -> list[str]:
+    """Gera arquivos SRT para múltiplos idiomas com base nos segmentos da transcrição."""
+    generated_files = []
+    for lang in languages:
+        try:
+            srt_content = translate_segments_to_srt(
+                segments=segments, target_lang=lang, proxy_url=proxy_url
+            )
+            # Define o caminho do arquivo: uploads/transcriptions/video_{id}_{lang}.srt
+            file_path = Path("uploads/transcriptions") / f"video_{video_id}_{lang}.srt"
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(srt_content)
+
+            generated_files.append(str(file_path))
+        except Exception as e:
+            # Logar erro mas continuar para o próximo idioma
+            print(f"Erro ao gerar SRT para o idioma {lang}: {e}")
+
+    return generated_files
+
+
 def transcribe_video_with_timestamps(
     *,
     video_id: str,
@@ -188,31 +217,38 @@ def transcribe_video_with_timestamps(
     model_name: str = "base",
     language: str | None = None,
     logger: Any | None = None,
+    proxy_url: str | None = None,
 ) -> dict[str, Any]:
     worker_python = resolve_transcription_python()
     worker_error: Exception | None = None
 
     if worker_python is not None and TRANSCRIPTION_SCRIPT_PATH.exists():
         try:
-            return _transcribe_with_worker(
+            payload = _transcribe_with_worker(
                 python_executable=worker_python,
                 video_id=video_id,
                 model_name=model_name,
                 language=language,
                 logger=logger,
             )
+            # Geração de SRTs após transcrição bem sucedida
+            generate_multilingual_srt(video_id=video_id, segments=payload.get("segments", []), proxy_url=proxy_url)
+            return payload
         except Exception as exc:
             worker_error = exc
             if logger:
                 logger.warning("transcription:worker_failed reason=%s", exc)
 
     if _local_whisper_available() and video_path:
-        return _transcribe_with_local_whisper(
+        payload = _transcribe_with_local_whisper(
             video_path=video_path,
             model_name=model_name,
             language=language,
             logger=logger,
         )
+        # Geração de SRTs após transcrição bem sucedida
+        generate_multilingual_srt(video_id=video_id, segments=payload.get("segments", []), proxy_url=proxy_url)
+        return payload
 
     if worker_error is not None:
         raise RuntimeError(

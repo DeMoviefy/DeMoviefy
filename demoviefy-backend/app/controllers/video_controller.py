@@ -326,12 +326,23 @@ def get_video_transcription(video_id: int):
             )
         ), 404
 
+    # Identifica SRTs disponíveis no diretório de transcrições
+    available_languages = []
+    transcriptions_dir = Path("uploads/transcriptions")
+    if transcriptions_dir.exists():
+        # Procura arquivos video_{id}_{lang}.srt
+        for srt_file in transcriptions_dir.glob(f"video_{video_id}_*.srt"):
+            # Extrai 'pt' ou 'en' do nome video_{id}_{lang}.srt
+            lang = srt_file.stem.replace(f"video_{video_id}_", "")
+            available_languages.append(lang)
+
     return jsonify(
         {
             "video_id": video.id,
             "filename": video.filename,
             "available": True,
             "transcription": transcription,
+            "available_languages": available_languages,
             "storage": storage,
         }
     )
@@ -362,6 +373,7 @@ def generate_video_transcription_by_id(video_id: int):
     payload = request.get_json(silent=True) or {}
     try:
         transcription = transcribe_video_with_timestamps(
+            video_id=video_id,
             video_path=str(filepath),
             model_name=str(payload.get("model_name") or current_app.config.get("TRANSCRIPTION_MODEL", "base")),
             language=payload.get("language") or current_app.config.get("TRANSCRIPTION_LANGUAGE"),

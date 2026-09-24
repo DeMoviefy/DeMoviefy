@@ -11,8 +11,10 @@ interface TranscriptionState {
   transcription: VideoTranscriptionResponse | null;
   transcriptionDraft: string;
   transcriptionMessage: string;
+  selectedLanguage: string;
 
   setTranscriptionDraft: (draft: string) => void;
+  setLanguage: (lang: string) => void;
 
   fetchTranscription: (video: VideoRecord) => Promise<void>;
   resetTranscription: () => void;
@@ -25,8 +27,10 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
   transcription: null,
   transcriptionDraft: "",
   transcriptionMessage: "",
+  selectedLanguage: "pt",
 
   setTranscriptionDraft: (transcriptionDraft) => set({ transcriptionDraft }),
+  setLanguage: (lang) => set({ selectedLanguage: lang }),
 
   fetchTranscription: async (video) => {
     try {
@@ -58,6 +62,7 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
       set({ transcriptionMessage: "Não foi possível carregar a transcrição." });
     }
   },
+
 
   resetTranscription: () => {
     set({ transcription: null, transcriptionDraft: "" });

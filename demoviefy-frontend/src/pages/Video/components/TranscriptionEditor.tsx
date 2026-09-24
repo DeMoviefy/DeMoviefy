@@ -20,6 +20,9 @@ interface TranscriptionEditorProps {
   onDelete: () => void
   onGenerate: () => void
   onSeek: (seconds: number) => void
+  selectedLanguage: string
+  onLanguageChange: (lang: string) => void
+  availableLanguages: string[]
 }
 
 export function TranscriptionEditor({
@@ -30,16 +33,37 @@ export function TranscriptionEditor({
   onDraftChange,
   onSave,
   onDelete,
-  // onGenerate,
+  onGenerate,
   onSeek,
+  selectedLanguage,
+  onLanguageChange,
+  availableLanguages,
 }: TranscriptionEditorProps) {
 
   return (
     <section className="editor-card">
       <div className="section-heading">
-        <div>
-          <span className="eyebrow">Transcrição</span>
-          <h3>Texto editável</h3>
+        <div className="heading-content">
+          <div className="title-group">
+            <span className="eyebrow">Transcrição</span>
+            <h3>Texto editável</h3>
+          </div>
+
+          {availableLanguages.length > 0 && (
+            <div className="language-selector">
+              <select
+                value={selectedLanguage}
+                onChange={(e) => onLanguageChange(e.target.value)}
+                className="language-dropdown"
+              >
+                {availableLanguages.map((lang) => (
+                  <option key={lang} value={lang}>
+                    {lang === "pt" ? "Português" : lang === "en" ? "English" : lang.toUpperCase()}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
       </div>
       {/* Botão desabilitado pois a funcionalidade ainda não está pronta para ser apresentada
@@ -49,7 +73,7 @@ export function TranscriptionEditor({
         <button type="button" className="ghost-button" onClick={onGenerate} disabled={isBusy}>
           {isBusy ? "Transcrição aguardando..." : "Gerar transcrição por IA"}
         </button>
-        
+
       </div>
       */}
       <textarea
