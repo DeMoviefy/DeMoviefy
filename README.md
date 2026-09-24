@@ -119,10 +119,10 @@ O fluxo correto é:
 A tradução nunca é executada automaticamente durante a geração da transcrição.
 Quando você clicar em **Traduzir**, os segmentos são enviados ao provedor em
 lotes de até 50 textos, reduzindo as requisições e a chance de atingir o limite
-temporário do Google Translate. A tradução ainda depende do limite do provedor
-público usado por `deep-translator`; se ele bloquear novas chamadas, aguarde e
-tente novamente mais tarde. O erro é mostrado na interface e a versão original
-não é sobrescrita.
+temporário do Google Translate. A tradução usa o `deep-translator` com
+`GoogleTranslator`; se o provedor bloquear novas chamadas, aguarde e tente
+novamente mais tarde. O erro é mostrado na interface e a versão original nunca
+é sobrescrita.
 
 > **Importante**: Manter `torch==2.11.0` e `torchvision==0.26.0` para compatibilidade.
 

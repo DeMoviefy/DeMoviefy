@@ -40,10 +40,8 @@ def translate_segments(
             continue
         source_segments.append((segment, text))
 
-    translated_texts = _translate_texts_in_batches(
-        translator,
-        [text for _, text in source_segments],
-    )
+    texts = [text for _, text in source_segments]
+    translated_texts = _translate_texts_in_batches(translator, texts)
     if len(translated_texts) != len(source_segments):
         raise RuntimeError("O provedor retornou uma quantidade inesperada de traduções.")
 

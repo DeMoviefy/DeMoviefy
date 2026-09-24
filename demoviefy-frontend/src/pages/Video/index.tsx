@@ -1,13 +1,17 @@
 // src/pages/Video/index.tsx
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useVideoDetailStore } from "src/pages/Video/stores/useVideoDetailStore";
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
 import { useVideoConfig } from "src/pages/Video/hooks/useVideoConfig";
 import { useCatalogStore } from "src/core/stores/useAICatalogStore";
 import { VideoWorkbench } from "src/pages/Video/components/VideoWorkbench";
+import { DashboardSidebar } from "src/pages/Upload/components/DashboardSidebar";
+import "/src/pages/Upload/styles/VideoDashboard.css";
+import "/src/pages/Upload/styles/NewDashboardLayout.css";
 
 export default function Video() {
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const { id } = useParams<{ id: string }>();
     const parsedId = id ? Number(id) : NaN;
     const isValidId = !Number.isNaN(parsedId);
@@ -51,13 +55,20 @@ export default function Video() {
         return <p>{error}</p>;
     }
     return (
-        <VideoWorkbench
-            video={video}
-            config={videoConfig}
-            isBusy={selectedVideoIsBusy}
-            onConfigChange={setVideoConfig}
-            onSaveConfig={handleSaveConfig}
-            onReprocess={handleReprocess}
-        />
+        <>
+            <DashboardSidebar
+                open={sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+            />
+            <VideoWorkbench
+                video={video}
+                config={videoConfig}
+                isBusy={selectedVideoIsBusy}
+                onConfigChange={setVideoConfig}
+                onSaveConfig={handleSaveConfig}
+                onReprocess={handleReprocess}
+                onToggleSidebar={() => setSidebarOpen((open) => !open)}
+            />
+        </>
     );
 }

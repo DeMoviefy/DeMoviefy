@@ -26,6 +26,7 @@ type VideoWorkbenchProps = {
   onConfigChange: (config: AiConfigPayload) => void;
   onSaveConfig: () => void;
   onReprocess: () => void;
+  onToggleSidebar?: () => void;
 };
 
 export const VideoWorkbench = memo(function VideoWorkbench({
@@ -35,6 +36,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
   onConfigChange,
   onSaveConfig,
   onReprocess,
+  onToggleSidebar,
 }: VideoWorkbenchProps) {
 
     const processingVideo = useProcessingStore((state) =>
@@ -80,6 +82,20 @@ export const VideoWorkbench = memo(function VideoWorkbench({
 
       <div className="inspector-grid">
         <div className="media-panel">
+          {onToggleSidebar && (
+            <div className="video-library-toolbar">
+              <button
+                type="button"
+                className="menu-toggle"
+                onClick={onToggleSidebar}
+                aria-label="Abrir biblioteca de vídeos"
+                title="Visualizar outros vídeos"
+              >
+                ☰
+              </button>
+              <span>Outros vídeos</span>
+            </div>
+          )}
 
           <VideoPreviewPanel
             video={currentVideo}

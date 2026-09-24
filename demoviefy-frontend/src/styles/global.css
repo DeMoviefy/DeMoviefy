@@ -484,6 +484,8 @@ code {
 .library-panel,
 .inspector-panel {
   padding: 22px;
+  min-width: 0;
+  contain: layout style;
 }
 
 .section-heading {
@@ -768,11 +770,33 @@ code {
   gap: 22px;
 }
 
+.media-panel {
+ min-width: 0;
+}
+
+.video-library-toolbar {
+ display: flex;
+ align-items: center;
+ justify-content: flex-start;
+ gap: 10px;
+ margin-bottom: 12px;
+ color: var(--muted);
+ font-size: 0.85rem;
+}
+
+.video-library-toolbar .menu-toggle {
+ flex: 0 0 auto;
+}
+
 .video-preview {
   width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  max-height: 70vh;
+  object-fit: contain;
   border-radius: 20px;
   background: #020617;
-  min-height: 240px;
+  min-height: 0;
 }
 
 .preview-grid {
@@ -789,6 +813,9 @@ code {
 .preview-card {
   display: grid;
   gap: 12px;
+  min-width: 0;
+  content-visibility: auto;
+  contain-intrinsic-size: 360px;
 }
 
 .preview-card-header {
@@ -827,6 +854,11 @@ code {
   gap: 14px;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   margin-top: 18px;
+}
+
+.info-grid {
+  content-visibility: auto;
+  contain-intrinsic-size: 180px;
 }
 
 .info-card,
@@ -1232,6 +1264,18 @@ code {
 
   .preview-grid {
     grid-template-columns: 1fr;
+  }
+
+  .video-library-toolbar {
+    margin-bottom: 10px;
+  }
+
+  .section-heading {
+    flex-wrap: wrap;
+  }
+
+  .section-heading h2 {
+    overflow-wrap: anywhere;
   }
 
   .stats-row {
