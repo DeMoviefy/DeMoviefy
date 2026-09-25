@@ -10,7 +10,6 @@ from app.config.paths import (
     metadata_file_path,
     to_repo_relative,
     transcription_file_path,
-    transcription_variant_file_path,
 )
 from app.services.ai_catalog_service import get_model_by_relative_path
 
@@ -255,9 +254,8 @@ def save_processing_state(
     return load_processing_state(video_id)
 
 
-def load_transcription(video_id: int, variant: str | None = None) -> dict[str, Any] | None:
-    path = transcription_file_path(video_id) if variant is None else transcription_variant_file_path(video_id, variant)
-    return _read_json(path)
+def load_transcription(video_id: int) -> dict[str, Any] | None:
+    return _read_json(transcription_file_path(video_id))
 
 
 def save_transcription(
@@ -270,7 +268,6 @@ def save_transcription(
     model_name: str | None = None,
     status: str = "ready",
     error: str | None = None,
-    variant: str | None = None,
 ) -> dict[str, Any]:
     payload = {
         "content": content,
@@ -281,21 +278,18 @@ def save_transcription(
         "status": status,
         "error": error,
     }
-    path = transcription_file_path(video_id) if variant is None else transcription_variant_file_path(video_id, variant)
-    _write_json(path, payload)
+    _write_json(transcription_file_path(video_id), payload)
     return payload
 
 
-def delete_transcription(video_id: int, variant: str | None = None) -> None:
-    path = transcription_file_path(video_id) if variant is None else transcription_variant_file_path(video_id, variant)
+def delete_transcription(video_id: int) -> None:
+    path = transcription_file_path(video_id)
     if path.exists():
         path.unlink()
 
 
 def has_transcription(video_id: int) -> bool:
-    return transcription_file_path(video_id).exists() or any(
-        transcription_file_path(video_id).parent.glob(f"video_{video_id}_*.json")
-    )
+    return transcription_file_path(video_id).exists()
 
 
 def update_analysis(video_id: int, payload: dict[str, Any]) -> dict[str, Any]:

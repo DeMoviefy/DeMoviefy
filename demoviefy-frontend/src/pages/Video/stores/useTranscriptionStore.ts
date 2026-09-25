@@ -11,21 +11,10 @@ interface TranscriptionState {
   transcription: VideoTranscriptionResponse | null;
   transcriptionDraft: string;
   transcriptionMessage: string;
-  selectedLanguage: string;
-  selectedModel: string;
-  selectedVariant: string;
-  transcriptionSegments: VideoTranscriptionResponse["transcription"]["segments"];
-  isGenerating: boolean;
-  isTranslating: boolean;
 
   setTranscriptionDraft: (draft: string) => void;
-  setLanguage: (lang: string) => void;
-  setModel: (model: string) => void;
-  setSelectedVariant: (variant: string) => void;
-  updateSegment: (id: number, field: "start" | "end" | "text", value: string) => void;
-  translateTranscription: (targetLanguage: string) => Promise<void>;
 
-  fetchTranscription: (video: VideoRecord, variant?: string) => Promise<void>;
+  fetchTranscription: (video: VideoRecord) => Promise<void>;
   resetTranscription: () => void;
   onSaveTranscription: () => Promise<void>;
   onDeleteTranscription: () => Promise<void>;
@@ -36,53 +25,16 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
   transcription: null,
   transcriptionDraft: "",
   transcriptionMessage: "",
-  selectedLanguage: "pt",
-  selectedModel: "base",
-  selectedVariant: "default",
-  transcriptionSegments: [],
-  isGenerating: false,
-  isTranslating: false,
 
   setTranscriptionDraft: (transcriptionDraft) => set({ transcriptionDraft }),
-  setLanguage: (lang) => set({ selectedLanguage: lang }),
-  setModel: (selectedModel) => set({ selectedModel }),
-  setSelectedVariant: (selectedVariant) => {
-    const video = useVideoDetailStore.getState().video;
-    set({ selectedVariant });
-    if (video) void get().fetchTranscription(video, selectedVariant);
-  },
-  updateSegment: (id, field, value) => set((state) => ({
-    transcriptionSegments: state.transcriptionSegments.map((segment) =>
-      segment.id === id
-        ? { ...segment, [field]: field === "text" ? value : Number(value) }
-        : segment
-    ),
-  })),
-  translateTranscription: async (targetLanguage) => {
-    const video = useVideoDetailStore.getState().video;
-    if (!video) return;
-    try {
-      set({ isTranslating: true });
-      await VideoService.translateTranscription(video.id, get().selectedVariant, targetLanguage);
-      toast.success("Tradução gerada. Ela já está disponível na lista de versões.");
-      await get().fetchTranscription(video, `${targetLanguage}-from-${get().selectedVariant}`);
-    } catch (error) {
-      console.error(error);
-      toast.error(getApiErrorMessage(error, "Não foi possível gerar a tradução."));
-    } finally {
-      set({ isTranslating: false });
-    }
-  },
 
-  fetchTranscription: async (video, variant = get().selectedVariant) => {
+  fetchTranscription: async (video) => {
     try {
-      const { data, status } = await VideoService.getTranscription(video.transcription_url, variant);
+      const { data, status } = await VideoService.getTranscription(video.transcription_url);
 
       set({
         transcription: data,
         transcriptionDraft: data.transcription.content ?? "",
-        transcriptionSegments: data.transcription.segments ?? [],
-        selectedVariant: data.selected_variant ?? variant,
       });
 
       if (status === 200) {
@@ -107,9 +59,8 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
     }
   },
 
-
   resetTranscription: () => {
-    set({ transcription: null, transcriptionDraft: "", transcriptionSegments: [], selectedVariant: "default" });
+    set({ transcription: null, transcriptionDraft: "" });
   },
 
   onSaveTranscription: async () => {
@@ -119,16 +70,7 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
     const { transcriptionDraft, fetchTranscription } = get();
 
     try {
-      const segments = get().transcriptionSegments;
-      const content = segments.length > 0
-        ? segments.map((segment) => segment.text.trim()).filter(Boolean).join(" ")
-        : transcriptionDraft;
-      await VideoService.saveTranscription(
-        selectedVideo.id,
-        content,
-        segments,
-        get().selectedVariant,
-      );
+      await VideoService.saveTranscription(selectedVideo.id, transcriptionDraft);
       toast.success("Transcrição salva com sucesso.");
       await useVideoDetailStore.getState().fetchVideoById(selectedVideo.id);
       await fetchTranscription(selectedVideo);
@@ -144,12 +86,11 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
 
 
     try {
-      await VideoService.deleteTranscription(selectedVideo.id, get().selectedVariant);
+      await VideoService.deleteTranscription(selectedVideo.id);
       set({
         transcription: null,
         transcriptionDraft: "",
         transcriptionMessage: "Transcrição removida. Você pode criar uma nova quando quiser.",
-        transcriptionSegments: [],
       });
       toast.success("Transcrição excluída.");
       await useVideoDetailStore.getState().fetchVideoById(selectedVideo.id);
@@ -167,20 +108,13 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
 
     try {
       set({ transcriptionMessage: "Gerando transcrição automática. Isso pode levar alguns instantes." });
-      const { selectedLanguage, selectedModel } = get();
-      set({ isGenerating: true });
-      const { message: apiMessage } = await VideoService.generateTranscription(selectedVideo.id, {
-        language: selectedLanguage,
-        modelName: selectedModel,
-      });
+      const { message: apiMessage } = await VideoService.generateTranscription(selectedVideo.id);
       toast(apiMessage);
       await useVideoDetailStore.getState().fetchVideoById(selectedVideo.id);
-      await fetchTranscription(selectedVideo, `${selectedLanguage || "auto"}-${selectedModel}`);
+      await fetchTranscription(selectedVideo);
     } catch (error) {
       console.error(error);
       toast.error(getApiErrorMessage(error, "Não foi possível gerar a transcrição automática. Verifique o Whisper e o ffmpeg."));
-    } finally {
-      set({ isGenerating: false });
     }
   },
 }));

@@ -26,7 +26,6 @@ type VideoWorkbenchProps = {
   onConfigChange: (config: AiConfigPayload) => void;
   onSaveConfig: () => void;
   onReprocess: () => void;
-  onToggleSidebar?: () => void;
 };
 
 export const VideoWorkbench = memo(function VideoWorkbench({
@@ -36,7 +35,6 @@ export const VideoWorkbench = memo(function VideoWorkbench({
   onConfigChange,
   onSaveConfig,
   onReprocess,
-  onToggleSidebar,
 }: VideoWorkbenchProps) {
 
     const processingVideo = useProcessingStore((state) =>
@@ -57,18 +55,13 @@ export const VideoWorkbench = memo(function VideoWorkbench({
     transcription, transcriptionDraft, transcriptionMessage,
     setTranscriptionDraft,
     onSaveTranscription, onDeleteTranscription, onGenerateTranscription,
-    selectedLanguage, setLanguage, selectedModel, setModel, isGenerating,
-    selectedVariant, setSelectedVariant, transcriptionSegments, updateSegment,
-    isTranslating, translateTranscription,
   } = useTranscriptionStore();
 
   const summary = analysis?.analysis ?? null;
   const analysisVariants = analysis?.available_variants ?? [];
   const hasMultipleAnalysisVariants = analysisVariants.length > 1;
-  const availableLanguages = transcription?.available_languages ?? [];
-  const transcriptionVariants = transcription?.variants ?? [{ id: "default", label: "Transcrição principal", language: null }];
+  const transcriptionSegments = transcription?.transcription.segments ?? [];
   const hasSelectedAnalysis = analysis !== null;
-
 
   const { videoRef, annotatedVideoSrc, originalVideoSrc, seekTo } = useVideoPlayer(
     currentVideo,
@@ -82,20 +75,6 @@ export const VideoWorkbench = memo(function VideoWorkbench({
 
       <div className="inspector-grid">
         <div className="media-panel">
-          {onToggleSidebar && (
-            <div className="video-library-toolbar">
-              <button
-                type="button"
-                className="menu-toggle"
-                onClick={onToggleSidebar}
-                aria-label="Abrir biblioteca de vídeos"
-                title="Visualizar outros vídeos"
-              >
-                ☰
-              </button>
-              <span>Outros vídeos</span>
-            </div>
-          )}
 
           <VideoPreviewPanel
             video={currentVideo}
@@ -104,31 +83,6 @@ export const VideoWorkbench = memo(function VideoWorkbench({
             originalVideoSrc={originalVideoSrc}
             annotatedVideoSrc={annotatedVideoSrc}
             videoRef={videoRef}
-            transcriptionPanel={
-              <TranscriptionEditor
-                transcriptionDraft={transcriptionDraft}
-                transcriptionMessage={transcriptionMessage}
-                segments={transcriptionSegments}
-                isBusy={isBusy}
-                onDraftChange={setTranscriptionDraft}
-                onSave={() => onSaveTranscription()}
-                onDelete={() => onDeleteTranscription()}
-                onGenerate={() => onGenerateTranscription()}
-                onSeek={seekTo}
-                selectedLanguage={selectedLanguage}
-                onLanguageChange={setLanguage}
-                availableLanguages={availableLanguages}
-                selectedModel={selectedModel}
-                onModelChange={setModel}
-                isGenerating={isGenerating}
-                variants={transcriptionVariants}
-                selectedVariant={selectedVariant}
-                onVariantChange={setSelectedVariant}
-                onSegmentChange={updateSegment}
-                isTranslating={isTranslating}
-                onTranslate={(language) => void translateTranscription(language)}
-              />
-            }
           />
 
         </div>
@@ -173,6 +127,17 @@ export const VideoWorkbench = memo(function VideoWorkbench({
               onDelete={() => onDeleteAnalysis(currentVideo)}
             />
 
+            <TranscriptionEditor
+              transcriptionDraft={transcriptionDraft}
+              transcriptionMessage={transcriptionMessage}
+              segments={transcriptionSegments}
+              isBusy={isBusy}
+              onDraftChange={setTranscriptionDraft}
+              onSave={() => onSaveTranscription()}
+              onDelete={() => onDeleteTranscription()}
+              onGenerate={() => onGenerateTranscription()}
+              onSeek={seekTo}
+            />
           </div>
         </div>
       </div>

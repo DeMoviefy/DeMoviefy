@@ -282,13 +282,7 @@ def generate_video_transcription_by_id(video_id: int):
         return jsonify({"error": "Transcrição automática indisponível. Instale openai-whisper no ambiente atual ou ative a opção de transcrição no setup."}), 503
     payload = request.get_json(silent=True) or {}
     try:
-        transcription = transcribe_video_with_timestamps(
-            video_id=video_id,
-            video_path=str(filepath),
-            model_name=str(payload.get("model_name") or current_app.config.get("TRANSCRIPTION_MODEL", "base")),
-            language=payload.get("language") or current_app.config.get("TRANSCRIPTION_LANGUAGE"),
-            logger=current_app.logger
-        )
+        transcription = transcribe_video_with_timestamps(video_path=str(filepath), model_name=str(payload.get("model_name") or current_app.config.get("TRANSCRIPTION_MODEL", "base")), language=payload.get("language") or current_app.config.get("TRANSCRIPTION_LANGUAGE"), logger=current_app.logger)
         saved = save_transcription(video_id, **transcription)
     except Exception as exc:
         current_app.logger.exception("transcription:failed video_id=%s", video_id)

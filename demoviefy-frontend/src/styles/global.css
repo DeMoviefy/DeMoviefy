@@ -484,8 +484,6 @@ code {
 .library-panel,
 .inspector-panel {
   padding: 22px;
-  min-width: 0;
-  contain: layout style;
 }
 
 .section-heading {
@@ -494,13 +492,10 @@ code {
   align-items: start;
   gap: 12px;
   margin-bottom: 18px;
-  min-width: 0;
 }
 
 .section-heading h2 {
   font-size: 1.8rem;
-  min-width: 0;
-  overflow-wrap: anywhere;
 }
 
 .empty-state {
@@ -773,53 +768,22 @@ code {
   gap: 22px;
 }
 
-.media-panel {
- min-width: 0;
-}
-
-.video-library-toolbar {
- display: flex;
- align-items: center;
- justify-content: flex-start;
- gap: 10px;
- margin-bottom: 12px;
- color: var(--muted);
- font-size: 0.85rem;
-}
-
-.video-library-toolbar .menu-toggle {
- flex: 0 0 auto;
-}
-
 .video-preview {
   width: 100%;
-  aspect-ratio: 16 / 9;
-  height: auto;
-  max-height: 70vh;
-  object-fit: contain;
   border-radius: 20px;
   background: #020617;
-  min-height: 0;
+  min-height: 240px;
 }
 
 .preview-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
-  min-width: 0;
-}
-
-.preview-grid > .editor-card {
-  margin-top: 0;
-  min-width: 0;
 }
 
 .preview-card {
   display: grid;
   gap: 12px;
-  min-width: 0;
-  content-visibility: auto;
-  contain-intrinsic-size: 360px;
 }
 
 .preview-card-header {
@@ -858,11 +822,6 @@ code {
   gap: 14px;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   margin-top: 18px;
-}
-
-.info-grid {
-  content-visibility: auto;
-  contain-intrinsic-size: 180px;
 }
 
 .info-card,
@@ -919,39 +878,6 @@ code {
   font-family: inherit;
 }
 
-.transcription-readonly {
-  cursor: default;
-  opacity: 0.9;
-}
-
-.transcription-progress {
-  margin-top: 14px;
-  padding: 12px;
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  border-radius: 10px;
-  background: rgba(59, 130, 246, 0.07);
-}
-
-.transcription-progress-bar {
-  overflow: hidden;
-}
-
-.transcription-progress-bar span {
-  display: block;
-  width: 38%;
-  height: 100%;
-  animation: transcription-progress-slide 1.4s ease-in-out infinite;
-}
-
-@keyframes transcription-progress-slide {
-  0% {
-    transform: translateX(-120%);
-  }
-  100% {
-    transform: translateX(360%);
-  }
-}
-
 .action-row {
   display: flex;
   gap: 12px;
@@ -1000,45 +926,6 @@ code {
   color: var(--brand-strong);
   font-size: 0.84rem;
   margin-bottom: 6px;
-  cursor: pointer;
-  border: 0;
-  background: transparent;
-  padding: 0;
-  text-align: left;
-  font: inherit;
-}
-
-.segment-edit-row {
-  display: grid;
-  grid-template-columns: 90px 90px minmax(0, 1fr);
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.segment-edit-row input {
-  width: 100%;
-  min-width: 0;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 8px;
-  background: rgba(15, 23, 42, 0.45);
-  color: inherit;
-  padding: 7px 8px;
-}
-
-.heading-content,
-.transcription-options,
-.action-row {
-  min-width: 0;
-}
-
-.transcription-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.field-block {
-  min-width: min(160px, 100%);
 }
 
 .segment-text {
@@ -1286,23 +1173,6 @@ code {
     grid-template-columns: 1fr;
   }
 
-  .inspector-grid,
-  .editor-grid {
-    min-width: 0;
-  }
-
-  .video-library-toolbar {
-    margin-bottom: 10px;
-  }
-
-  .section-heading {
-    flex-wrap: wrap;
-  }
-
-  .section-heading h2 {
-    overflow-wrap: anywhere;
-  }
-
   .stats-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1357,58 +1227,5 @@ code {
 
   .pipeline-steps {
     gap: 6px;
-  }
-
-  .section-heading {
-    align-items: stretch;
-  }
-
-  .heading-content,
-  .transcription-options,
-  .field-block,
-  .action-row {
-    width: 100%;
-  }
-
-  .transcription-options {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  }
-
-  .action-row,
-  .action-row-start {
-    flex-wrap: wrap;
-    justify-content: flex-start;
-  }
-
-  .action-row > button,
-  .action-row > select {
-    max-width: 100%;
-  }
-
-  .segment-edit-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .segment-edit-row input:last-child {
-    grid-column: 1 / -1;
-  }
-}
-
-@media (max-width: 420px) {
-  .inspector-panel {
-    padding: 14px;
-  }
-
-  .transcription-options {
-    grid-template-columns: 1fr;
-  }
-
-  .segment-edit-row {
-    grid-template-columns: 1fr;
-  }
-
-  .segment-edit-row input:last-child {
-    grid-column: auto;
   }
 }
