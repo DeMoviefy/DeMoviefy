@@ -101,6 +101,29 @@ O sistema gera transcrição automática com timestamps apos processamento. Reco
 .\.venv\Scripts\python -m pip install -r demoviefy-backend/requirements-transcription.txt
 ```
 
+Na tela do vídeo, use **Gerar transcrição por IA** para escolher o idioma e o nível
+de precisão do Whisper. A transcrição automática fica habilitada por padrão; para
+desabilitá-la explicitamente, defina `AUTO_TRANSCRIPTION_ENABLED=false`.
+
+O fluxo correto é:
+
+1. Gere a transcrição no idioma original do áudio.
+2. Clique em **Traduzir**, escolha outro idioma e aguarde a nova versão aparecer
+   no seletor **Versão**.
+3. Se o idioma de origem e o destino forem iguais, a tradução fica bloqueada e
+   nenhuma chamada de tradução é feita.
+4. Clique no timestamp azul de um segmento para levar o vídeo àquele momento.
+5. Use **Editar transcrição** para alterar texto, início e fim dos segmentos, e
+   depois clique em **Salvar transcrição**.
+
+A tradução nunca é executada automaticamente durante a geração da transcrição.
+Quando você clicar em **Traduzir**, os segmentos são enviados ao provedor em
+lotes de até 50 textos, reduzindo as requisições e a chance de atingir o limite
+temporário do Google Translate. A tradução usa o `deep-translator` com
+`GoogleTranslator`; se o provedor bloquear novas chamadas, aguarde e tente
+novamente mais tarde. O erro é mostrado na interface e a versão original nunca
+é sobrescrita.
+
 > **Importante**: Manter `torch==2.11.0` e `torchvision==0.26.0` para compatibilidade.
 
 ## Documentação Adicional

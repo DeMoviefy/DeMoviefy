@@ -1,6 +1,6 @@
 // src/pages/Upload/components/VideoPreviewPanel.tsx
 
-import { useState, useEffect, type RefObject } from "react"
+import { useState, useEffect, type ReactNode, type RefObject } from "react"
 import type { VideoRecord } from "src/pages/Upload/types"
 
 interface VideoPreviewPanelProps {
@@ -10,6 +10,7 @@ interface VideoPreviewPanelProps {
   annotatedVideoSrc: string
   videoRef: RefObject<HTMLVideoElement | null>
   hasSelectedAnalysis: boolean
+  transcriptionPanel?: ReactNode
 }
 
 function getAnnotatedPreviewState(
@@ -46,7 +47,9 @@ export function VideoPreviewPanel({
   video,
   analysisState,
   annotatedVideoSrc,
-  hasSelectedAnalysis
+  videoRef,
+  hasSelectedAnalysis,
+  transcriptionPanel,
 }: VideoPreviewPanelProps) {
   const [annotatedPlaybackError, setAnnotatedPlaybackError] = useState(false)
 
@@ -74,6 +77,7 @@ export function VideoPreviewPanel({
               controls
               preload="metadata"
               src={annotatedVideoSrc}
+              ref={videoRef}
               onError={() => setAnnotatedPlaybackError(true)}
             >
               Seu navegador não suporta reproduzir este vídeo.
@@ -85,6 +89,7 @@ export function VideoPreviewPanel({
             </div>
           )}
         </article>
+        {transcriptionPanel}
       </div>
 
       <div className="info-grid">
