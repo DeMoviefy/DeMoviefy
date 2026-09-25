@@ -265,7 +265,7 @@ def get_video_transcription(video_id: int):
     if transcription is None:
         if video.status in {"PROCESSANDO", "PROCESSANDO_IA"}:
             return jsonify(_empty_transcription_payload(video, storage, status="pending", error="A transcrição sera consultada novamente quando o processamento terminar.")), 202
-        return jsonify(_empty_transcription_payload(video, storage, status="missing", error="Transcrição não disponível.")), 404
+        return jsonify(_empty_transcription_payload(video, storage, status="missing", error="Transcrição não disponível. Gere-a ou escreva-a manualmente neste editor.")), 404
     return jsonify({"video_id": video.id, "filename": video.filename, "available": True, "transcription": transcription, "storage": storage})
 
 

@@ -81,6 +81,18 @@ export const VideoWorkbench = memo(function VideoWorkbench({
             annotatedVideoSrc={annotatedVideoSrc}
           />
         </div>
+
+        <TranscriptionEditor
+              transcriptionDraft={transcriptionDraft}
+              transcriptionMessage={transcriptionMessage}
+              segments={transcriptionSegments}
+              isBusy={isBusy}
+              onDraftChange={setTranscriptionDraft}
+              onSave={() => onSaveTranscription()}
+              onDelete={() => onDeleteTranscription()}
+              onGenerate={() => onGenerateTranscription()}
+              onSeek={seekTo}
+        />
   
         <div className="min-w-0">
           <AnalysisHeader
@@ -115,17 +127,6 @@ export const VideoWorkbench = memo(function VideoWorkbench({
               onReprocess={onReprocess}
             />
   
-            <TranscriptionEditor
-              transcriptionDraft={transcriptionDraft}
-              transcriptionMessage={transcriptionMessage}
-              segments={transcriptionSegments}
-              isBusy={isBusy}
-              onDraftChange={setTranscriptionDraft}
-              onSave={() => onSaveTranscription()}
-              onDelete={() => onDeleteTranscription()}
-              onGenerate={() => onGenerateTranscription()}
-              onSeek={seekTo}
-            />
           </div>
         </div>
       </div>

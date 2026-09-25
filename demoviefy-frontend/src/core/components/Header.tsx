@@ -5,8 +5,8 @@ import demoviefyLight from "src/assets/DeMoviefy-Dark.png"
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-50 bg-white">
-      <div className="mx-auto flex h-20 w-full items-center justify-between px-4">
+    <header className="top-0 z-50 bg-white">
+      <div className="mx-auto flex h-20 w-full items-center justify-between px-4 border-b">
         <NavLink to="/">
           <img
             src={demoviefyLight}

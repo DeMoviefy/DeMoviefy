@@ -30,23 +30,20 @@ export function TranscriptionEditor({
   onDraftChange,
   onSave,
   onDelete,
-  // onGenerate,
+  //onGenerate,
   onSeek,
 }: TranscriptionEditorProps) {
 
   return (
-    <section className="group border-t border-neutral-200 pt-8">
-      <div className="flex items-start gap-3">
-        <div className="mt-1 h-5 w-1 shrink-0 bg-transparent transition-colors group-hover:bg-blue-600" />
+    <section className="group">
+      <div className="flex items-start">
+        <div className="mt-1 h-5 w-1 shrink-0 bg-transparent transition-colors" />
   
         <div>
           <h3 className="text-base font-semibold text-neutral-900">
-            Transcrição
+            Editor de transcrição
           </h3>
   
-          <p className="mt-1 text-sm leading-6 text-neutral-500">
-            Edite a transcrição associada ao vídeo.
-          </p>
         </div>
       </div>
   
@@ -54,12 +51,9 @@ export function TranscriptionEditor({
         className="mt-6 min-h-48 w-full resize-y border border-neutral-200 bg-neutral-50 p-6 text-sm leading-7 text-neutral-900 outline-none transition focus:border-blue-400"
         value={transcriptionDraft}
         onChange={(e) => onDraftChange(e.target.value)}
-        placeholder="Cole ou escreva aqui a transcrição do vídeo."
+        placeholder={transcriptionMessage}
       />
   
-      <p className="mt-2 text-sm text-neutral-500">
-        {transcriptionMessage}
-      </p>
   
       {segments.length > 0 && (
         <div className="mt-6 flex flex-col border border-neutral-200 bg-neutral-50">

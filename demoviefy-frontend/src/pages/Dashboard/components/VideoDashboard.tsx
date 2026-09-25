@@ -24,7 +24,7 @@ export default function VideoDashboard() {
     }, [fetchCatalog, refresh]);
 
     return (
-        <div className="relative flex min-h-[calc(100vh-6rem)] w-full pt-4">
+        <div className="relative flex min-h-[calc(100vh-6rem)] w-full pt-6">
             <DashboardSidebar
             />
 
