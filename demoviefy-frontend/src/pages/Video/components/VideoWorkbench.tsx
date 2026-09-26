@@ -20,20 +20,20 @@ import type { AiConfigPayload, VideoRecord } from "src/core/types/videoTypes";
 
 type VideoWorkbenchProps = {
     video: VideoRecord | null;
-  config: AiConfigPayload;
-  isBusy: boolean;
-  onConfigChange: (config: AiConfigPayload) => void;
-  onSaveConfig: () => void;
-  onReprocess: () => void;
+    config: AiConfigPayload;
+    isBusy: boolean;
+    onConfigChange: (config: AiConfigPayload) => void;
+    onSaveConfig: () => void;
+    onReprocess: () => void;
 };
 
 export const VideoWorkbench = memo(function VideoWorkbench({
     video,
-  config,
-  isBusy,
-  onConfigChange,
-  onSaveConfig,
-  onReprocess,
+    config,
+    isBusy,
+    onConfigChange,
+    onSaveConfig,
+    onReprocess,
 }: VideoWorkbenchProps) {
 
     const processingVideo = useProcessingStore((state) =>
@@ -44,92 +44,93 @@ export const VideoWorkbench = memo(function VideoWorkbench({
 
     useVideoWorkbenchSync(currentVideo);
 
-  const {
-    analysis, analysisState, analysisMessage, selectedAnalysisVariantId,
-    setSelectedAnalysisVariantId,
-    onDeleteAnalysis,
-  } = useAnalysisStore();
+    const {
+        analysis, analysisState, analysisMessage, selectedAnalysisVariantId,
+        setSelectedAnalysisVariantId,
+        onDeleteAnalysis,
+    } = useAnalysisStore();
 
-  const {
-    transcription, transcriptionDraft, transcriptionMessage,
-    setTranscriptionDraft,
-    onSaveTranscription, onDeleteTranscription, onGenerateTranscription,
-  } = useTranscriptionStore();
+    const {
+        transcription, transcriptionDraft, transcriptionMessage,
+        setTranscriptionDraft,
+        onSaveTranscription, onDeleteTranscription, onGenerateTranscription,
+    } = useTranscriptionStore();
 
-  const summary = analysis?.analysis ?? null;
-  const analysisVariants = analysis?.available_variants ?? [];
-  const transcriptionSegments = transcription?.transcription.segments ?? [];
-  const hasSelectedAnalysis = analysis !== null;
+    const summary = analysis?.analysis ?? null;
+    const analysisVariants = analysis?.available_variants ?? [];
+    const transcriptionSegments = transcription?.transcription.segments ?? [];
+    const hasSelectedAnalysis = analysis !== null;
 
-  const { annotatedVideoSrc, seekTo } = useVideoPlayer(
-    currentVideo,
-    selectedAnalysisVariantId
-  );
+    const { annotatedVideoSrc, seekTo } = useVideoPlayer(
+        currentVideo,
+        selectedAnalysisVariantId
+    );
 
-  if (!currentVideo) return <WorkbenchEmptyState />;
+    if (!currentVideo) return <WorkbenchEmptyState />;
 
-  return (
-    <section className="flex w-full flex-col gap-6 py-6">
-      <WorkbenchHeader video={currentVideo} />
-  
-      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-        <div className="min-w-0">
-          <VideoPreviewPanel
-            video={currentVideo}
-            analysisState={analysisState}
-            hasSelectedAnalysis={hasSelectedAnalysis}
-            annotatedVideoSrc={annotatedVideoSrc}
-          />
-        </div>
+    return (
+        <section className="flex w-full flex-col gap-6 py-6">
+            <WorkbenchHeader video={currentVideo} />
 
-        <TranscriptionEditor
-              transcriptionDraft={transcriptionDraft}
-              transcriptionMessage={transcriptionMessage}
-              segments={transcriptionSegments}
-              isBusy={isBusy}
-              onDraftChange={setTranscriptionDraft}
-              onSave={() => onSaveTranscription()}
-              onDelete={() => onDeleteTranscription()}
-              onGenerate={() => onGenerateTranscription()}
-              onSeek={seekTo}
-        />
-  
-        <div className="min-w-0">
-          <AnalysisHeader
-            message={analysisMessage}
-            variants={analysisVariants}
-            selectedVariantId={selectedAnalysisVariantId}
-            onDelete={() => onDeleteAnalysis(currentVideo)}
-            onVariantChange={(id) => {
-              setSelectedAnalysisVariantId(id, currentVideo);
-  
-              window.scrollTo({
-                top: 0,
-                behavior: "smooth",
-              });
-            }}
-          />
-  
-          <AnalysisResults
-            state={analysisState}
-            summary={summary}
-            taskLabel={currentVideo.ai_config.task_label}
-            modelName={currentVideo.ai_config.model_name}
-          />
-  
-          <div className="mt-6 grid gap-6">
-            <VideoConfigPanel
-              video={currentVideo}
-              config={config}
-              onConfigChange={onConfigChange}
-              isBusy={isBusy}
-              onSaveConfig={onSaveConfig}
-              onReprocess={onReprocess}
-            />
-  
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+            <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+                <div className="min-w-0">
+                    <VideoPreviewPanel
+                        video={currentVideo}
+                        analysisState={analysisState}
+                        hasSelectedAnalysis={hasSelectedAnalysis}
+                        annotatedVideoSrc={annotatedVideoSrc}
+                    />
+
+                    <div className="mt-6 min-w-0">
+                        <AnalysisHeader
+                            message={analysisMessage}
+                            variants={analysisVariants}
+                            selectedVariantId={selectedAnalysisVariantId}
+                            onDelete={() => onDeleteAnalysis(currentVideo)}
+                            onVariantChange={(id) => {
+                                setSelectedAnalysisVariantId(id, currentVideo);
+
+                                window.scrollTo({
+                                    top: 0,
+                                    behavior: "smooth",
+                                });
+                            }}
+                        />
+
+                        <div className="mt-6 grid gap-6">
+                            <VideoConfigPanel
+                                video={currentVideo}
+                                config={config}
+                                onConfigChange={onConfigChange}
+                                isBusy={isBusy}
+                                onSaveConfig={onSaveConfig}
+                                onReprocess={onReprocess}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex min-w-0 flex-col gap-6">
+                    <TranscriptionEditor
+                        transcriptionDraft={transcriptionDraft}
+                        transcriptionMessage={transcriptionMessage}
+                        segments={transcriptionSegments}
+                        isBusy={isBusy}
+                        onDraftChange={setTranscriptionDraft}
+                        onSave={() => onSaveTranscription()}
+                        onDelete={() => onDeleteTranscription()}
+                        onGenerate={() => onGenerateTranscription()}
+                        onSeek={seekTo}
+                    />
+
+                    <AnalysisResults
+                        state={analysisState}
+                        summary={summary}
+                        taskLabel={currentVideo.ai_config.task_label}
+                        modelName={currentVideo.ai_config.model_name}
+                    />
+                </div>
+            </div>
+        </section>
+    );
 });

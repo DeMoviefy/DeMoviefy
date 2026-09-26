@@ -157,13 +157,8 @@ export function NewVideoPanel() {
                     {/* Enviar vídeo */}
                     <button
                         type="button"
-                        onClick={async () => {
-                            await handleUpload(uploadTask, uploadModelPath);
-
-                            window.scrollTo({
-                                top: 0,
-                                behavior: "smooth",
-                            });
+                        onClick={() => {
+                            handleUpload(uploadTask, uploadModelPath);
                         }}
                         disabled={uploading}
                         className="w-full cursor-pointer bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
