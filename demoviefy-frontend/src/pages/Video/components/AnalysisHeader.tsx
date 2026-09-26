@@ -24,12 +24,14 @@ export const AnalysisHeader = memo(function AnalysisHeader({
 
     return (
         <div className="pb-5">
-            <p className="text-sm leading-6 text-neutral-600">
-                {message}
-            </p>
+            {(message || variants.length === 0) && (
+                <p className="mt-2 text-xs leading-5 text-neutral-400" aria-live="polite">
+                    {message || "Nenhuma análise disponível."}
+                </p>
+            )}
 
-            <div className="mt-4 flex w-full items-end gap-4">
-                {variants.length > 0 && (<>
+            {variants.length > 0 && (
+                <div className="mt-4 flex w-full items-end gap-4">
                     <label className="min-w-0 flex-1">
                         <span className="mb-1.5 block text-xs font-medium text-neutral-500">
                             Versão da análise
@@ -67,9 +69,8 @@ export const AnalysisHeader = memo(function AnalysisHeader({
                             </button>
                         )}
                     </ConfirmationDialog>
-                </>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     )
 })
