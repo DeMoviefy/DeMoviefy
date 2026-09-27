@@ -61,6 +61,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
     const transcriptionContent = transcription?.transcription.content ?? "";
     const hasTranscriptionChanges = transcriptionDraft !== transcriptionContent;
     const hasSelectedAnalysis = analysis !== null;
+    const isProcessing = currentVideo.status.startsWith("PROCESSANDO");
 
     const { annotatedVideoSrc, seekTo } = useVideoPlayer(
         currentVideo,
@@ -117,7 +118,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                                 video={currentVideo}
                                 config={config}
                                 onConfigChange={onConfigChange}
-                                isBusy={isBusy}
+                                isBusy={isBusy || isProcessing}
                                 onReprocess={onReprocess}
                             />
                         </div>

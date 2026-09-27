@@ -30,6 +30,7 @@ export function WorkbenchHeader({ video }: WorkbenchHeaderProps) {
   
       {video.status.startsWith("PROCESSANDO") && (
         <ProcessingProgress
+          modelName={video.ai_config.model_name}
           progress={video.processing.processing_progress}
           stage={video.processing.processing_stage}
           etaSeconds={video.processing.processing_eta_seconds}
