@@ -20,7 +20,7 @@ export function StatsPanel({
           Vídeos
         </span>
 
-        <strong className="mt-1.5 block text-2xl font-semibold tracking-tight text-neutral-900">
+        <strong className="mt-3.5 block text-2xl font-semibold tracking-tight text-neutral-900">
           {total}
         </strong>
       </div>
@@ -30,7 +30,7 @@ export function StatsPanel({
           Processando
         </span>
 
-        <strong className="mt-1.5 block text-2xl font-semibold tracking-tight text-neutral-900">
+        <strong className="mt-3.5 block text-2xl font-semibold tracking-tight text-neutral-900">
           {processing}
         </strong>
       </div>
@@ -40,7 +40,7 @@ export function StatsPanel({
           Concluídos
         </span>
 
-        <strong className="mt-1.5 block text-2xl font-semibold tracking-tight text-neutral-900">
+        <strong className="mt-3.5 block text-2xl font-semibold tracking-tight text-neutral-900">
           {processed}
         </strong>
       </div>
@@ -50,7 +50,7 @@ export function StatsPanel({
           Erros
         </span>
 
-        <strong className="mt-1.5 block text-2xl font-semibold tracking-tight text-neutral-900">
+        <strong className="mt-3.5 block text-2xl font-semibold tracking-tight text-neutral-900">
           {errors}
         </strong>
       </div>
