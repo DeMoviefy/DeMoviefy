@@ -26,12 +26,12 @@ Antes de começar, certifique-se de ter instalado:
 
 ```bash
 git clone https://github.com/Bruno-Timoteo/DeMoviefy.git
-cd demoviefy-front
 ```
 
 **2. Instale as dependências**
 
 ```bash
+cd demoviefy-frontend
 npm install
 ```
 ## Executando o projeto
