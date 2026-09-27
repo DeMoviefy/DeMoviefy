@@ -23,7 +23,7 @@ export const AnalysisHeader = memo(function AnalysisHeader({
 }: AnalysisHeaderProps) {
 
     return (
-        <div className="pb-5">
+        <div className="py-5">
             {(message || variants.length === 0) && (
                 <p className="mt-2 text-xs leading-5 text-neutral-400" aria-live="polite">
                     {message || "Nenhuma análise disponível."}
@@ -62,7 +62,7 @@ export const AnalysisHeader = memo(function AnalysisHeader({
                         {(open) => (
                             <button
                                 type="button"
-                                className="shrink-0 pb-2 text-sm font-medium text-neutral-500 transition-colors hover:text-red-600"
+                                className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:border-red-300 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
                                 onClick={open}
                             >
                                 Excluir análise

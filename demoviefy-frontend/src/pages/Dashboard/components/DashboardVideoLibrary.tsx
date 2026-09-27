@@ -93,14 +93,14 @@ export const DashboardVideoLibrary = memo(
             <div className="py-4">
               <strong className="text-sm font-medium text-neutral-900">
                 {search
-                  ? "Nenhum vídeo encontrado."
-                  : "Nenhum vídeo enviado ainda."}
+                  ? "Nenhum vídeo encontrado"
+                  : "Nenhum vídeo enviado ainda"}
               </strong>
 
               <p className="mt-2 text-sm leading-6 text-neutral-500">
                 {search
                   ? "Tente buscar por outro nome de arquivo."
-                  : "Assim que o upload terminar, ele aparecerá aqui."}
+                  : "Assim que o upload for concluído o vídeo aparecerá aqui."}
               </p>
             </div>
           ) : (

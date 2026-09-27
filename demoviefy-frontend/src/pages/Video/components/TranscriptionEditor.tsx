@@ -85,7 +85,7 @@ export function TranscriptionEditor({
                     {(open) => (
                         <button
                             type="button"
-                            className="text-sm font-medium text-neutral-500 transition-colors hover:text-red-600"
+                            className="text-sm cursor-pointer font-medium text-neutral-500 transition-colors hover:text-red-600"
                             onClick={open}
                             disabled={isBusy}
                         >
@@ -96,7 +96,7 @@ export function TranscriptionEditor({
 
                 <button
                     type="button"
-                    className="rounded-md border border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-md border cursor-pointer border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     onClick={onSave}
                     disabled={isBusy}
                 >

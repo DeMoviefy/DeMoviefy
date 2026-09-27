@@ -447,7 +447,7 @@ def process_video(flask_app, video_id, *, cancellation_requested=None):
         try:
             update_status(video, "PROCESSANDO_IA")
             ensure_storage_dirs()
-            save_processing_state(video_id, progress=5, stage="preparing", eta_seconds=None, message="Preparando video e configuracoes da análise.")
+            save_processing_state(video_id, progress=5, stage="preparing", eta_seconds=None, message="Preparando vídeo e configurações da análise.")
             ai_config = load_ai_config(video_id)
             annotated_path = annotated_video_path(video_id)
             annotated_temp_path = annotated_video_temp_path(video_id)

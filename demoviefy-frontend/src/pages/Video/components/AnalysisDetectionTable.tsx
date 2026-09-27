@@ -17,12 +17,10 @@ export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
         if (countA === countB) return labelA.localeCompare(labelB, "pt-BR");
         return sortDirection === "desc" ? countB - countA : countA - countB;
     });
-    const hasScrollableRows = labels.length > 3;
-
     return (
         <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm">
-            <div className={hasScrollableRows ? "max-h-48 overflow-auto" : "overflow-x-auto"}>
-                <table className="w-full min-w-96 border-separate border-spacing-0 text-left text-sm">
+            <div className="h-48 overflow-auto">
+                <table className="h-full w-full min-w-96 border-separate border-spacing-0 text-left text-sm">
                     <thead className="sticky top-0 z-10 bg-neutral-50 text-xs font-semibold tracking-wide text-neutral-500">
                         <tr>
                             <th scope="col" className="px-5 py-3.5">

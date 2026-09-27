@@ -39,6 +39,8 @@ function deriveStats(videos: VideoRecord[]): VideoStats {
 }
 
 const poller = createPoller(500);
+let refreshInFlight: Promise<void> | null = null;
+let refreshAgain = false;
 
 export const useProcessingStore = create<ProcessingState>((set, get) => ({
     videos: [],
@@ -54,50 +56,64 @@ export const useProcessingStore = create<ProcessingState>((set, get) => ({
     initialized: false,
 
     refresh: async () => {
-        if (get().loading) {
+        if (refreshInFlight) {
+            refreshAgain = true;
+            await refreshInFlight;
             return;
         }
 
-        set({ loading: true });
+        refreshInFlight = (async () => {
+            set({ loading: true });
+
+            try {
+                const videos = (await VideoService.listVideos()).map(normalizeVideoRecord);
+
+                const previousStats = get().stats;
+                const wasInitialized = get().initialized;
+
+                const stats = deriveStats(videos);
+
+                set({ videos, stats, initialized: true });
+
+                if (wasInitialized) {
+
+                    if (stats.processed > previousStats.processed) {
+                        toast.success("Processamento concluído");
+                    }
+
+                    else if (stats.errors > previousStats.errors) {
+                        toast.error("Erro no processamento");
+                    }
+                }
+
+                const hasRunningProcessing = videos.some(
+                    (video) => video.status.startsWith("PROCESSANDO")
+                );
+
+                if (hasRunningProcessing) {
+                    get().startPolling();
+                } else {
+                    get().stopPolling();
+                }
+
+            } catch (error) {
+                console.error(error);
+
+                toast.error(getApiErrorMessage(error, "Erro ao buscar vídeos."));
+
+            } finally {
+                set({ loading: false });
+            }
+        })();
 
         try {
-            const videos = (await VideoService.listVideos()).map(normalizeVideoRecord);
-
-            const previousStats = get().stats;
-            const wasInitialized = get().initialized;
-
-            const stats = deriveStats(videos);
-
-            set({videos, stats, initialized: true,});
-
-            if (wasInitialized) {
-
-                if (stats.processed > previousStats.processed) {
-                    toast.success("Processamento concluído");
-                }
-
-                else if (stats.errors > previousStats.errors) {
-                    toast.error("Erro no processamento");
-                }
-            }
-
-            const hasRunningProcessing = videos.some(
-                (video) => video.status.startsWith("PROCESSANDO")
-            );
-
-            if (hasRunningProcessing) {
-                get().startPolling();
-            } else {
-                get().stopPolling();
-            }
-
-        } catch (error) {
-            console.error(error);
-
-            toast.error(getApiErrorMessage(error, "Erro ao buscar vídeos."));
-
+            await refreshInFlight;
         } finally {
-            set({ loading: false });
+            refreshInFlight = null;
+            if (refreshAgain) {
+                refreshAgain = false;
+                void get().refresh();
+            }
         }
     },
 
