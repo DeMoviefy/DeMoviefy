@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useCatalogStore } from "src/core/stores/useAICatalogStore"
-
+import { FaTrashAlt } from "react-icons/fa"
 import { ConfirmationDialog } from "src/core/components/ConfirmationDialog"
 import { VideoAnalysisConfig } from "src/core/components/VideoAnalysisConfig"
 
@@ -52,7 +52,7 @@ export function VideoConfigPanel({
             <button
                 type="button"
                 onClick={() => setIsOpen((open) => !open)}
-                className="group flex w-full items-center justify-between rounded-lg py-2 text-left transition-colors hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                className="group flex w-full items-center justify-between rounded-lg py-5 text-left transition-colors hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
                 <div>
                     <h3 className="text-base font-semibold text-neutral-900">
@@ -97,25 +97,9 @@ export function VideoConfigPanel({
 
                     <div className="mt-8 flex flex-wrap items-center justify-end gap-3">
 
-                        <ConfirmationDialog
-                            title="Excluir vídeo"
-                            message="Tem certeza de que deseja excluir o vídeo? Esta ação é irreversível."
-                            onConfirm={handleDeleteVideo}
-                        >
-                            {(open) => (
-                                <button
-                                    type="button"
-                                    className="text-sm font-medium text-neutral-500 transition-colors hover:text-red-600"
-                                    onClick={open}
-                                >
-                                    Excluir vídeo
-                                </button>
-                            )}
-                        </ConfirmationDialog>
-
                         <button
                             type="button"
-                    className="rounded-md border border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-300 hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="cursor-pointer rounded-md border border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-300 hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             onClick={onSaveConfig}
                             disabled={isBusy}
                         >
@@ -124,7 +108,7 @@ export function VideoConfigPanel({
 
                         <button
                             type="button"
-                            className="rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="cursor-pointer rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             onClick={onReprocess}
                             disabled={isBusy}
                         >
@@ -135,6 +119,25 @@ export function VideoConfigPanel({
                     </div>
                 </div>
             )}
+
+            <div className="flex justify-start border-t border-neutral-100 py-4">
+                <ConfirmationDialog
+                    title="Excluir vídeo"
+                    message="Tem certeza de que deseja excluir o vídeo? Esta ação é irreversível."
+                    onConfirm={handleDeleteVideo}
+                >
+                    {(open) => (
+                        <button
+                            type="button"
+                            className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:border-red-300 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+                            onClick={open}
+                        >
+                            <FaTrashAlt aria-hidden="true" className="size-3" />
+                            Excluir vídeo
+                        </button>
+                    )}
+                </ConfirmationDialog>
+            </div>
         </section>
 
     )
