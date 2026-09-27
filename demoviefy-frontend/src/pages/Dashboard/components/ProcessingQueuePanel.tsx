@@ -155,7 +155,7 @@ export function ProcessingQueuePanel() {
       {totalPages > 1 && (
         <nav
           aria-label="Paginação da fila de processamento"
-          className="flex items-center justify-between gap-2 border-t border-neutral-100 pt-4"
+          className="flex items-center justify-between gap-2 pt-4"
         >
           <button
             type="button"
