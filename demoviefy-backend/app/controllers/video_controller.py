@@ -1,3 +1,4 @@
+from contextlib import nullcontext
 from fileinput import filename
 import mimetypes
 from pathlib import Path
@@ -44,6 +45,7 @@ from app.services.video_artifact_service import (
     delete_analysis,
     delete_metadata,
     delete_transcription,
+    delete_video_artifacts,
     has_transcription,
     load_ai_config,
     load_processing_state,
@@ -702,14 +704,24 @@ def delete_video_by_id(video_id: int):
     if not video:
         return jsonify({"error": "Vídeo não encontrado"}), 404
 
-    filepath = video_file_path(video.filename)
-    delete_video(video)
-    for path in (filepath,):
-        if path.exists():
-            path.unlink()
-    delete_analysis_artifacts(video.id)
-    delete_transcription(video_id)
-    delete_metadata(video_id)
+    job_queue = current_app.extensions.get("video_job_queue")
+    cleanup_lock = (
+        job_queue.cancel_and_wait(video.id, video.job_id)
+        if job_queue is not None
+        else nullcontext()
+    )
+    try:
+        with cleanup_lock:
+            delete_video_artifacts(video.id, video.filename, logger=current_app.logger)
+            delete_video(video)
+    except OSError:
+        current_app.logger.exception(
+            "action:delete_video_cleanup_failed video_id=%s filename=%s",
+            video_id,
+            video.filename,
+        )
+        return jsonify({"error": "Falha ao remover todos os arquivos relacionados ao vídeo"}), 500
+
     current_app.logger.info("action:delete_video video_id=%s filename=%s", video_id, video.filename)
     return jsonify({"message": "Vídeo removido com sucesso"})
 

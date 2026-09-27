@@ -260,6 +260,33 @@ class DeMoviefyTestPlan(unittest.TestCase):
             b"test video",
         )
 
+    def test_ct10_deletes_video_after_cleaning_its_artifacts(self):
+        video_id = self.create_video()
+
+        with patch("app.controllers.video_controller.delete_video_artifacts") as cleanup:
+            response = self.client.delete(f"/videos/{video_id}")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["message"], "Vídeo removido com sucesso")
+        cleanup.assert_called_once()
+        self.assertEqual(cleanup.call_args.args, (video_id, "video_teste.mp4"))
+        with self.app.app_context():
+            self.assertIsNone(Video.query.filter_by(id=video_id).first())
+
+    def test_ct11_keeps_video_record_when_artifact_cleanup_fails(self):
+        video_id = self.create_video()
+
+        with patch(
+            "app.controllers.video_controller.delete_video_artifacts",
+            side_effect=OSError("storage unavailable"),
+        ):
+            response = self.client.delete(f"/videos/{video_id}")
+
+        self.assertEqual(response.status_code, 500)
+        self.assertIn("arquivos relacionados", response.get_json()["error"])
+        with self.app.app_context():
+            self.assertIsNotNone(Video.query.filter_by(id=video_id).first())
+
     def test_sec01_sanitizes_traversal_filename(self):
         response = self.upload("../../outside.mp4")
 
