@@ -1,9 +1,6 @@
 type VideoAnalysisConfigProps = {
     taskType: string
     modelPath: string
-    frameStride: string | number
-    confidenceThreshold: string | number
-    maxFrames: string | number
     clipStart: string | number
     clipEnd: string | number | null
   
@@ -20,9 +17,6 @@ type VideoAnalysisConfigProps = {
   
     onTaskChange: (value: string) => void
     onModelChange: (value: string) => void
-    onFrameStrideChange: (value: string) => void
-    onConfidenceChange: (value: string) => void
-    onMaxFramesChange: (value: string) => void
     onClipStartChange: (value: string) => void
     onClipEndChange: (value: string) => void
   }
@@ -30,18 +24,12 @@ type VideoAnalysisConfigProps = {
 export function VideoAnalysisConfig({
   taskType,
   modelPath,
-  frameStride,
-  confidenceThreshold,
-  maxFrames,
   clipStart,
   clipEnd,
   tasks,
   models,
   onTaskChange,
   onModelChange,
-  onFrameStrideChange,
-  onConfidenceChange,
-  onMaxFramesChange,
   onClipStartChange,
   onClipEndChange,
 }: VideoAnalysisConfigProps) {
@@ -51,7 +39,7 @@ export function VideoAnalysisConfig({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="border-t border-neutral-200 pt-6">
+      <div className="pt-6">
         <div className="flex items-start gap-3">
           <div>
             <h3 className="text-base font-semibold text-neutral-900">
@@ -116,76 +104,7 @@ export function VideoAnalysisConfig({
           )}
         </div>
       </div>
-  
-      <div className="border-t border-neutral-200 pt-6">
-        <div className="flex items-start gap-3">
-          <div>
-            <h3 className="text-base font-semibold text-neutral-900">
-              Parâmetros
-            </h3>
-          </div>
-        </div>
-  
-        <div className="mt-4 grid gap-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4 md:grid-cols-3">
-          <div>
-            <label
-              htmlFor="video-analysis-stride"
-              className="text-sm font-medium text-neutral-700"
-            >
-              Stride
-            </label>
-  
-            <input
-              id="video-analysis-stride"
-              type="number"
-              min="1"
-              max="30"
-              value={frameStride}
-              onChange={(e) => onFrameStrideChange(e.target.value)}
-              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-            />
-          </div>
-  
-          <div>
-            <label
-              htmlFor="video-analysis-confidence"
-              className="text-sm font-medium text-neutral-700"
-            >
-              Confiança
-            </label>
-  
-            <input
-              id="video-analysis-confidence"
-              type="number"
-              min="0"
-              max="1"
-              step="0.05"
-              value={confidenceThreshold}
-              onChange={(e) => onConfidenceChange(e.target.value)}
-              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-            />
-          </div>
-  
-          <div>
-            <label
-              htmlFor="video-analysis-max-frames"
-              className="text-sm font-medium text-neutral-700"
-            >
-              Max Frames
-            </label>
-  
-            <input
-              id="video-analysis-max-frames"
-              type="number"
-              min="1"
-              max="600"
-              value={maxFrames}
-              onChange={(e) => onMaxFramesChange(e.target.value)}
-              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-            />
-          </div>
-        </div>
-      </div>
+
   
       <div className="border-t border-neutral-200 pt-6">
         <div className="flex items-start gap-3">

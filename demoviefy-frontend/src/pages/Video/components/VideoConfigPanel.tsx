@@ -16,7 +16,6 @@ interface VideoConfigPanelProps {
     config: AiConfigPayload
     onConfigChange: (config: AiConfigPayload) => void
     isBusy: boolean
-    onSaveConfig: () => void
     onReprocess: () => void
 }
 
@@ -25,7 +24,6 @@ export function VideoConfigPanel({
     config,
     onConfigChange,
     isBusy,
-    onSaveConfig,
     onReprocess,
 }: VideoConfigPanelProps) {
 
@@ -73,38 +71,22 @@ export function VideoConfigPanel({
             </button>
 
             {isOpen && (
-                <div className="mt-6">
+                <div className="mt-2 rounded-lg border border-neutral-200 bg-white p-5 shadow-sm">
                     <VideoAnalysisConfig
                         taskType={config.task_type}
                         modelPath={config.model_path}
-                        frameStride={config.frame_stride}
-                        confidenceThreshold={config.confidence_threshold}
-                        maxFrames={config.max_frames}
                         clipStart={config.clip_start_sec}
                         clipEnd={config.clip_end_sec}
                         tasks={tasks}
                         models={models}
                         onTaskChange={(value) => update("task_type", value)}
                         onModelChange={(value) => update("model_path", value)}
-                        onFrameStrideChange={(value) => update("frame_stride", value)}
-                        onConfidenceChange={(value) =>
-                            update("confidence_threshold", value)
-                        }
-                        onMaxFramesChange={(value) => update("max_frames", value)}
                         onClipStartChange={(value) => update("clip_start_sec", value)}
                         onClipEndChange={(value) => update("clip_end_sec", value || null)}
                     />
 
                     <div className="mt-8 flex flex-wrap items-center justify-end gap-3">
 
-                        <button
-                            type="button"
-                            className="cursor-pointer rounded-md border border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-300 hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                            onClick={onSaveConfig}
-                            disabled={isBusy}
-                        >
-                            Salvar configuração
-                        </button>
 
                         <button
                             type="button"

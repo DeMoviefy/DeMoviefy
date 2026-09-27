@@ -1,11 +1,11 @@
-// src/pages/Dashboard/components/AnalysisHeader.tsx
+// src/pages/Dashboard/components/AnalysisVersion.tsx
 
 import { memo } from "react"
 import { formatVariantLabel } from "src/core/utils/videoHelpers"
 import { ConfirmationDialog } from "src/core/components/ConfirmationDialog"
 import type { VideoAnalysisResponse } from "src/core/types/videoTypes"
 
-type AnalysisHeaderProps = {
+type AnalysisVersionProps = {
     message: string
     variants: NonNullable<VideoAnalysisResponse["available_variants"]>
     selectedVariantId: string | null
@@ -14,16 +14,16 @@ type AnalysisHeaderProps = {
 
 }
 
-export const AnalysisHeader = memo(function AnalysisHeader({
+export const AnalysisVersion = memo(function AnalysisVersion({
     message,
     variants,
     selectedVariantId,
     onVariantChange,
     onDelete
-}: AnalysisHeaderProps) {
+}: AnalysisVersionProps) {
 
     return (
-        <div className="py-5">
+        <div>
             {(message || variants.length === 0) && (
                 <p className="mt-2 text-xs leading-5 text-neutral-400" aria-live="polite">
                     {message || "Nenhuma análise disponível."}
@@ -31,7 +31,7 @@ export const AnalysisHeader = memo(function AnalysisHeader({
             )}
 
             {variants.length > 0 && (
-                <div className="mt-4 flex w-full items-end gap-4">
+                <div className="flex w-full items-end gap-4">
                     <label className="min-w-0 flex-1">
                         <span className="mb-1.5 block text-xs font-medium text-neutral-500">
                             Versão da análise

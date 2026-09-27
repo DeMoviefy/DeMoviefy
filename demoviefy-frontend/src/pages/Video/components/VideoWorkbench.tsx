@@ -10,7 +10,7 @@ import { useVideoWorkbenchSync } from "src/pages/Video/hooks/useVideoWorkbenchSy
 
 import { WorkbenchHeader } from "src/pages/Video/components/WorkbenchHeader";
 import { VideoConfigPanel } from "src/pages/Video/components/VideoConfigPanel";
-import { AnalysisHeader } from "src/pages/Video/components/AnalysisHeader";
+import { AnalysisVersion } from "src/pages/Video/components/AnalysisVersion";
 import { AnalysisResults } from "src/pages/Video/components/AnalysisResults";
 import { AnalysisMetrics } from "src/pages/Video/components/AnalysisMetrics";
 import { TranscriptionEditor } from "src/pages/Video/components/TranscriptionEditor";
@@ -24,7 +24,6 @@ type VideoWorkbenchProps = {
     config: AiConfigPayload;
     isBusy: boolean;
     onConfigChange: (config: AiConfigPayload) => void;
-    onSaveConfig: () => void;
     onReprocess: () => void;
 };
 
@@ -33,7 +32,6 @@ export const VideoWorkbench = memo(function VideoWorkbench({
     config,
     isBusy,
     onConfigChange,
-    onSaveConfig,
     onReprocess,
 }: VideoWorkbenchProps) {
 
@@ -82,38 +80,42 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                         annotatedVideoSrc={annotatedVideoSrc}
                     />
 
-                    <div className="mt-6 min-w-0 overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm divide-y divide-neutral-100">
-                        <div className="px-5 py-5">
-                            <AnalysisMetrics
-                                summary={summary}
-                                modelName={currentVideo.ai_config.model_name}
-                            />
+                    <div className="mt-6 min-w-0">
+                        <h3 className="mb-6 text-base font-semibold tracking-tight text-neutral-900">
+                            Detalhes da análise
+                        </h3>
+                        <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm">
+                            <div className="px-3 py-5">
+                                <AnalysisMetrics
+                                    summary={summary}
+                                    modelName={currentVideo.ai_config.model_name}
+                                />
+                            </div>
+
+                            <div className="px-3 py-5">
+                                <AnalysisVersion
+                                    message={analysisMessage}
+                                    variants={analysisVariants}
+                                    selectedVariantId={selectedAnalysisVariantId}
+                                    onDelete={() => onDeleteAnalysis(currentVideo)}
+                                    onVariantChange={(id) => {
+                                        setSelectedAnalysisVariantId(id, currentVideo);
+
+                                        window.scrollTo({
+                                            top: 0,
+                                            behavior: "smooth",
+                                        });
+                                    }}
+                                />
+                            </div>
                         </div>
 
-                        <div className="px-5">
-                            <AnalysisHeader
-                                message={analysisMessage}
-                                variants={analysisVariants}
-                                selectedVariantId={selectedAnalysisVariantId}
-                                onDelete={() => onDeleteAnalysis(currentVideo)}
-                                onVariantChange={(id) => {
-                                    setSelectedAnalysisVariantId(id, currentVideo);
-
-                                    window.scrollTo({
-                                        top: 0,
-                                        behavior: "smooth",
-                                    });
-                                }}
-                            />
-                        </div>
-
-                        <div className="px-5">
+                        <div className="mt-6">
                             <VideoConfigPanel
                                 video={currentVideo}
                                 config={config}
                                 onConfigChange={onConfigChange}
                                 isBusy={isBusy}
-                                onSaveConfig={onSaveConfig}
                                 onReprocess={onReprocess}
                             />
                         </div>
@@ -121,12 +123,9 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                 </div>
 
                 <div className="flex min-w-0 flex-col gap-6">
-
-                    
                     <AnalysisResults
                         state={analysisState}
                         summary={summary}
-                        
                     />
                     <TranscriptionEditor
                         transcriptionDraft={transcriptionDraft}

@@ -23,7 +23,7 @@ export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
                 <table className="h-full w-full min-w-96 border-separate border-spacing-0 text-left text-sm">
                     <thead className="sticky top-0 z-10 bg-neutral-50 text-xs font-semibold tracking-wide text-neutral-500">
                         <tr>
-                            <th scope="col" className="px-5 py-3.5">
+                            <th scope="col" className="px-3 py-3.5">
                                 Classe
                             </th>
                             <th scope="col" className="px-5 py-3.5 text-right">
@@ -69,7 +69,7 @@ export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
                                 <tr key={label} className="transition-colors hover:bg-blue-50/40">
                                     <th
                                         scope="row"
-                                        className="px-5 py-3.5 font-medium text-neutral-900"
+                                        className="px-3 py-3.5 font-medium text-neutral-900"
                                     >
                                         {label}
                                     </th>

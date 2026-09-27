@@ -8,9 +8,6 @@ import { useProcessingStore } from "src/core/stores/useProcessingStore";
 
 export function useUpload() {
   const [file, setFile] = useState<File | null>(null);
-  const [uploadFrameStride, setUploadFrameStride] = useState("8");
-  const [uploadConfidenceThreshold, setUploadConfidenceThreshold] = useState("0.35");
-  const [uploadMaxFrames, setUploadMaxFrames] = useState("300");
   const [uploadClipStart, setUploadClipStart] = useState("0");
   const [uploadClipEnd, setUploadClipEnd] = useState("");
 
@@ -29,17 +26,14 @@ export function useUpload() {
         file,
         uploadTask,
         uploadModelPath,
-        parseInt(uploadFrameStride) || 8,
-        parseFloat(uploadConfidenceThreshold) || 0.35,
-        parseInt(uploadMaxFrames) || 300,
+        8,
+        0.35,
+        90000,
         parseInt(uploadClipStart) || 0,
         uploadClipEnd.trim() ? parseInt(uploadClipEnd) : null
       );
 
       setFile(null);
-      setUploadFrameStride("8");
-      setUploadConfidenceThreshold("0.35");
-      setUploadMaxFrames("300");
       setUploadClipStart("0");
       setUploadClipEnd("");
 
@@ -53,12 +47,10 @@ export function useUpload() {
     } finally {
       setUploading(false);
     }
-  }, [file, uploadFrameStride, uploadConfidenceThreshold, uploadMaxFrames, uploadClipStart, uploadClipEnd, setUploading]);
+  }, [file, uploadClipStart, uploadClipEnd, setUploading]);
 
   return {
-    file, setFile, uploadFrameStride, setUploadFrameStride,
-    uploadConfidenceThreshold, setUploadConfidenceThreshold,
-    uploadMaxFrames, setUploadMaxFrames, uploadClipStart, setUploadClipStart,
+    file, setFile, uploadClipStart, setUploadClipStart,
     uploadClipEnd, setUploadClipEnd, handleUpload
   };
 }

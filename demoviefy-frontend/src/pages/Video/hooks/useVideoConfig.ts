@@ -15,7 +15,7 @@ export function useVideoConfig(video: VideoRecord | null) {
         model_path: "",
         frame_stride: "8",
         confidence_threshold: "0.35",
-        max_frames: "300",
+        max_frames: "99999999999",
         clip_start_sec: "0",
         clip_end_sec: null,
     });

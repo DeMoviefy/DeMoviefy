@@ -29,12 +29,6 @@ export function NewVideoPanel() {
     const {
         file,
         setFile,
-        uploadFrameStride,
-        setUploadFrameStride,
-        uploadConfidenceThreshold,
-        setUploadConfidenceThreshold,
-        uploadMaxFrames,
-        setUploadMaxFrames,
         uploadClipStart,
         setUploadClipStart,
         uploadClipEnd,
@@ -138,18 +132,12 @@ export function NewVideoPanel() {
                     <VideoAnalysisConfig
                         taskType={uploadTask}
                         modelPath={uploadModelPath}
-                        frameStride={uploadFrameStride}
-                        confidenceThreshold={uploadConfidenceThreshold}
-                        maxFrames={uploadMaxFrames}
                         clipStart={uploadClipStart}
                         clipEnd={uploadClipEnd}
                         tasks={tasks}
                         models={models}
                         onTaskChange={handleUploadTaskChange}
                         onModelChange={setUploadModelPath}
-                        onFrameStrideChange={setUploadFrameStride}
-                        onConfidenceChange={setUploadConfidenceThreshold}
-                        onMaxFramesChange={setUploadMaxFrames}
                         onClipStartChange={setUploadClipStart}
                         onClipEndChange={setUploadClipEnd}
                     />

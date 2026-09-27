@@ -34,7 +34,6 @@ export default function Video() {
     const {
         videoConfig,
         setVideoConfig,
-        handleSaveConfig,
         handleReprocess,
     } = useVideoConfig(video);
 
@@ -56,7 +55,6 @@ export default function Video() {
             config={videoConfig}
             isBusy={selectedVideoIsBusy}
             onConfigChange={setVideoConfig}
-            onSaveConfig={handleSaveConfig}
             onReprocess={handleReprocess}
         />
     );
