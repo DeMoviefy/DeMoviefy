@@ -19,24 +19,24 @@ function getAnnotatedPreviewState(
 ) {
   if (isReprocessing) {
     return {
-      title: "Vídeo sendo processado.",
+      title: "Vídeo sendo processado",
       message: "O vídeo está sendo processado com uma nova configuração. O preview anotado estará disponível quando terminar.",
     };
   }
   if (annotatedPlaybackError && hasSelectedAnalysis) {
     return {
-      title: "Não foi possível reproduzir o vídeo anotado.",
+      title: "Não foi possível reproduzir o vídeo anotado",
       message: "O preview anotado foi gerado, mas falhou ao abrir no navegador. Reprocesse o vídeo para regenerar um MP4 compatível ou abra o arquivo salvo em uma nova guia.",
     };
   }
   if (analysisState === "pending") {
     return {
-      title: "Vídeo anotado ainda não disponível.",
+      title: "Vídeo anotado ainda não disponível",
       message: "A IA ainda está processando o arquivo. Quando terminar, o preview anotado aparece aqui.",
     };
   }
   return {
-    title: "Vídeo anotado indisponível.",
+    title: "Vídeo anotado indisponível",
     message: "Não há uma análise disponível para este vídeo.",
   };
 }

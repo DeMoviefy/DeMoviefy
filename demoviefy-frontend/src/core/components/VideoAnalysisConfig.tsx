@@ -1,4 +1,5 @@
 type VideoAnalysisConfigProps = {
+    showSectionCards?: boolean
     taskType: string
     modelPath: string
     clipStart: string | number
@@ -22,6 +23,7 @@ type VideoAnalysisConfigProps = {
   }
   
 export function VideoAnalysisConfig({
+  showSectionCards = true,
   taskType,
   modelPath,
   clipStart,
@@ -52,7 +54,7 @@ export function VideoAnalysisConfig({
           </div>
         </div>
   
-        <div className="mt-4 grid gap-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4 md:grid-cols-2">
+        <div className={`mt-4 grid gap-4 md:grid-cols-2 ${showSectionCards ? "rounded-lg border border-neutral-200 bg-neutral-50 p-4" : ""}`}>
           <div>
             <label
               htmlFor="video-analysis-task"
@@ -106,7 +108,7 @@ export function VideoAnalysisConfig({
       </div>
 
   
-      <div className="border-t border-neutral-200 pt-6">
+      <div className={`${showSectionCards ? "border-t border-neutral-200" : ""} pt-6`}>
         <div className="flex items-start gap-3">
           <div>
             <h3 className="text-base font-semibold text-neutral-900">
@@ -119,7 +121,7 @@ export function VideoAnalysisConfig({
           </div>
         </div>
   
-        <div className="mt-4 grid gap-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4 md:grid-cols-2">
+        <div className={`mt-4 grid gap-4 md:grid-cols-2 ${showSectionCards ? "rounded-lg border border-neutral-200 bg-neutral-50 p-4" : ""}`}>
           <div>
             <label
               htmlFor="video-analysis-clip-start"

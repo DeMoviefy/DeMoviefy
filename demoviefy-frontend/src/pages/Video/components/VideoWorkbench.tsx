@@ -58,6 +58,8 @@ export const VideoWorkbench = memo(function VideoWorkbench({
     const summary = analysis?.analysis ?? null;
     const analysisVariants = analysis?.available_variants ?? [];
     const transcriptionSegments = transcription?.transcription.segments ?? [];
+    const transcriptionContent = transcription?.transcription.content ?? "";
+    const hasTranscriptionChanges = transcriptionDraft !== transcriptionContent;
     const hasSelectedAnalysis = analysis !== null;
 
     const { annotatedVideoSrc, seekTo } = useVideoPlayer(
@@ -131,6 +133,8 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                         transcriptionDraft={transcriptionDraft}
                         transcriptionMessage={transcriptionMessage}
                         segments={transcriptionSegments}
+                        hasTranscription={currentVideo.transcription_ready}
+                        hasChanges={hasTranscriptionChanges}
                         isBusy={isBusy}
                         onDraftChange={setTranscriptionDraft}
                         onSave={() => onSaveTranscription()}

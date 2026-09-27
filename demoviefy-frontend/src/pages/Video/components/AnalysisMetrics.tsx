@@ -16,8 +16,8 @@ export const AnalysisMetrics = memo(function AnalysisMetrics({
     return (
         <div>
             {!summary ? (
-                <p className="text-xs leading-5 text-neutral-400" aria-live="polite">
-                    Métricas indisponíveis sem uma análise.
+                <p className="text-xs font-medium text-neutral-500" aria-live="polite">
+                    Nenhuma análise disponível.
                 </p>
             ) : (
                 <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3">

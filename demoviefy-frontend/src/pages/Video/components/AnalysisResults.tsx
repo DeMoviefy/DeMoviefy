@@ -9,7 +9,7 @@ type AnalysisResultsProps = {
 export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
     if (state === "loading" || state === "pending") {
         return (
-            <section className="flex flex-col gap-6">
+            <section className="flex flex-col gap-3">
                 <h3 className="text-base font-semibold tracking-tight text-neutral-900">
                     Resultados da Análise
                 </h3>
@@ -22,7 +22,7 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
 
     if (!summary) {
         return (
-            <section className="flex flex-col gap-6">
+            <section className="flex flex-col gap-3">
                 <h3 className="text-base font-semibold tracking-tight text-neutral-900">
                     Resultados da Análise
                 </h3>
@@ -34,7 +34,7 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
     }
 
     return (
-        <section className="flex flex-col gap-6">
+        <section className="flex flex-col gap-4">
             <h3 className="text-base font-semibold tracking-tight text-neutral-900">
                 Resultados da Análise
             </h3>

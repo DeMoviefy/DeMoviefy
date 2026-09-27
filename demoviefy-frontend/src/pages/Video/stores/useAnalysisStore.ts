@@ -154,7 +154,6 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
 
       set({ analysis: null, analysisDraft: "{}" });
       useTranscriptionStore.getState().resetTranscription();
-      useTranscriptionStore.setState({ transcriptionMessage: "Transcrição removida." });
 
       get().resetArtifactSignature();
       return true;

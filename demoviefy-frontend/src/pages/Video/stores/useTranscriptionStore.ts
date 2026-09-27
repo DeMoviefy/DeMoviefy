@@ -90,7 +90,6 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
       set({
         transcription: null,
         transcriptionDraft: "",
-        transcriptionMessage: "Transcrição removida. Você pode criar uma nova quando quiser.",
       });
       toast.success("Transcrição excluída.");
       await useVideoDetailStore.getState().fetchVideoById(selectedVideo.id);

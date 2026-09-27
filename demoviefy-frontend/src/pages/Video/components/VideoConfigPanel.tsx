@@ -47,32 +47,46 @@ export function VideoConfigPanel({
 
     return (
         <section>
-            <button
-                type="button"
-                onClick={() => setIsOpen((open) => !open)}
-                className="group flex w-full items-center justify-between rounded-lg py-5 text-left transition-colors hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-            >
+            <div className="py-5 text-left">
                 <div>
-                    <h3 className="text-base font-semibold text-neutral-900">
-                        Reprocessar vídeo
-                    </h3>
+                    <div className="flex items-center gap-3">
+                        <h3 className="text-base font-semibold text-neutral-900">
+                            Reprocessar vídeo
+                        </h3>
+                        <button
+                            type="button"
+                            onClick={() => setIsOpen((open) => !open)}
+                            aria-expanded={isOpen}
+                            aria-controls="video-reprocess-config"
+                            aria-label={isOpen ? "Recolher configurações" : "Expandir configurações"}
+                            className={`flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-all hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${isOpen ? "rotate-180" : ""}`}
+                        >
+                            <svg
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                className="size-4"
+                            >
+                                <path
+                                    d="m5 7.5 5 5 5-5"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                        </button>
+                    </div>
 
                     <p className="mt-1 text-sm leading-6 text-neutral-500">
-                        Ajuste a configuração e execute uma nova análise.
+                        Execute uma nova análise do vídeo.
                     </p>
                 </div>
-
-                <span
-                    className={`text-sm text-neutral-400 transition-transform ${isOpen ? "rotate-180" : ""
-                        }`}
-                >
-                    ↓
-                </span>
-            </button>
+            </div>
 
             {isOpen && (
-                <div className="mt-2 rounded-lg border border-neutral-200 bg-white p-5 shadow-sm">
+                <div id="video-reprocess-config" className="mt-2 rounded-lg border border-neutral-200 bg-white px-3 py-5 shadow-sm">
                     <VideoAnalysisConfig
+                        showSectionCards={false}
                         taskType={config.task_type}
                         modelPath={config.model_path}
                         clipStart={config.clip_start_sec}

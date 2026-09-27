@@ -26,7 +26,7 @@ export const AnalysisVersion = memo(function AnalysisVersion({
         <div>
             {(message || variants.length === 0) && (
                 <p className="mt-2 text-xs leading-5 text-neutral-400" aria-live="polite">
-                    {message || "Nenhuma análise disponível."}
+                    {message}
                 </p>
             )}
 

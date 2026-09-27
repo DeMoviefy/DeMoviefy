@@ -14,6 +14,8 @@ interface TranscriptionEditorProps {
     transcriptionDraft: string
     transcriptionMessage: string
     segments: TranscriptionSegment[]
+    hasTranscription: boolean
+    hasChanges: boolean
     isBusy: boolean
     onDraftChange: (value: string) => void
     onSave: () => void
@@ -26,6 +28,8 @@ export function TranscriptionEditor({
     transcriptionDraft,
     transcriptionMessage,
     segments,
+    hasTranscription,
+    hasChanges,
     isBusy,
     onDraftChange,
     onSave,
@@ -85,9 +89,9 @@ export function TranscriptionEditor({
                     {(open) => (
                         <button
                             type="button"
-                            className="text-sm cursor-pointer font-medium text-neutral-500 transition-colors hover:text-red-600"
+                            className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:border-red-300 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             onClick={open}
-                            disabled={isBusy}
+                            disabled={isBusy || !hasTranscription}
                         >
                             Excluir transcrição
                         </button>
@@ -96,9 +100,9 @@ export function TranscriptionEditor({
 
                 <button
                     type="button"
-                    className="rounded-md border cursor-pointer border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="cursor-pointer rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed"
                     onClick={onSave}
-                    disabled={isBusy}
+                    disabled={isBusy || !hasChanges}
                 >
                     Salvar transcrição
                 </button>
