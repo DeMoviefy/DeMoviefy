@@ -1,5 +1,6 @@
 import { memo, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 import { StatusBadge } from "src/core/components/StatusBadge";
 import type { VideoRecord } from "src/core/types/videoTypes";
@@ -21,36 +22,6 @@ function formatDate(createdAt: string | null) {
   }).format(new Date(createdAt));
 }
 
-function getStatusStyles(status: string) {
-  const normalizedStatus = status.toLowerCase();
-
-  if (status.startsWith("PROCESSANDO")) {
-    return "bg-blue-50 hover:bg-blue-100";
-  }
-
-  if (
-    normalizedStatus.includes("erro") ||
-    normalizedStatus.includes("falha")
-  ) {
-    return "bg-red-50 hover:bg-red-100";
-  }
-
-  if (
-    normalizedStatus.includes("concluído") ||
-    normalizedStatus.includes("concluido")
-  ) {
-    return "bg-green-50 hover:bg-green-100";
-  }
-
-  if (
-    normalizedStatus.includes("aguardando") ||
-    normalizedStatus.includes("pendente")
-  ) {
-    return "bg-amber-50 hover:bg-amber-100";
-  }
-
-  return "bg-neutral-50 hover:bg-neutral-100";
-}
 
 export const DashboardVideoLibrary = memo(
   function DashboardVideoLibrary({
@@ -74,6 +45,15 @@ export const DashboardVideoLibrary = memo(
     const totalPages = Math.max(
       1,
       Math.ceil(filteredVideos.length / VIDEOS_PER_PAGE),
+    );
+    const visiblePageCount = Math.min(totalPages, 5);
+    const pageWindowStart = Math.min(
+      Math.max(page - Math.floor(visiblePageCount / 2), 1),
+      Math.max(totalPages - visiblePageCount + 1, 1),
+    );
+    const visiblePages = Array.from(
+      { length: visiblePageCount },
+      (_, index) => pageWindowStart + index,
     );
 
     const visibleVideos = useMemo(() => {
@@ -104,7 +84,7 @@ export const DashboardVideoLibrary = memo(
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Busque pelo nome do vídeo..."
             aria-label="Buscar vídeo"
-            className="w-full rounded-lg border border-neutral-200 bg-neutral-50 px-2 py-2 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-blue-400 focus:bg-white"
+            className="w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
           />
         </div>
 
@@ -129,9 +109,7 @@ export const DashboardVideoLibrary = memo(
                 <Link
                   key={video.id}
                   to={`/video/${video.id}`}
-                  className={`group px-2 block rounded-lg py-4 transition ${getStatusStyles(
-                    video.status,
-                  )}`}
+                  className={`group block rounded-lg px-2 py-4 transition-color hover:bg-blue-100`}
                 >
                   <div className="min-w-0">
                     <div className="flex items-start justify-between gap-3">
@@ -179,45 +157,45 @@ export const DashboardVideoLibrary = memo(
         {totalPages > 1 && (
           <nav
             aria-label="Paginação da biblioteca"
-            className="flex items-center justify-between border-t border-neutral-100 pt-4"
+            className="flex items-center justify-between gap-2 border-t border-neutral-100 pt-4"
           >
             <button
               type="button"
               disabled={page === 1}
               onClick={() => setPage((current) => current - 1)}
-              className="cursor-pointer rounded-md px-2 py-1 text-sm text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-900 disabled:pointer-events-none disabled:opacity-40"
+              aria-label="Página anterior"
+              className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 disabled:pointer-events-none disabled:opacity-40"
             >
-              Anterior
+              <FaChevronLeft aria-hidden="true" className="size-3" />
             </button>
 
-            <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, index) => {
-                const pageNumber = index + 1;
-
-                return (
-                  <button
-                    key={pageNumber}
-                    type="button"
-                    onClick={() => setPage(pageNumber)}
-                    className={`cursor-pointer h-7 min-w-7 rounded-md px-2 text-xs font-medium transition ${
-                      pageNumber === page
-                        ? "bg-blue-600 text-white"
-                        : "text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900"
-                    }`}
-                  >
-                    {pageNumber}
-                  </button>
-                );
-              })}
+            <div className="flex shrink-0 items-center gap-1" aria-label="Selecionar página">
+              {visiblePages.map((pageNumber) => (
+                <button
+                  key={pageNumber}
+                  type="button"
+                  onClick={() => setPage(pageNumber)}
+                  aria-current={pageNumber === page ? "page" : undefined}
+                  aria-label={`Página ${pageNumber}`}
+                  className={`h-7 min-w-7 cursor-pointer rounded-md px-2 text-xs font-medium transition-colors ${
+                    pageNumber === page
+                      ? "bg-blue-600 text-white"
+                      : "text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900"
+                  }`}
+                >
+                  {pageNumber}
+                </button>
+              ))}
             </div>
 
             <button
               type="button"
               disabled={page === totalPages}
               onClick={() => setPage((current) => current + 1)}
-              className="cursor-pointer rounded-md px-2 py-1 text-sm text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-900 disabled:pointer-events-none disabled:opacity-40"
+              aria-label="Próxima página"
+              className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 disabled:pointer-events-none disabled:opacity-40"
             >
-              Próxima
+              <FaChevronRight aria-hidden="true" className="size-3" />
             </button>
           </nav>
         )}

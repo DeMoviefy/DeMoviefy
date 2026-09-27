@@ -40,7 +40,7 @@ export const AnalysisHeader = memo(function AnalysisHeader({
                         <select
                             value={selectedVariantId ?? ""}
                             onChange={(e) => onVariantChange(e.target.value || null)}
-                            className="max-w-l border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-700 outline-none transition focus:border-blue-400"
+                            className="max-w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
                         >
                             {variants.map((variant) => (
                                 <option key={variant.variant_id} value={variant.variant_id}>

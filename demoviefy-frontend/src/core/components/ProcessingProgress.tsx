@@ -55,20 +55,20 @@ export const ProcessingProgress = memo(function ProcessingProgress({
   const displayStage = currentStep === "completed" ? "Concluído" : currentStep;
 
   return (
-    <div className="processing-progress">
-      <div className="processing-progress-header">
-        <div className="progress-metrics">
-          <strong>{safeProgress}%</strong>
-          <span>{displayStage}</span>
+    <div className="rounded-lg border border-blue-100 bg-blue-50/60 p-4">
+      <div className="mb-3 flex items-center justify-between gap-4">
+        <div className="flex items-baseline gap-2">
+          <strong className="text-lg font-semibold tabular-nums text-blue-700">{safeProgress}%</strong>
+          <span className="text-sm font-medium text-neutral-700">{displayStage}</span>
         </div>
-        <span className="progress-eta">{formatEta(etaSeconds)}</span>
+        <span className="text-xs text-neutral-500">{formatEta(etaSeconds)}</span>
       </div>
 
-      <div className="progress-bar" aria-hidden="true">
-        <span style={{ width: `${safeProgress}%` }} />
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-blue-100" aria-hidden="true">
+        <span className="block h-full rounded-full bg-blue-600 transition-all" style={{ width: `${safeProgress}%` }} />
       </div>
 
-      <div className="pipeline-steps" aria-label="Etapas do processamento">
+      <div className="mt-4 flex items-center justify-between gap-2" aria-label="Etapas do processamento">
         {PIPELINE_STEPS.map((step, index) => {
           const isDone = index < currentIndex || stage === "completed";
           const isCurrent = stage === step.id || (stage === "error" && index === Math.max(currentIndex, 0));
@@ -76,16 +76,16 @@ export const ProcessingProgress = memo(function ProcessingProgress({
           return (
             <span
               key={step.id}
-              className={`pipeline-step ${isDone ? "is-done" : ""} ${isCurrent ? "is-current" : ""}`}
+              className={`flex items-center gap-1.5 text-xs ${isCurrent ? "font-semibold text-blue-700" : isDone ? "font-medium text-blue-600" : "text-neutral-400"}`}
             >
-              <span className="step-indicator" />
-              <span className="step-label">{step.label}</span>
+              <span className={`size-2 rounded-full ${isDone || isCurrent ? "bg-blue-600" : "bg-neutral-300"}`} />
+              <span>{step.label}</span>
             </span>
           );
         })}
       </div>
 
-      <small>{message ?? "Aguardando proximo status..."}</small>
+      <small className="mt-3 block text-xs leading-5 text-neutral-500">{message ?? "Aguardando próximo status..."}</small>
     </div>
   );
 });

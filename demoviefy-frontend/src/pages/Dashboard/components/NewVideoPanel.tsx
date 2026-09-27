@@ -81,9 +81,9 @@ export function NewVideoPanel() {
             </div>
 
             <div
-                className={`flex min-h-48 cursor-pointer items-center justify-center border px-8 py-10 text-center transition ${isDragging
-                    ? "border-blue-500 bg-blue-100"
-                    : "border-blue-200 bg-blue-50 hover:border-blue-300 hover:bg-blue-100/70"
+                className={`flex min-h-48 cursor-pointer items-center justify-center rounded-lg border px-8 py-10 text-center transition-colors ${isDragging
+                    ? "border-blue-400 bg-blue-50 ring-2 ring-blue-100"
+                    : "border-neutral-200 bg-neutral-50 hover:border-blue-300 hover:bg-blue-50/60"
                     }`}
                 onDrop={handleDrop}
                 onDragOver={(e) => {
@@ -161,7 +161,7 @@ export function NewVideoPanel() {
                             handleUpload(uploadTask, uploadModelPath);
                         }}
                         disabled={uploading}
-                        className="w-full cursor-pointer bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="w-full cursor-pointer rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         Enviar vídeo
                     </button>

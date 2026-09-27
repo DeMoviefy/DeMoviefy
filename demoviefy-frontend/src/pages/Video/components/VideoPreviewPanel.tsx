@@ -63,7 +63,7 @@ export function VideoPreviewPanel({
 
   return (
     <div className="flex flex-col gap-6">
-      <article className="overflow-hidden rounded-xl border border-neutral-200 bg-black">
+      <article className="overflow-hidden rounded-lg border border-neutral-200 bg-black shadow-sm">
         {canTryAnnotated ? (
           <video
             key={annotatedVideoSrc}

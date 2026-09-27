@@ -52,7 +52,7 @@ export function VideoConfigPanel({
             <button
                 type="button"
                 onClick={() => setIsOpen((open) => !open)}
-                className="group flex w-full items-center justify-between py-2 text-left"
+                className="group flex w-full items-center justify-between rounded-lg py-2 text-left transition-colors hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
                 <div>
                     <h3 className="text-base font-semibold text-neutral-900">
@@ -115,7 +115,7 @@ export function VideoConfigPanel({
 
                         <button
                             type="button"
-                            className="border border-neutral-200 px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-md border border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-300 hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             onClick={onSaveConfig}
                             disabled={isBusy}
                         >
@@ -124,7 +124,7 @@ export function VideoConfigPanel({
 
                         <button
                             type="button"
-                            className="bg-blue-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             onClick={onReprocess}
                             disabled={isBusy}
                         >
@@ -139,4 +139,3 @@ export function VideoConfigPanel({
 
     )
 }
-

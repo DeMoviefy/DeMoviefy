@@ -48,7 +48,7 @@ export function TranscriptionEditor({
             </div>
 
             <textarea
-                className="mt-6 min-h-48 w-full resize-y border border-neutral-200 bg-neutral-50 p-2 text-sm leading-7 text-neutral-900 outline-none transition focus:border-blue-400"
+                className="mt-6 min-h-30 w-full resize-y rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm leading-7 text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
                 value={transcriptionDraft}
                 onChange={(e) => onDraftChange(e.target.value)}
                 placeholder={transcriptionMessage}
@@ -56,12 +56,12 @@ export function TranscriptionEditor({
 
 
             {segments.length > 0 && (
-                <div className="mt-6 flex flex-col border border-neutral-200 bg-neutral-50">
+                <div className="mt-6 flex flex-col overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50">
                     {segments.map((segment) => (
                         <button
                             key={`${segment.id}-${segment.start}`}
                             type="button"
-                            className="flex gap-4 border-b border-neutral-200 px-4 py-3 text-left transition-colors last:border-b-0 hover:bg-white"
+                            className="flex gap-4 border-b border-neutral-200 px-4 py-3 text-left transition-colors last:border-b-0 hover:bg-blue-50/50"
                             onClick={() => onSeek(segment.start)}
                         >
                             <span className="shrink-0 text-xs font-medium text-neutral-500">
@@ -96,7 +96,7 @@ export function TranscriptionEditor({
 
                 <button
                     type="button"
-                    className="border border-neutral-200 px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-md border border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     onClick={onSave}
                     disabled={isBusy}
                 >

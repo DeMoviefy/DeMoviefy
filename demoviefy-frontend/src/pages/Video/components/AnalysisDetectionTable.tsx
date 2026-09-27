@@ -14,7 +14,7 @@ export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
   const labels = Object.entries(summary.label_counts);
 
   return (
-    <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white">
+    <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full min-w-96 border-collapse text-left text-sm">
           <thead className="bg-neutral-50 text-xs font-semibold tracking-wide text-neutral-500">
@@ -43,7 +43,7 @@ export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
               </tr>
             ) : (
               labels.map(([label, count]) => (
-                <tr key={label} className="transition-colors hover:bg-neutral-50">
+                <tr key={label} className="transition-colors hover:bg-blue-50/40">
                   <th
                     scope="row"
                     className="px-5 py-3.5 font-medium text-neutral-900"
