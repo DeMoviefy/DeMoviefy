@@ -66,22 +66,22 @@ export function ProcessingQueuePanel() {
   }
 
   return (
-    <section className="flex flex-col gap-8">
+    <section className="flex flex-col gap-6">
       <div>
         <div className="flex items-center justify-between gap-4">
-          <h2 className="text-2xl font-semibold tracking-tight text-neutral-900">
+          <h2 className="text-xl font-semibold tracking-tight text-neutral-900">
             Fila de processamento
           </h2>
         </div>
 
-        <p className="mt-2 text-base leading-7 text-neutral-500">
+        <p className="mt-1.5 text-sm leading-6 text-neutral-500">
           Acompanhe os vídeos que estão sendo processados.
         </p>
       </div>
 
       {processingVideos.length === 0 ? (
-        <div className="flex min-h-48 flex-col items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 px-8 py-10 text-center">
-          <p className="text-base font-medium text-neutral-900">
+        <div className="flex min-h-48 flex-col items-center justify-center rounded-xl border border-neutral-300 bg-neutral-50 px-6 py-8 text-center">
+          <p className="text-sm font-semibold text-neutral-900">
             Nenhum vídeo em processamento
           </p>
 
@@ -91,11 +91,11 @@ export function ProcessingQueuePanel() {
           </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-4">
           {visibleVideos.map((video) => (
             <div
               key={video.id}
-              className="rounded-lg border border-neutral-200 bg-neutral-50 p-6"
+              className="min-h-48 rounded-lg border border-neutral-200 bg-neutral-50 p-4"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
@@ -115,7 +115,7 @@ export function ProcessingQueuePanel() {
                 <StatusBadge status={video.status} />
               </div>
 
-              <div className="mt-5">
+              <div className="mt-4">
                 <div className="h-1.5 w-full overflow-hidden rounded-full bg-neutral-200">
                   <div
                     className="h-full rounded-full bg-blue-600 transition-all"

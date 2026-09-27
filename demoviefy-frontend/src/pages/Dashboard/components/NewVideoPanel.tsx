@@ -69,21 +69,21 @@ export function NewVideoPanel() {
     };
 
     return (
-        <section className="flex flex-col gap-8">
+        <section className="flex flex-col gap-6">
             <div>
-                <h2 className="text-2xl font-semibold tracking-tight text-neutral-900">
+                <h2 className="text-xl font-semibold tracking-tight text-neutral-900">
                     Novo vídeo
                 </h2>
 
-                <p className="mt-2 text-base leading-7 text-neutral-500">
+                <p className="mt-1.5 text-sm leading-6 text-neutral-500">
                     Envie um vídeo e escolha como ele será analisado.
                 </p>
             </div>
 
             <div
-                className={`flex min-h-48 cursor-pointer items-center justify-center rounded-lg border px-8 py-10 text-center transition-colors ${isDragging
-                    ? "border-blue-400 bg-blue-50 ring-2 ring-blue-100"
-                    : "border-neutral-200 bg-neutral-50 hover:border-blue-300 hover:bg-blue-50/60"
+                className={`flex min-h-48 cursor-pointer items-center justify-center rounded-xl border px-6 py-8 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${isDragging
+                    ? "border-blue-400 bg-blue-100"
+                    : "border-neutral-300 bg-neutral-50 hover:border-blue-300 hover:bg-blue-100"
                     }`}
                 onDrop={handleDrop}
                 onDragOver={(e) => {
@@ -122,11 +122,11 @@ export function NewVideoPanel() {
                     </div>
                 ) : (
                     <div>
-                        <p className="font-medium text-neutral-900">
+                        <p className="text-sm font-semibold text-neutral-900">
                             Arraste seu vídeo aqui
                         </p>
 
-                        <p className="mt-2 text-sm text-blue-700">
+                        <p className="mt-1.5 text-sm text-neutral-500">
                             ou clique para selecionar um arquivo
                         </p>
                     </div>

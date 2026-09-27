@@ -29,7 +29,7 @@ export default function VideoDashboard() {
             />
 
 
-            <div className="flex min-w-0 flex-1 flex-col gap-10 pl-8">
+            <div className="flex min-w-0 flex-1 flex-col gap-8 pl-8">
                 <StatsPanel
                     total={stats.total}
                     processing={stats.processing}
@@ -37,7 +37,7 @@ export default function VideoDashboard() {
                     errors={stats.errors}
                 />
 
-                <div className="grid gap-10 xl:grid-cols-2">
+                <div className="grid gap-8 xl:grid-cols-2">
                     <NewVideoPanel />
                     <ProcessingQueuePanel />
                 </div>

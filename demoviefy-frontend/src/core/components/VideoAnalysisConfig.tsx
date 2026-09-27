@@ -50,8 +50,8 @@ export function VideoAnalysisConfig({
   )
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="border-t border-neutral-200 pt-8">
+    <div className="flex flex-col gap-6">
+      <div className="border-t border-neutral-200 pt-6">
         <div className="flex items-start gap-3">
           <div>
             <h3 className="text-base font-semibold text-neutral-900">
@@ -64,7 +64,7 @@ export function VideoAnalysisConfig({
           </div>
         </div>
   
-        <div className="mt-6 grid gap-6 rounded-lg border border-neutral-200 bg-neutral-50 p-6 md:grid-cols-2">
+        <div className="mt-4 grid gap-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4 md:grid-cols-2">
           <div>
             <label
               htmlFor="video-analysis-task"
@@ -77,7 +77,7 @@ export function VideoAnalysisConfig({
               id="video-analysis-task"
               value={taskType}
               onChange={(e) => onTaskChange(e.target.value)}
-              className="mt-2 w-full rounded-md border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             >
               <option value="">Selecione uma tarefa</option>
   
@@ -102,7 +102,7 @@ export function VideoAnalysisConfig({
                 id="video-analysis-model"
                 value={modelPath}
                 onChange={(e) => onModelChange(e.target.value)}
-                className="mt-2 w-full rounded-md border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="">Selecione um modelo</option>
   
@@ -117,7 +117,7 @@ export function VideoAnalysisConfig({
         </div>
       </div>
   
-      <div className="border-t border-neutral-200 pt-8">
+      <div className="border-t border-neutral-200 pt-6">
         <div className="flex items-start gap-3">
           <div>
             <h3 className="text-base font-semibold text-neutral-900">
@@ -126,7 +126,7 @@ export function VideoAnalysisConfig({
           </div>
         </div>
   
-        <div className="mt-6 grid gap-6 rounded-lg border border-neutral-200 bg-neutral-50 p-6 md:grid-cols-3">
+        <div className="mt-4 grid gap-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4 md:grid-cols-3">
           <div>
             <label
               htmlFor="video-analysis-stride"
@@ -142,7 +142,7 @@ export function VideoAnalysisConfig({
               max="30"
               value={frameStride}
               onChange={(e) => onFrameStrideChange(e.target.value)}
-              className="mt-2 w-full rounded-md border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
   
@@ -162,7 +162,7 @@ export function VideoAnalysisConfig({
               step="0.05"
               value={confidenceThreshold}
               onChange={(e) => onConfidenceChange(e.target.value)}
-              className="mt-2 w-full rounded-md border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
   
@@ -181,13 +181,13 @@ export function VideoAnalysisConfig({
               max="600"
               value={maxFrames}
               onChange={(e) => onMaxFramesChange(e.target.value)}
-              className="mt-2 w-full rounded-md border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
         </div>
       </div>
   
-      <div className="border-t border-neutral-200 pt-8">
+      <div className="border-t border-neutral-200 pt-6">
         <div className="flex items-start gap-3">
           <div>
             <h3 className="text-base font-semibold text-neutral-900">
@@ -200,7 +200,7 @@ export function VideoAnalysisConfig({
           </div>
         </div>
   
-        <div className="mt-6 grid gap-6 rounded-lg border border-neutral-200 bg-neutral-50 p-6 md:grid-cols-2">
+        <div className="mt-4 grid gap-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4 md:grid-cols-2">
           <div>
             <label
               htmlFor="video-analysis-clip-start"
@@ -215,7 +215,7 @@ export function VideoAnalysisConfig({
               min="0"
               value={clipStart}
               onChange={(e) => onClipStartChange(e.target.value)}
-              className="mt-2 w-full rounded-md border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
   
@@ -233,7 +233,7 @@ export function VideoAnalysisConfig({
               min="0"
               value={clipEnd ?? ""}
               onChange={(e) => onClipEndChange(e.target.value)}
-              className="mt-2 w-full rounded-md border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               placeholder="Vídeo inteiro"
             />
           </div>
