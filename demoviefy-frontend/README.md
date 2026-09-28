@@ -26,12 +26,12 @@ Antes de começar, certifique-se de ter instalado:
 
 ```bash
 git clone https://github.com/Bruno-Timoteo/DeMoviefy.git
-cd demoviefy-front
 ```
 
 **2. Instale as dependências**
 
 ```bash
+cd demoviefy-frontend
 npm install
 ```
 ## Executando o projeto
@@ -60,4 +60,4 @@ Para uma melhor experiência de desenvolvimento no VS Code, instale:
 
 ## Setup automático
 
-Caso siga os passos de setup descritos no README principal, o "Setup Environment" irá realizar a configuração do frontend automaticamente, desde que você tenha as [dependências](#pré-requisitos) em seu sistema.
+Caso siga os passos de setup descritos no README principal, o "Setup Environment" irá realizar a configuração do frontend automaticamente, desde que você tenha os [pré-requisitos](#pré-requisitos) em seu sistema.

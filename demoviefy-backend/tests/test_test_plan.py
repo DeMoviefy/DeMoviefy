@@ -216,16 +216,18 @@ class DeMoviefyTestPlan(unittest.TestCase):
         self.assertEqual(transcription_response.status_code, 202)
         self.assertFalse(transcription_response.get_json()["available"])
 
-    def test_ct07_rejects_manual_updates_to_ai_results(self):
-        # Test both endpoints; protecting only the interface would still allow
-        # a user to alter results by calling the API directly.
+    def test_ct07_allows_manual_transcription_updates_but_not_analysis_updates(self):
         video_id = self.create_video()
 
         analysis_response = self.client.put(f"/videos/{video_id}/analysis", json={"top_labels": ["other"]})
         transcription_response = self.client.put(f"/videos/{video_id}/transcription", json={"content": "alterado"})
 
         self.assertEqual(analysis_response.status_code, 405)
-        self.assertEqual(transcription_response.status_code, 405)
+        self.assertEqual(transcription_response.status_code, 200)
+        self.assertEqual(
+            transcription_response.get_json()["transcription"]["content"],
+            "alterado",
+        )
 
     def test_ct08_accepts_multiple_uploads_and_queues_each_request(self):
         # This covers application-level queue initiation. Use a separate load

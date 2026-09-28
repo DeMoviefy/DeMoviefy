@@ -1,4 +1,3 @@
-// src/pages/Video/index.tsx
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useVideoDetailStore } from "src/pages/Video/stores/useVideoDetailStore";
@@ -20,35 +19,18 @@ export default function Video() {
         if (useCatalogStore.getState().tasks.length === 0) {
             void useCatalogStore.getState().fetchCatalog();
         }
-
     }, [parsedId, isValidId]);
-
 
     const video = useVideoDetailStore((state) => state.video);
     const selectedVideoIsBusy = video?.status.startsWith("PROCESSANDO") ?? false;
-
     const loading = useVideoDetailStore((state) => state.loading);
-    
     const error = useVideoDetailStore((state) => state.error);
+    const { videoConfig, setVideoConfig, handleReprocess } = useVideoConfig(video);
 
-    const {
-        videoConfig,
-        setVideoConfig,
-        handleReprocess,
-    } = useVideoConfig(video);
+    if (!isValidId) return <p>ID de vídeo inválido.</p>;
+    if (loading && !video) return <p>Carregando vídeo...</p>;
+    if (error) return <p>{error}</p>;
 
-
-    if (!isValidId) {
-        return <p>ID de vídeo inválido.</p>;
-    }
-
-    if (loading && !video) {
-        return <p>Carregando vídeo...</p>;
-    }
-
-    if (error) {
-        return <p>{error}</p>;
-    }
     return (
         <VideoWorkbench
             video={video}

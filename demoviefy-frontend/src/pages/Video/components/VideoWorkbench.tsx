@@ -1,5 +1,3 @@
-// src/pages/Video/components/VideoWorkbench.tsx
-
 import { memo } from "react";
 
 import { useVideoPlayer } from "src/pages/Video/hooks/useVideoPlayer";
@@ -34,39 +32,39 @@ export const VideoWorkbench = memo(function VideoWorkbench({
     onConfigChange,
     onReprocess,
 }: VideoWorkbenchProps) {
-
     const processingVideo = useProcessingStore((state) =>
         state.videos.find((item) => item.id === video?.id)
     );
-
-    const currentVideo = processingVideo ?? video; // Essa linha faz com que o poller seja atualizado.
+    const currentVideo = processingVideo ?? video;
 
     useVideoWorkbenchSync(currentVideo);
 
     const {
         analysis, analysisState, analysisMessage, selectedAnalysisVariantId,
-        setSelectedAnalysisVariantId,
-        onDeleteAnalysis,
+        setSelectedAnalysisVariantId, onDeleteAnalysis,
     } = useAnalysisStore();
-
     const {
-        transcription, transcriptionDraft, transcriptionMessage,
-        setTranscriptionDraft,
+        transcription, transcriptionDraft, transcriptionMessage, setTranscriptionDraft,
         onSaveTranscription, onDeleteTranscription, onGenerateTranscription,
+        selectedLanguage, setLanguage, selectedModel, setModel, isGenerating,
+        selectedVariant, setSelectedVariant, transcriptionSegments, updateSegment,
+        isTranslating, translateTranscription,
     } = useTranscriptionStore();
 
     const summary = analysis?.analysis ?? null;
     const analysisVariants = analysis?.available_variants ?? [];
-    const transcriptionSegments = transcription?.transcription.segments ?? [];
+    const availableLanguages = transcription?.available_languages ?? [];
+    const transcriptionVariants = transcription?.variants ?? [
+        { id: "default", label: "Transcrição principal", language: null },
+    ];
+    const originalSegments = transcription?.transcription.segments ?? [];
     const transcriptionContent = transcription?.transcription.content ?? "";
-    const hasTranscriptionChanges = transcriptionDraft !== transcriptionContent;
+    const hasTranscriptionChanges = transcriptionDraft !== transcriptionContent
+        || JSON.stringify(transcriptionSegments) !== JSON.stringify(originalSegments);
     const hasSelectedAnalysis = analysis !== null;
     const isProcessing = currentVideo?.status.startsWith("PROCESSANDO") ?? false;
 
-    const { annotatedVideoSrc, seekTo } = useVideoPlayer(
-        currentVideo,
-        selectedAnalysisVariantId
-    );
+    const { annotatedVideoSrc, seekTo } = useVideoPlayer(currentVideo, selectedAnalysisVariantId);
 
     if (!currentVideo) return <WorkbenchEmptyState />;
 
@@ -89,12 +87,8 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                         </h3>
                         <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm">
                             <div className="px-3 py-5">
-                                <AnalysisMetrics
-                                    summary={summary}
-                                    modelName={currentVideo.ai_config.model_name}
-                                />
+                                <AnalysisMetrics summary={summary} modelName={currentVideo.ai_config.model_name} />
                             </div>
-
                             <div className="px-3 py-5">
                                 <AnalysisVersion
                                     message={analysisMessage}
@@ -103,11 +97,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                                     onDelete={() => onDeleteAnalysis(currentVideo)}
                                     onVariantChange={(id) => {
                                         setSelectedAnalysisVariantId(id, currentVideo);
-
-                                        window.scrollTo({
-                                            top: 0,
-                                            behavior: "smooth",
-                                        });
+                                        window.scrollTo({ top: 0, behavior: "smooth" });
                                     }}
                                 />
                             </div>
@@ -126,10 +116,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                 </div>
 
                 <div className="flex min-w-0 flex-col gap-6">
-                    <AnalysisResults
-                        state={analysisState}
-                        summary={summary}
-                    />
+                    <AnalysisResults state={analysisState} summary={summary} />
                     <TranscriptionEditor
                         transcriptionDraft={transcriptionDraft}
                         transcriptionMessage={transcriptionMessage}
@@ -138,10 +125,22 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                         hasChanges={hasTranscriptionChanges}
                         isBusy={isBusy}
                         onDraftChange={setTranscriptionDraft}
-                        onSave={() => onSaveTranscription()}
-                        onDelete={() => onDeleteTranscription()}
-                        onGenerate={() => onGenerateTranscription()}
+                        onSave={onSaveTranscription}
+                        onDelete={onDeleteTranscription}
+                        onGenerate={onGenerateTranscription}
                         onSeek={seekTo}
+                        selectedLanguage={selectedLanguage}
+                        onLanguageChange={setLanguage}
+                        availableLanguages={availableLanguages}
+                        selectedModel={selectedModel}
+                        onModelChange={setModel}
+                        isGenerating={isGenerating}
+                        variants={transcriptionVariants}
+                        selectedVariant={selectedVariant}
+                        onVariantChange={setSelectedVariant}
+                        onSegmentChange={updateSegment}
+                        isTranslating={isTranslating}
+                        onTranslate={(language) => void translateTranscription(language)}
                     />
                 </div>
             </div>
