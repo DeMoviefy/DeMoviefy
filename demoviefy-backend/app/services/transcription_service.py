@@ -14,7 +14,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from app.config.paths import TRANSCRIPTION_ENV_DIR, TRANSCRIPTION_SCRIPT_PATH
+from app.config.paths import TRANSCRIPTIONS_DIR, TRANSCRIPTION_ENV_DIR, TRANSCRIPTION_SCRIPT_PATH
 from app.services.video_artifact_service import (
     delete_transcription,
     has_transcription,
@@ -164,7 +164,7 @@ def _transcribe_with_worker(
     try:
         # Se o script grava em arquivo e não imprime o JSON no stdout, 
         # tenta carregar o JSON direto do arquivo gravado
-        transcription_path = Path("uploads/transcriptions") / f"video_{video_id}.json"
+        transcription_path = TRANSCRIPTIONS_DIR / f"video_{video_id}.json"
         if transcription_path.exists():
             with open(transcription_path, "r", encoding="utf-8") as f:
                 payload = json.load(f)
@@ -196,7 +196,7 @@ def generate_multilingual_srt(
                 segments=segments, target_lang=lang, proxy_url=proxy_url
             )
             # Define o caminho do arquivo: uploads/transcriptions/video_{id}_{lang}.srt
-            file_path = Path("uploads/transcriptions") / f"video_{video_id}_{lang}.srt"
+            file_path = TRANSCRIPTIONS_DIR / f"video_{video_id}_{lang}.srt"
             file_path.parent.mkdir(parents=True, exist_ok=True)
 
             with open(file_path, "w", encoding="utf-8") as f:

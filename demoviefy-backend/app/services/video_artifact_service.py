@@ -4,6 +4,11 @@ from typing import Any
 
 from app.config.ai_settings import load_frame_ai_settings
 from app.config.paths import (
+    ANALYSIS_DIR,
+    ANNOTATED_DIR,
+    BACKEND_ROOT,
+    METADATA_DIR,
+    TRANSCRIPTIONS_DIR,
     analysis_file_path,
     analysis_variant_file_path,
     ensure_storage_dirs,
@@ -11,8 +16,10 @@ from app.config.paths import (
     to_repo_relative,
     transcription_file_path,
     transcription_variant_file_path,
+    video_file_path,
 )
 from app.services.ai_catalog_service import get_model_by_relative_path
+from app.utils.file_utils import unlink_with_retries
 
 
 """
@@ -316,3 +323,35 @@ def delete_metadata(video_id: int) -> None:
     path = metadata_file_path(video_id)
     if path.exists():
         path.unlink()
+
+
+def delete_video_artifacts(video_id: int, filename: str, *, logger: Any | None = None) -> None:
+    """Delete every persisted file owned by one video without touching sibling IDs."""
+    video_prefix = f"video_{video_id}"
+    artifact_directories = (
+        ANALYSIS_DIR,
+        ANNOTATED_DIR,
+        TRANSCRIPTIONS_DIR,
+        BACKEND_ROOT / "uploads" / "transcriptions",
+        METADATA_DIR,
+    )
+    paths_to_delete = {video_file_path(filename)}
+
+    for directory in artifact_directories:
+        if not directory.exists():
+            continue
+        for path in directory.glob(f"{video_prefix}*"):
+            suffix = path.name[len(video_prefix):]
+            if path.is_file() and suffix.startswith((".", "_")):
+                paths_to_delete.add(path)
+
+    failures: list[tuple[Path, OSError]] = []
+    for path in paths_to_delete:
+        try:
+            unlink_with_retries(path, logger=logger)
+        except OSError as exc:
+            failures.append((path, exc))
+
+    if failures:
+        failed_paths = ", ".join(str(path) for path, _ in failures)
+        raise OSError(f"Não foi possível remover todos os arquivos do vídeo: {failed_paths}") from failures[0][1]

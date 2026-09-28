@@ -1,35 +1,19 @@
 # DeMoviefy - Run Instructions
 
-## Inicio rapido
+## Início rápido
 
-Launcher com detecção automática de Python:
+Na raiz do repositório, inicie o launcher:
 
-```powershell
-.\run_form.ps1
+```sh
+python setup/main.py
 ```
 
-No Linux:
+Se o comando do Python for `python3`, use `python3 setup/main.py`. Responda `Y`
+ao prompt inicial para aplicar o proxy da escola. Na janela, use **Setup
+Environment** na primeira execução e **Start All** para iniciar os serviços.
 
-```bash
-./run_form.sh
-```
-
-Com proxy da escola:
-
-```powershell
-python run_form.py --proxy http://proxy.spo.ifsp.edu.br:3128
-```
-
-Ou:
-
-```powershell
-python run_form_proxy.py
-```
-
-Depois clique em:
-
-- `Setup Environment`
-- `Start All`
+Consulte o [Guia do Launcher](LAUNCHER.md) para ver o passo a passo de todas as
+funcionalidades, requisitos e soluções de problemas.
 
 ## Fluxo de upload
 
@@ -65,7 +49,7 @@ Backend padrao:
 ### Frontend
 
 ```powershell
-cd demoviefy-front
+cd demoviefy-frontend
 npm install
 npm run dev
 ```
