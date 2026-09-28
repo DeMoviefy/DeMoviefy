@@ -42,11 +42,11 @@ export function VideoAnalysisConfig({
       <div className="pt-2">
         <div className="flex items-start gap-3">
           <div>
-            <h3 className="text-base font-semibold text-neutral-900">
+            <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
               Configuração
             </h3>
   
-            <p className="mt-1 text-sm leading-6 text-neutral-500">
+            <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
               Defina como o vídeo será processado.
             </p>
           </div>
@@ -56,7 +56,7 @@ export function VideoAnalysisConfig({
           <div>
             <label
               htmlFor="video-analysis-task"
-              className="text-sm font-medium text-neutral-700"
+              className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
             >
               Tarefa IA
             </label>
@@ -65,7 +65,7 @@ export function VideoAnalysisConfig({
               id="video-analysis-task"
               value={taskType}
               onChange={(e) => onTaskChange(e.target.value)}
-              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"
             >
               <option value="">Selecione uma tarefa</option>
   
@@ -81,7 +81,7 @@ export function VideoAnalysisConfig({
             <div>
               <label
                 htmlFor="video-analysis-model"
-                className="text-sm font-medium text-neutral-700"
+                className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
               >
                 Modelo
               </label>
@@ -90,7 +90,7 @@ export function VideoAnalysisConfig({
                 id="video-analysis-model"
                 value={modelPath}
                 onChange={(e) => onModelChange(e.target.value)}
-                className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"
               >
                 <option value="">Selecione um modelo</option>
   
@@ -109,11 +109,11 @@ export function VideoAnalysisConfig({
       <div className="pt-6">
         <div className="flex items-start gap-3">
           <div>
-            <h3 className="text-base font-semibold text-neutral-900">
+            <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
               Trecho do vídeo
             </h3>
   
-            <p className="mt-1 text-sm leading-6 text-neutral-500">
+            <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
               Opcionalmente, defina o intervalo que será analisado.
             </p>
           </div>
@@ -123,7 +123,7 @@ export function VideoAnalysisConfig({
           <div>
             <label
               htmlFor="video-analysis-clip-start"
-              className="text-sm font-medium text-neutral-700"
+              className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
             >
               Começo (s)
             </label>
@@ -134,14 +134,14 @@ export function VideoAnalysisConfig({
               min="0"
               value={clipStart}
               onChange={(e) => onClipStartChange(e.target.value)}
-              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"
             />
           </div>
   
           <div>
             <label
               htmlFor="video-analysis-clip-end"
-              className="text-sm font-medium text-neutral-700"
+              className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
             >
               Fim (s)
             </label>
@@ -152,7 +152,7 @@ export function VideoAnalysisConfig({
               min="0"
               value={clipEnd ?? ""}
               onChange={(e) => onClipEndChange(e.target.value)}
-              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-blue-400 dark:focus:ring-blue-900"
               placeholder="Vídeo inteiro"
             />
           </div>

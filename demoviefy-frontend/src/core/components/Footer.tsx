@@ -15,7 +15,7 @@ export default function Footer(): JSX.Element {
                     href="https://github.com/DeMoviefy/DeMoviefy"
                     rel="noopener noreferrer"
                     aria-label="GitHub do DeMoviefy"
-                    className="shrink-0 text-neutral-500 transition hover:text-neutral-900"
+                    className="shrink-0 text-neutral-500 transition hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
                 >
                     <FaGithub className="h-8 w-8" />
                 </a>

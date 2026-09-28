@@ -32,12 +32,12 @@ export const ProcessingProgress = memo(function ProcessingProgress({
   const statusMessage = message || STAGE_LABELS[stage] || stage;
 
   return (
-    <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-5">
-      <p className="mb-3 truncate text-xs font-medium text-neutral-600" title={modelName}>
+    <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-5 dark:border-neutral-700 dark:bg-neutral-800">
+      <p className="mb-3 truncate text-xs font-medium text-neutral-600 dark:text-neutral-300" title={modelName}>
         {modelName}
       </p>
       <div
-        className="h-1.5 w-full overflow-hidden rounded-full bg-neutral-200"
+        className="h-1.5 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700"
         role="progressbar"
         aria-label="Progresso do processamento"
         aria-valuemin={0}
@@ -45,17 +45,17 @@ export const ProcessingProgress = memo(function ProcessingProgress({
         aria-valuenow={safeProgress}
       >
         <div
-          className="h-full rounded-full bg-blue-600 transition-all"
+          className="h-full rounded-full bg-blue-600 transition-all dark:bg-blue-800"
           style={{ width: `${safeProgress}%` }}
         />
       </div>
 
-      <div className="mt-2 flex items-start justify-between gap-4 text-xs text-neutral-500">
+      <div className="mt-2 flex items-start justify-between gap-4 text-xs text-neutral-500 dark:text-neutral-400">
         <span className="min-w-0 truncate" aria-live="polite">
           {statusMessage}
         </span>
 
-        <span className="shrink-0 font-semibold tabular-nums text-neutral-700">
+        <span className="shrink-0 font-semibold tabular-nums text-neutral-700 dark:text-neutral-300">
           {safeProgress}%
           {etaSeconds !== null && ` · ~${etaSeconds}s`}
         </span>

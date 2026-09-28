@@ -16,17 +16,17 @@ export const AnalysisMetrics = memo(function AnalysisMetrics({
     return (
         <div>
             {!summary ? (
-                <p className="text-xs font-medium text-neutral-500" aria-live="polite">
+                <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400" aria-live="polite">
                     Nenhuma análise disponível.
                 </p>
             ) : (
                 <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3">
                     <div>
-                        <span className="text-xs font-medium text-neutral-500">
+                        <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
                             Modelo
                         </span>
                         <strong
-                            className="mt-1 block truncate text-sm font-semibold text-neutral-900"
+                            className="mt-1 block truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100"
                             title={modelName}
                         >
                             {modelName}
@@ -34,10 +34,10 @@ export const AnalysisMetrics = memo(function AnalysisMetrics({
                     </div>
 
                     <div>
-                        <span className="text-xs font-medium text-neutral-500">
+                        <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
                             Trecho
                         </span>
-                        <strong className="mt-1 block text-sm font-semibold text-neutral-900">
+                        <strong className="mt-1 block text-sm font-semibold text-neutral-900 dark:text-neutral-100">
                             {formatSeconds(summary.clip_start_sec)} -{" "}
                             {summary.clip_end_sec === null
                                 ? "fim"

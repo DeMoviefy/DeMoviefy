@@ -57,8 +57,8 @@ export function TranscriptionWorkbench({
     return (
         <section className="flex min-w-0 flex-col gap-6">
             <div>
-                <h3 className="text-base font-semibold text-neutral-900">Editor de transcrição</h3>
-                <p className="mt-1 text-sm leading-6 text-neutral-500">
+                <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">Editor de transcrição</h3>
+                <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
                     Edite a transcrição no formato SRT ou gere e traduza versões.
                 </p>
             </div>

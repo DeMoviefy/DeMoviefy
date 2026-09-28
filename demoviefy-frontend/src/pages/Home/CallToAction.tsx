@@ -14,7 +14,7 @@ export default function CallToAction() {
 
         <Link
           to="/dashboard"
-          className="mt-8 inline-block rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white hover:bg-blue-500"
+          className="mt-8 inline-block rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white hover:bg-blue-500 dark:bg-blue-800 dark:hover:bg-blue-700"
         >
           Começar agora
         </Link>

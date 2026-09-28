@@ -68,9 +68,9 @@ export function VideoPreviewPanel({ video, analysisState, annotatedVideoSrc, has
                     Seu navegador não suporta reproduzir este vídeo.
                 </video>
             ) : (
-                <div className="flex aspect-video flex-col items-center justify-center bg-neutral-50 px-8 text-center">
-                    <strong className="text-sm font-semibold text-neutral-900">{previewState.title}</strong>
-                    <p className="mt-2 max-w-lg text-sm leading-6 text-neutral-500">{previewState.message}</p>
+                <div className="flex aspect-video flex-col items-center justify-center bg-neutral-50 px-8 text-center dark:bg-neutral-800">
+                    <strong className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{previewState.title}</strong>
+                    <p className="mt-2 max-w-lg text-sm leading-6 text-neutral-500 dark:text-neutral-400">{previewState.message}</p>
                 </div>
             )}
         </article>

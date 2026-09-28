@@ -12,12 +12,12 @@ export function WorkbenchHeader({ video }: WorkbenchHeaderProps) {
   return (
     <>
       <div className="min-w-0">
-        <span className="text-sm font-medium text-neutral-500">
+        <span className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
           Análise do vídeo
         </span>
   
         <h2
-          className="mt-1 truncate text-2xl font-semibold tracking-tight text-neutral-900"
+          className="mt-1 truncate text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100"
           title={video.filename}
         >
           {video.filename}

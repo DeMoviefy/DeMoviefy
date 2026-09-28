@@ -10,10 +10,10 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
     if (state === "loading" || state === "pending") {
         return (
             <section className="flex flex-col gap-3">
-                <h3 className="text-base font-semibold tracking-tight text-neutral-900">
+                <h3 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
                     Resultados da Análise
                 </h3>
-                <p className="text-sm leading-6 text-neutral-500" aria-live="polite">
+                <p className="text-sm leading-6 text-neutral-500 dark:text-neutral-400" aria-live="polite">
                     Processando análise. Os resultados aparecerão aqui quando terminar.
                 </p>
             </section>
@@ -23,10 +23,10 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
     if (!summary) {
         return (
             <section className="flex flex-col gap-3">
-                <h3 className="text-base font-semibold tracking-tight text-neutral-900">
+                <h3 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
                     Resultados da Análise
                 </h3>
-                <p className="text-sm leading-6 text-neutral-500" aria-live="polite">
+                <p className="text-sm leading-6 text-neutral-500 dark:text-neutral-400" aria-live="polite">
                     Não há uma análise disponível para este vídeo.
                 </p>
             </section>
@@ -35,7 +35,7 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
 
     return (
         <section className="flex flex-col gap-4">
-            <h3 className="text-base font-semibold tracking-tight text-neutral-900">
+            <h3 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
                 Resultados da Análise
             </h3>
             <AnalysisDetectionTable summary={summary} />

@@ -36,7 +36,7 @@ export default function FeaturesSection() {
 
           <div>
             <h3 className="text-xl font-semibold tracking-tight">
-              <span className="text-blue-600">Conteúdo sensível</span>
+              <span className="text-blue-600 dark:text-blue-400">Conteúdo sensível</span>
             </h3>
 
             <p className="mt-3 max-w-xl text-base leading-7 text-neutral-400">
@@ -58,7 +58,7 @@ export default function FeaturesSection() {
 
           <div>
             <h3 className="text-xl font-semibold tracking-tight">
-              <span className="text-blue-600">Timestamps</span>
+              <span className="text-blue-600 dark:text-blue-400">Timestamps</span>
             </h3>
 
             <p className="mt-3 max-w-xl text-base leading-7 text-neutral-400">

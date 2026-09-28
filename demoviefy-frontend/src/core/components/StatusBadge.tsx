@@ -27,10 +27,10 @@ export function StatusBadge({ status }: StatusBadgeProps) {
                         : "warning"
 
     const toneClasses = {
-        success: "bg-green-50 text-green-700",
-        processing:"bg-blue-50 text-blue-700",
-        warning: "bg-amber-50 text-amber-700",
-        danger: "bg-red-50 text-red-700",
+        success: "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300",
+        processing:"bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
+        warning: "bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300",
+        danger: "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300",
     };
 
 

@@ -18,10 +18,10 @@ export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
         return sortDirection === "desc" ? countB - countA : countA - countB;
     });
     return (
-        <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
             <div className="h-48 overflow-auto">
                 <table className="h-full w-full min-w-96 border-separate border-spacing-0 text-left text-sm">
-                    <thead className="sticky top-0 z-10 bg-neutral-50 text-xs font-semibold tracking-wide text-neutral-500">
+                    <thead className="sticky top-0 z-10 bg-neutral-50 text-xs font-semibold tracking-wide text-neutral-500 dark:bg-neutral-900 dark:text-neutral-400">
                         <tr>
                             <th scope="col" className="px-3 py-3.5">
                                 Classe
@@ -37,7 +37,7 @@ export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
                             >
                                 <button
                                     type="button"
-                                    className="inline-flex cursor-pointer items-center gap-1.5 text-right transition-colors hover:text-blue-700"
+                                    className="inline-flex cursor-pointer items-center gap-1.5 text-right transition-colors hover:text-blue-700 dark:hover:text-blue-400"
                                     aria-label={`Ordenar ocorrências em ordem ${sortDirection === "desc" ? "crescente" : "decrescente"}`}
                                     title={`Ordenar ocorrências em ordem ${sortDirection === "desc" ? "crescente" : "decrescente"}`}
                                     onClick={() => setSortDirection((direction) => direction === "desc" ? "asc" : "desc")}
@@ -54,22 +54,22 @@ export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
                         </tr>
                     </thead>
 
-                    <tbody className="divide-y divide-neutral-100 text-neutral-700">
+                    <tbody className="divide-y divide-neutral-100 text-neutral-700 dark:divide-neutral-700 dark:text-neutral-300">
                         {labels.length === 0 ? (
                             <tr>
                                 <td
                                     colSpan={3}
-                                    className="px-5 py-8 text-center text-sm text-neutral-400"
+                                    className="px-5 py-8 text-center text-sm text-neutral-400 dark:text-neutral-500"
                                 >
                                     Nenhuma detecção encontrada
                                 </td>
                             </tr>
                         ) : (
                             labels.map(([label, count]) => (
-                                <tr key={label} className="transition-colors hover:bg-blue-50/40">
+                                <tr key={label} className="transition-colors hover:bg-blue-50/40 dark:hover:bg-neutral-700/50">
                                     <th
                                         scope="row"
-                                        className="px-3 py-3.5 font-medium text-neutral-900"
+                                        className="px-3 py-3.5 font-medium text-neutral-900 dark:text-neutral-100"
                                     >
                                         {label}
                                     </th>

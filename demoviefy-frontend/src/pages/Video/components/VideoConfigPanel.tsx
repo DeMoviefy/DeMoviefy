@@ -50,7 +50,7 @@ export function VideoConfigPanel({
             <div className="py-5 text-left">
                 <div>
                     <div className="flex items-center gap-3">
-                        <h3 className="text-base font-semibold text-neutral-900">
+                        <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
                             Reprocessar vídeo
                         </h3>
                         <button
@@ -59,7 +59,7 @@ export function VideoConfigPanel({
                             aria-expanded={isOpen}
                             aria-controls="video-reprocess-config"
                             aria-label={isOpen ? "Recolher configurações" : "Expandir configurações"}
-                            className={`flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-all hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${isOpen ? "rotate-180" : ""}`}
+                            className={`flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-all hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-100 ${isOpen ? "rotate-180" : ""}`}
                         >
                             <svg
                                 viewBox="0 0 20 20"
@@ -77,14 +77,14 @@ export function VideoConfigPanel({
                         </button>
                     </div>
 
-                    <p className="mt-1 text-sm leading-6 text-neutral-500">
+                    <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
                         Execute uma nova análise do vídeo.
                     </p>
                 </div>
             </div>
 
             {isOpen && (
-                <div id="video-reprocess-config" className="mt-2 rounded-lg border border-neutral-200 bg-white px-3 py-5 shadow-sm">
+                <div id="video-reprocess-config" className="mt-2 rounded-lg border border-neutral-200 bg-white px-3 py-5 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
                     <VideoAnalysisConfig
                         taskType={config.task_type}
                         modelPath={config.model_path}
@@ -101,7 +101,7 @@ export function VideoConfigPanel({
                     <div className="mt-8 flex flex-wrap items-center justify-end gap-3">
                         <button
                             type="button"
-                            className="cursor-pointer rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="cursor-pointer rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-800 dark:hover:bg-blue-700"
                             onClick={() => {
                                 setIsOpen(false);
                                 onReprocess();
@@ -116,7 +116,7 @@ export function VideoConfigPanel({
                 </div>
             )}
 
-            <div className="flex justify-start border-t border-neutral-100 py-4">
+            <div className="flex justify-start border-t border-neutral-100 py-4 dark:border-neutral-800">
                 <ConfirmationDialog
                     title="Excluir vídeo"
                     message="Tem certeza de que deseja excluir o vídeo? Esta ação é irreversível."
@@ -125,7 +125,7 @@ export function VideoConfigPanel({
                     {(open) => (
                         <button
                             type="button"
-                            className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:border-red-300 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+                            className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:border-red-300 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 dark:border-red-900 dark:bg-red-950 dark:text-red-300 dark:hover:border-red-800 dark:hover:bg-red-900"
                             onClick={open}
                         >
                             <FaTrashAlt aria-hidden="true" className="size-3" />
