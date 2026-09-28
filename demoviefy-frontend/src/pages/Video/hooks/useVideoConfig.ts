@@ -45,18 +45,6 @@ export function useVideoConfig(video: VideoRecord | null) {
         }));
     }, []);
 
-    const handleSaveConfig = useCallback(async () => {
-        if (!video) return;
-
-        try {
-            await VideoService.saveAiConfig(video.id, videoConfig);
-            toast.success("Configuração de IA salva para o vídeo selecionado.");
-        } catch (error) {
-            console.error(error);
-            toast.error(getApiErrorMessage(error, "Não foi possível salvar a configuração de IA."));
-        }
-    }, [videoConfig]);
-
     const handleReprocess = useCallback(async () => {
         if (!video) return;
 
@@ -75,7 +63,6 @@ export function useVideoConfig(video: VideoRecord | null) {
         videoConfig,
         setVideoConfig,
         handleVideoTaskChange,
-        handleSaveConfig,
         handleReprocess,
     };
 }
