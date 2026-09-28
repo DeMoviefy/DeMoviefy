@@ -55,7 +55,7 @@ export function VideoPreviewPanel({ video, analysisState, annotatedVideoSrc, has
     );
 
     return (
-        <article className="overflow-hidden rounded-lg border border-neutral-200 bg-black shadow-sm">
+        <article className="overflow-hidden rounded-lg bg-black shadow-sm">
             {canTryAnnotated ? (
                 <video
                     key={annotatedVideoSrc}

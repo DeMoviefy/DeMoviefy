@@ -66,19 +66,19 @@ export function NewVideoPanel() {
     return (
         <section className="flex flex-col gap-6">
             <div>
-                <h2 className="text-xl font-semibold tracking-tight text-neutral-900">
+                <h2 className="text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
                     Novo vídeo
                 </h2>
 
-                <p className="mt-1.5 text-sm leading-6 text-neutral-500">
+                <p className="mt-1.5 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
                     Envie um vídeo e escolha como ele será analisado.
                 </p>
             </div>
 
             <div
                 className={`flex min-h-48 cursor-pointer items-center justify-center rounded-xl border px-6 py-8 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${isDragging
-                    ? "border-blue-400 bg-blue-100"
-                    : "border-neutral-200 bg-neutral-50 hover:border-blue-300 hover:bg-blue-50"
+                    ? "border-blue-400 bg-blue-100 dark:border-blue-600 dark:bg-blue-950"
+                    : "border-neutral-200 bg-neutral-50 hover:border-blue-300 hover:bg-blue-50 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-blue-700 dark:hover:bg-neutral-700"
                     }`}
                 onDrop={handleDrop}
                 onDragOver={(e) => {
@@ -107,33 +107,33 @@ export function NewVideoPanel() {
 
                 {file ? (
                     <div className="flex flex-col items-center gap-2">
-                        <span className="max-w-full break-all text-sm font-medium text-neutral-900">
+                        <span className="max-w-full break-all text-sm font-medium text-neutral-900 dark:text-neutral-100">
                             {file.name}
                         </span>
 
-                        <span className="text-sm text-blue-700">
+                        <span className="text-sm text-blue-700 dark:text-blue-400">
                             {(file.size / (1024 * 1024)).toFixed(2)} MB
                         </span>
                     </div>
                 ) : (
                     <div className="flex flex-col items-center">
-                        <p className="text-sm font-semibold text-neutral-900">
+                        <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
                             Adicione um vídeo à sua biblioteca
                         </p>
 
-                        <p className="mt-1.5 text-sm text-neutral-500">
+                        <p className="mt-1.5 text-sm text-neutral-500 dark:text-neutral-400">
                             Arraste o arquivo até aqui ou clique para procurá-lo.
                         </p>
                         <FaUpload
                             aria-hidden="true"
-                            className="mt-4 size-7 text-neutral-400"
+                            className="mt-4 size-7 text-neutral-400 dark:text-neutral-500"
                         />
                     </div>
                 )}
             </div>
 
             {file && (
-                <div className="rounded-lg border border-neutral-200 bg-white px-3 py-5 shadow-sm">
+                <div className="rounded-lg border border-neutral-200 bg-white px-3 py-5 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
                     <VideoAnalysisConfig
                         taskType={uploadTask}
                         modelPath={uploadModelPath}
@@ -160,7 +160,7 @@ export function NewVideoPanel() {
                                     behavior: "smooth",
                                 });
                             }}
-                            className="cursor-pointer text-sm font-medium text-neutral-500 transition-colors hover:text-red-600"
+                            className="cursor-pointer text-sm font-medium text-neutral-500 transition-colors hover:text-red-600 dark:text-neutral-400 dark:hover:text-red-400"
                         >
                             Cancelar envio
                         </button>
@@ -172,7 +172,7 @@ export function NewVideoPanel() {
                                 handleUpload(uploadTask, uploadModelPath);
                             }}
                             disabled={uploading}
-                            className="cursor-pointer rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="cursor-pointer rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-800 dark:hover:bg-blue-700 dark:focus-visible:ring-offset-neutral-900"
                         >
                             Enviar vídeo
                         </button>

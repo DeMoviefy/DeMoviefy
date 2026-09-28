@@ -12,9 +12,10 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const { pathname } = useLocation();
   const isHome = pathname === "/";
   const isVideo = pathname.startsWith("/video/");
+  const isDashboard = pathname === "/dashboard";
 
   return (
-    <div className={isHome || isVideo ? "min-h-screen bg-white text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100" : ""}>
+    <div className={isHome || isVideo || isDashboard ? "min-h-screen bg-white text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100" : ""}>
       <div>
         <Header />
             <main className="px-8">{children}</main>

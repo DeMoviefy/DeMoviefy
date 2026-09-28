@@ -11,7 +11,7 @@ export default function Header() {
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
 
   return (
-    <header className="top-0 z-50 border-b border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+    <header className="top-0 z-50 bg-white dark:bg-neutral-900">
       <div className="mx-auto flex h-20 w-full items-center justify-between px-4">
         <NavLink to="/">
           <img
