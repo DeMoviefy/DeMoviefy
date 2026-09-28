@@ -11,6 +11,7 @@ import { VideoConfigPanel } from "src/pages/Video/components/VideoConfigPanel";
 import { AnalysisVersion } from "src/pages/Video/components/AnalysisVersion";
 import { AnalysisResults } from "src/pages/Video/components/AnalysisResults";
 import { AnalysisMetrics } from "src/pages/Video/components/AnalysisMetrics";
+import { TranscriptionVersion } from "src/pages/Video/components/TranscriptionVersion";
 import { TranscriptionEditor } from "src/pages/Video/components/TranscriptionEditor";
 import { VideoPreviewPanel } from "src/pages/Video/components/VideoPreviewPanel";
 import { WorkbenchEmptyState } from "src/pages/Video/components/WorkbenchEmptyState";
@@ -47,7 +48,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
         transcription, transcriptionDraft, transcriptionMessage, setTranscriptionDraft,
         onSaveTranscription, onDeleteTranscription, onGenerateTranscription,
         selectedLanguage, setLanguage, selectedModel, setModel, isGenerating,
-        selectedVariant, setSelectedVariant, transcriptionSegments, updateSegment,
+        selectedVariant, setSelectedVariant, transcriptionSegments, setTranscriptionSegments,
         isTranslating, translateTranscription,
     } = useTranscriptionStore();
 
@@ -64,7 +65,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
     const hasSelectedAnalysis = analysis !== null;
     const isProcessing = currentVideo?.status.startsWith("PROCESSANDO") ?? false;
 
-    const { annotatedVideoSrc, seekTo } = useVideoPlayer(currentVideo, selectedAnalysisVariantId);
+    const { annotatedVideoSrc } = useVideoPlayer(currentVideo, selectedAnalysisVariantId);
 
     if (!currentVideo) return <WorkbenchEmptyState />;
 
@@ -100,6 +101,14 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                                         window.scrollTo({ top: 0, behavior: "smooth" });
                                     }}
                                 />
+                                <TranscriptionVersion
+                                    variants={transcriptionVariants}
+                                    selectedVariant={selectedVariant}
+                                    onVariantChange={setSelectedVariant}
+                                    hasTranscription={currentVideo.transcription_ready}
+                                    onDelete={onDeleteTranscription}
+                                    disabled={isBusy || isProcessing || isGenerating || isTranslating}
+                                />
                             </div>
                         </div>
 
@@ -121,14 +130,11 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                         transcriptionDraft={transcriptionDraft}
                         transcriptionMessage={transcriptionMessage}
                         segments={transcriptionSegments}
-                        hasTranscription={currentVideo.transcription_ready}
                         hasChanges={hasTranscriptionChanges}
                         isBusy={isBusy}
                         onDraftChange={setTranscriptionDraft}
                         onSave={onSaveTranscription}
-                        onDelete={onDeleteTranscription}
                         onGenerate={onGenerateTranscription}
-                        onSeek={seekTo}
                         selectedLanguage={selectedLanguage}
                         onLanguageChange={setLanguage}
                         availableLanguages={availableLanguages}
@@ -137,8 +143,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                         isGenerating={isGenerating}
                         variants={transcriptionVariants}
                         selectedVariant={selectedVariant}
-                        onVariantChange={setSelectedVariant}
-                        onSegmentChange={updateSegment}
+                        onSegmentsChange={setTranscriptionSegments}
                         isTranslating={isTranslating}
                         onTranslate={(language) => void translateTranscription(language)}
                     />

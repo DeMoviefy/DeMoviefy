@@ -359,7 +359,7 @@ def get_video_transcription(video_id: int):
                 video,
                 storage,
                 status="missing",
-                error="Transcrição não disponível. Gere-a ou escreva-a manualmente neste editor.",
+                error="Transcrição não disponível. Gere-a e depois confira-a neste editor.",
             )
         ), 404
 

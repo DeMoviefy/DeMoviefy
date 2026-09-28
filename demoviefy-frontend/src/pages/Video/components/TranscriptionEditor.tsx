@@ -1,8 +1,6 @@
 // src/pages/Video/components/TranscriptionEditor.tsx
 
-import { useState } from "react";
-import { ConfirmationDialog } from "src/core/components/ConfirmationDialog";
-import { formatTimecode } from "src/core/utils/videoHelpers";
+import { useEffect, useState } from "react";
 import type { VideoTranscriptionResponse } from "src/core/types/videoTypes";
 
 type TranscriptionSegment = VideoTranscriptionResponse["transcription"]["segments"][number];
@@ -12,14 +10,11 @@ interface TranscriptionEditorProps {
     transcriptionDraft: string;
     transcriptionMessage: string;
     segments: TranscriptionSegment[];
-    hasTranscription: boolean;
     hasChanges: boolean;
     isBusy: boolean;
     onDraftChange: (value: string) => void;
     onSave: () => void | Promise<void>;
-    onDelete: () => void;
     onGenerate: () => void;
-    onSeek: (seconds: number) => void;
     selectedLanguage: string;
     onLanguageChange: (language: string) => void;
     availableLanguages: string[];
@@ -28,8 +23,7 @@ interface TranscriptionEditorProps {
     isGenerating: boolean;
     variants: TranscriptionVariant[];
     selectedVariant: string;
-    onVariantChange: (variant: string) => void;
-    onSegmentChange: (id: number, field: "start" | "end" | "text", value: string) => void;
+    onSegmentsChange: (segments: TranscriptionSegment[]) => void;
     isTranslating: boolean;
     onTranslate: (targetLanguage: string) => void;
 }
@@ -51,18 +45,57 @@ const MODEL_OPTIONS = [
 
 const SELECT_CLASS = "mt-1.5 w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-60";
 
+function formatSrtTime(seconds: number): string {
+    const milliseconds = Math.max(0, Math.round(seconds * 1000));
+    const hours = Math.floor(milliseconds / 3_600_000);
+    const minutes = Math.floor((milliseconds % 3_600_000) / 60_000);
+    const remainingSeconds = Math.floor((milliseconds % 60_000) / 1000);
+    const remainder = milliseconds % 1000;
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")},${String(remainder).padStart(3, "0")}`;
+}
+
+function formatSrt(segments: TranscriptionSegment[], fallbackText: string): string {
+    if (segments.length === 0) {
+        return fallbackText ? `1\n00:00:00,000 --> 00:00:00,000\n${fallbackText}` : "";
+    }
+
+    return segments.map((segment, index) =>
+        `${String(index + 1).padStart(2, "0")}\n${formatSrtTime(segment.start)} --> ${formatSrtTime(segment.end)}\n${segment.text}`
+    ).join("\n\n");
+}
+
+function parseSrtTime(value: string): number | null {
+    const match = value.trim().match(/^(\d{1,2}):(\d{2}):(\d{2})[,.](\d{1,3})$/);
+    if (!match) return null;
+    const [, hours, minutes, seconds, milliseconds] = match;
+    return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds) + Number(milliseconds.padEnd(3, "0")) / 1000;
+}
+
+function parseSrt(value: string): TranscriptionSegment[] {
+    return value.trim().split(/\n\s*\n/).flatMap((block, index) => {
+        const lines = block.split("\n").map((line) => line.trimEnd());
+        const timeLineIndex = lines.findIndex((line) => line.includes("-->"));
+        if (timeLineIndex < 0) return [];
+
+        const [startValue, endValue] = lines[timeLineIndex].split("-->");
+        const start = parseSrtTime(startValue);
+        const end = parseSrtTime(endValue);
+        const text = lines.slice(timeLineIndex + 1).join("\n").trim();
+        if (start === null || end === null || end < start || !text) return [];
+
+        return [{ id: index + 1, start, end, text }];
+    });
+}
+
 export function TranscriptionEditor({
     transcriptionDraft,
     transcriptionMessage,
     segments,
-    hasTranscription,
     hasChanges,
     isBusy,
     onDraftChange,
     onSave,
-    onDelete,
     onGenerate,
-    onSeek,
     selectedLanguage,
     onLanguageChange,
     availableLanguages,
@@ -71,221 +104,192 @@ export function TranscriptionEditor({
     isGenerating,
     variants,
     selectedVariant,
-    onVariantChange,
-    onSegmentChange,
+    onSegmentsChange,
     isTranslating,
     onTranslate,
 }: TranscriptionEditorProps) {
     const [translationLanguage, setTranslationLanguage] = useState("en");
-    const [isEditing, setIsEditing] = useState(false);
+    const [isGenerationOpen, setIsGenerationOpen] = useState(false);
+    const [isTranslationOpen, setIsTranslationOpen] = useState(false);
+    const [srtDraft, setSrtDraft] = useState(() => formatSrt(segments, transcriptionDraft));
     const sourceLanguage = variants.find((variant) => variant.id === selectedVariant)?.language ?? selectedLanguage;
     const languageOptions = Array.from(new Set(["auto", "pt", "en", "es", ...availableLanguages]));
     const isWorking = isBusy || isGenerating || isTranslating;
+
+    useEffect(() => {
+        if (!hasChanges) setSrtDraft(formatSrt(segments, transcriptionDraft));
+    }, [hasChanges, segments, transcriptionDraft, selectedVariant]);
+
+    const handleSrtChange = (value: string) => {
+        setSrtDraft(value);
+        onDraftChange(value);
+        onSegmentsChange(parseSrt(value));
+    };
 
     return (
         <section className="flex min-w-0 flex-col gap-6">
             <div>
                 <h3 className="text-base font-semibold text-neutral-900">Editor de transcrição</h3>
                 <p className="mt-1 text-sm leading-6 text-neutral-500">
-                    Gere, traduza ou edite o texto e seus segmentos.
+                    Gere, traduza ou edite a transcrição no formato SRT.
                 </p>
             </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-                <label className="text-xs font-medium text-neutral-500">
-                    Versão
-                    <select
-                        value={selectedVariant}
-                        onChange={(event) => onVariantChange(event.target.value)}
-                        className={SELECT_CLASS}
-                        disabled={isWorking}
-                    >
-                        {variants.map((variant) => (
-                            <option key={variant.id} value={variant.id}>{variant.label}</option>
-                        ))}
-                    </select>
-                </label>
-
-                <label className="text-xs font-medium text-neutral-500">
-                    Idioma da transcrição
-                    <select
-                        value={selectedLanguage || "auto"}
-                        onChange={(event) => onLanguageChange(event.target.value)}
-                        className={SELECT_CLASS}
-                        disabled={isWorking}
-                    >
-                        {languageOptions.map((language) => (
-                            <option key={language} value={language}>
-                                {LANGUAGE_LABELS[language] ?? language.toUpperCase()}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-
-                <label className="text-xs font-medium text-neutral-500 sm:col-span-2">
-                    Modelo de transcrição
-                    <select
-                        value={selectedModel}
-                        onChange={(event) => onModelChange(event.target.value)}
-                        className={SELECT_CLASS}
-                        disabled={isWorking}
-                    >
-                        {MODEL_OPTIONS.map((model) => (
-                            <option key={model.value} value={model.value}>{model.label}</option>
-                        ))}
-                    </select>
-                </label>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-                <button
-                    type="button"
-                    className="cursor-pointer rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    onClick={onGenerate}
-                    disabled={isWorking}
-                >
-                    {isGenerating ? "Gerando transcrição..." : "Gerar transcrição por IA"}
-                </button>
-
-                <label className="sr-only" htmlFor="transcription-translation-language">
-                    Idioma da tradução
-                </label>
-                <select
-                    id="transcription-translation-language"
-                    value={translationLanguage}
-                    onChange={(event) => setTranslationLanguage(event.target.value)}
-                    className="rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-sm text-neutral-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-60"
-                    disabled={isWorking}
-                >
-                    {["pt", "en", "es"].map((language) => (
-                        <option key={language} value={language}>{language.toUpperCase()}</option>
-                    ))}
-                </select>
-                <button
-                    type="button"
-                    className="cursor-pointer rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    onClick={() => onTranslate(translationLanguage)}
-                    disabled={isWorking || !sourceLanguage || sourceLanguage === translationLanguage}
-                    title={sourceLanguage === translationLanguage ? "A transcrição já está nesse idioma." : "Traduzir somente ao clicar"}
-                >
-                    {isTranslating ? "Traduzindo..." : "Traduzir"}
-                </button>
-
-                {!isEditing && (
-                    <button
-                        type="button"
-                        className="cursor-pointer rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        onClick={() => setIsEditing(true)}
-                        disabled={isWorking}
-                    >
-                        Editar transcrição
-                    </button>
-                )}
-            </div>
-
-            {isGenerating && (
-                <p className="rounded-md bg-blue-50 px-4 py-3 text-sm text-blue-700" role="status" aria-live="polite">
-                    O Whisper está gerando a transcrição. Isso pode levar alguns minutos.
-                </p>
-            )}
 
             <textarea
                 className="min-h-30 w-full resize-y rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm leading-7 text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 read-only:cursor-default"
-                value={transcriptionDraft}
-                onChange={(event) => onDraftChange(event.target.value)}
-                readOnly={!isEditing || isWorking}
-                placeholder={transcriptionMessage || "A transcrição aparecerá aqui."}
+                value={srtDraft}
+                onChange={(event) => handleSrtChange(event.target.value)}
+                readOnly={isWorking}
+                placeholder={transcriptionMessage || "01\n00:00:00,000 --> 00:00:04,000\nTexto da transcrição"}
+                spellCheck={false}
+                aria-label="Transcrição no formato SRT"
             />
 
-            {transcriptionMessage && (
-                <p className="-mt-4 text-xs leading-5 text-neutral-500" aria-live="polite">
-                    {transcriptionMessage}
-                </p>
-            )}
-
-            {segments.length > 0 && (
-                <div className="flex flex-col overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50">
-                    {segments.map((segment) => (
-                        <div
-                            key={`${segment.id}-${segment.start}`}
-                            className="flex flex-col gap-3 border-b border-neutral-200 px-4 py-3 last:border-b-0 sm:flex-row sm:items-center"
-                        >
-                            <button
-                                type="button"
-                                className="shrink-0 cursor-pointer text-left text-xs font-medium text-neutral-500 transition-colors hover:text-blue-700"
-                                onClick={() => onSeek(segment.start)}
-                                title="Ir para este momento do vídeo"
-                            >
-                                {formatTimecode(segment.start)} - {formatTimecode(segment.end)}
-                            </button>
-                            {isEditing ? (
-                                <div className="grid min-w-0 flex-1 gap-2 sm:grid-cols-[6rem_6rem_minmax(0,1fr)]">
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        value={segment.start}
-                                        onChange={(event) => onSegmentChange(segment.id, "start", event.target.value)}
-                                        aria-label="Início do segmento"
-                                        className="min-w-0 rounded-md border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                                    />
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        value={segment.end}
-                                        onChange={(event) => onSegmentChange(segment.id, "end", event.target.value)}
-                                        aria-label="Fim do segmento"
-                                        className="min-w-0 rounded-md border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                                    />
-                                    <input
-                                        type="text"
-                                        value={segment.text}
-                                        onChange={(event) => onSegmentChange(segment.id, "text", event.target.value)}
-                                        aria-label="Texto do segmento"
-                                        className="min-w-0 rounded-md border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                                    />
-                                </div>
-                            ) : (
-                                <span className="text-sm leading-6 text-neutral-700">{segment.text}</span>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            <div className="flex flex-wrap items-center justify-end gap-3">
-                <ConfirmationDialog
-                    title="Excluir transcrição"
-                    message="Tem certeza que deseja excluir esta transcrição? Essa ação não pode ser desfeita."
-                    onConfirm={onDelete}
+            <div className="flex justify-end">
+                <button
+                    type="button"
+                    className="cursor-pointer rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed"
+                    onClick={() => void onSave()}
+                    disabled={isWorking || !hasChanges}
                 >
-                    {(open) => (
+                    Salvar transcrição
+                </button>
+            </div>
+
+            <section className="border-t border-neutral-100 pt-5">
+                <div className="text-left">
+                    <div className="flex items-center gap-3">
+                        <h4 className="text-base font-semibold text-neutral-900">
+                            Gerar nova transcrição
+                        </h4>
                         <button
                             type="button"
-                            className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:border-red-300 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                            onClick={open}
-                            disabled={isWorking || !hasTranscription}
+                            onClick={() => setIsGenerationOpen((open) => !open)}
+                            aria-expanded={isGenerationOpen}
+                            aria-controls="transcription-generation"
+                            aria-label={isGenerationOpen ? "Recolher geração de transcrição" : "Expandir geração de transcrição"}
+                            className={`flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-all hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${isGenerationOpen ? "rotate-180" : ""}`}
                         >
-                            Excluir transcrição
+                            <svg viewBox="0 0 20 20" fill="none" className="size-4">
+                                <path
+                                    d="m5 7.5 5 5 5-5"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
                         </button>
-                    )}
-                </ConfirmationDialog>
+                    </div>
+                    <p className="mt-1 text-sm leading-6 text-neutral-500">
+                        Escolha o modelo e o idioma usados pela IA.
+                    </p>
+                </div>
 
-                {isEditing && (
-                    <button
-                        type="button"
-                        className="cursor-pointer rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed"
-                        onClick={() => {
-                            void onSave();
-                            setIsEditing(false);
-                        }}
-                        disabled={isWorking || !hasChanges}
-                    >
-                        Salvar transcrição
-                    </button>
+                {isGenerationOpen && (
+                    <div id="transcription-generation" className="mt-4 rounded-lg border border-neutral-200 bg-white px-3 py-5 shadow-sm">
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <label className="text-xs font-medium text-neutral-500">
+                                Modelo de transcrição
+                                <select
+                                    value={selectedModel}
+                                    onChange={(event) => onModelChange(event.target.value)}
+                                    className={SELECT_CLASS}
+                                    disabled={isWorking}
+                                >
+                                    {MODEL_OPTIONS.map((model) => (
+                                        <option key={model.value} value={model.value}>{model.label}</option>
+                                    ))}
+                                </select>
+                            </label>
+                            <label className="text-xs font-medium text-neutral-500">
+                                Idioma da transcrição
+                                <select
+                                    value={selectedLanguage || "auto"}
+                                    onChange={(event) => onLanguageChange(event.target.value)}
+                                    className={SELECT_CLASS}
+                                    disabled={isWorking}
+                                >
+                                    {languageOptions.map((language) => (
+                                        <option key={language} value={language}>
+                                            {LANGUAGE_LABELS[language] ?? language.toUpperCase()}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                        </div>
+                        <button
+                            type="button"
+                            className="mt-4 cursor-pointer rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            onClick={onGenerate}
+                            disabled={isWorking}
+                        >
+                            {isGenerating ? "Gerando transcrição..." : "Gerar transcrição por IA"}
+                        </button>
+                        {isGenerating && (
+                            <p className="mt-4 rounded-md bg-blue-50 px-4 py-3 text-sm text-blue-700" role="status" aria-live="polite">
+                                O Whisper está gerando a transcrição. Isso pode levar alguns minutos.
+                            </p>
+                        )}
+                    </div>
                 )}
-            </div>
+            </section>
+
+            <section className="border-t border-neutral-100 pt-5">
+                <div className="text-left">
+                    <div className="flex items-center gap-3">
+                        <h4 className="text-base font-semibold text-neutral-900">Traduzir transcrição</h4>
+                        <button
+                            type="button"
+                            onClick={() => setIsTranslationOpen((open) => !open)}
+                            aria-expanded={isTranslationOpen}
+                            aria-controls="transcription-translation"
+                            aria-label={isTranslationOpen ? "Recolher tradução" : "Expandir tradução"}
+                            className={`flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-all hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${isTranslationOpen ? "rotate-180" : ""}`}
+                        >
+                            <svg viewBox="0 0 20 20" fill="none" className="size-4">
+                                <path
+                                    d="m5 7.5 5 5 5-5"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                    <p className="mt-1 text-sm leading-6 text-neutral-500">
+                        Crie uma versão traduzida a partir da versão da transcrição selecionada.
+                    </p>
+                </div>
+
+                {isTranslationOpen && (
+                    <div id="transcription-translation" className="mt-4 rounded-lg border border-neutral-200 bg-white px-3 py-5 shadow-sm">
+                        <label className="block max-w-sm text-xs font-medium text-neutral-500">
+                            Idioma da tradução
+                            <select
+                                value={translationLanguage}
+                                onChange={(event) => setTranslationLanguage(event.target.value)}
+                                className={SELECT_CLASS}
+                                disabled={isWorking}
+                            >
+                                {["pt", "en", "es"].map((language) => (
+                                    <option key={language} value={language}>{language.toUpperCase()}</option>
+                                ))}
+                            </select>
+                        </label>
+                        <button
+                            type="button"
+                            className="mt-4 cursor-pointer rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            onClick={() => onTranslate(translationLanguage)}
+                            disabled={isWorking || !sourceLanguage || sourceLanguage === translationLanguage}
+                            title={sourceLanguage === translationLanguage ? "A transcrição já está nesse idioma." : "Traduzir somente ao clicar"}
+                        >
+                            {isTranslating ? "Traduzindo..." : "Traduzir"}
+                        </button>
+                    </div>
+                )}
+            </section>
         </section>
     );
 }

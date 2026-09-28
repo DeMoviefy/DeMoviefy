@@ -19,10 +19,10 @@ interface TranscriptionState {
   isTranslating: boolean;
 
   setTranscriptionDraft: (draft: string) => void;
+  setTranscriptionSegments: (segments: VideoTranscriptionResponse["transcription"]["segments"]) => void;
   setLanguage: (lang: string) => void;
   setModel: (model: string) => void;
   setSelectedVariant: (variant: string) => void;
-  updateSegment: (id: number, field: "start" | "end" | "text", value: string) => void;
   translateTranscription: (targetLanguage: string) => Promise<void>;
 
   fetchTranscription: (video: VideoRecord, variant?: string) => Promise<void>;
@@ -44,6 +44,7 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
   isTranslating: false,
 
   setTranscriptionDraft: (transcriptionDraft) => set({ transcriptionDraft }),
+  setTranscriptionSegments: (transcriptionSegments) => set({ transcriptionSegments }),
   setLanguage: (lang) => set({ selectedLanguage: lang }),
   setModel: (selectedModel) => set({ selectedModel }),
   setSelectedVariant: (selectedVariant) => {
@@ -51,13 +52,6 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
     set({ selectedVariant });
     if (video) void get().fetchTranscription(video, selectedVariant);
   },
-  updateSegment: (id, field, value) => set((state) => ({
-    transcriptionSegments: state.transcriptionSegments.map((segment) =>
-      segment.id === id
-        ? { ...segment, [field]: field === "text" ? value : Number(value) }
-        : segment
-    ),
-  })),
   translateTranscription: async (targetLanguage) => {
     const video = useVideoDetailStore.getState().video;
     if (!video) return;
