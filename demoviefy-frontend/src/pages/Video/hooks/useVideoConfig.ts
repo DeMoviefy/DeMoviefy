@@ -1,10 +1,10 @@
-// src/pages/Upload/Video/useVideoConfig.ts
+// src/pages/Dashboard/Video/useVideoConfig.ts
 import { useCallback, useEffect, useState } from "react";
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
-import { VideoService } from "src/pages/Upload/services/videoService";
+import { VideoService } from "src/core/services/videoService";
 import { toast } from "sonner";
-import type { AiConfigPayload, VideoRecord } from "src/pages/Upload/types";
-import { getApiErrorMessage, chooseFirstModel } from "src/pages/Upload/utils/helpers";
+import type { AiConfigPayload, VideoRecord } from "src/core/types/videoTypes";
+import { getApiErrorMessage, chooseFirstModel } from "src/core/utils/videoHelpers";
 import { useCatalogStore } from "src/core/stores/useAICatalogStore";
 
 export function useVideoConfig(video: VideoRecord | null) {
@@ -15,7 +15,7 @@ export function useVideoConfig(video: VideoRecord | null) {
         model_path: "",
         frame_stride: "8",
         confidence_threshold: "0.35",
-        max_frames: "300",
+        max_frames: "99999999999",
         clip_start_sec: "0",
         clip_end_sec: null,
     });
@@ -45,18 +45,6 @@ export function useVideoConfig(video: VideoRecord | null) {
         }));
     }, []);
 
-    const handleSaveConfig = useCallback(async () => {
-        if (!video) return;
-
-        try {
-            await VideoService.saveAiConfig(video.id, videoConfig);
-            toast.success("Configuração de IA salva para o vídeo selecionado.");
-        } catch (error) {
-            console.error(error);
-            toast.error(getApiErrorMessage(error, "Não foi possível salvar a configuração de IA."));
-        }
-    }, [videoConfig]);
-
     const handleReprocess = useCallback(async () => {
         if (!video) return;
 
@@ -75,7 +63,6 @@ export function useVideoConfig(video: VideoRecord | null) {
         videoConfig,
         setVideoConfig,
         handleVideoTaskChange,
-        handleSaveConfig,
         handleReprocess,
     };
 }

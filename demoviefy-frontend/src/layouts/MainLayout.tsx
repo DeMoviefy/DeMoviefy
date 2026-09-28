@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 
 import Footer from "src/core/components/Footer";
@@ -9,51 +9,16 @@ type MainLayoutProps = {
 };
 
 export default function MainLayout({ children }: MainLayoutProps) {
-  const location = useLocation();
-  const isHomePage = location.pathname === "/";
-
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    try {
-      const stored = window.localStorage.getItem("demoviefy-theme");
-      if (stored === "light" || stored === "dark") {
-        return stored;
-      }
-    } catch (error) {
-      console.warn("Não foi possível ler o tema salvo.", error);
-    }
-
-    try {
-      // return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      return "dark";
-    } catch (error) {
-      console.warn("Não foi possível consultar o tema do sistema.", error);
-      // return "light";
-      return "dark";
-    }
-  });
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    try {
-      window.localStorage.setItem("demoviefy-theme", theme);
-    } catch (error) {
-      console.warn("Não foi possível persistir o tema atual.", error);
-    }
-  }, [theme]);
-
-  const themeLabel = useMemo(
-    () => (theme === "dark" ? "Usar tema claro" : "Usar tema escuro"),
-    [theme],
-  );
+  const { pathname } = useLocation();
+  const isHome = pathname === "/";
+  const isVideo = pathname.startsWith("/video/");
+  const isDashboard = pathname === "/dashboard";
 
   return (
-    <div className={`app-shell ${isHomePage ? "app-shell--full-width" : ""}`}>
-      <div className="app-content-shell">
-        <Header
-          themeLabel={themeLabel}
-          onToggleTheme={() => setTheme((current) => (current === "dark" ? "light" : "dark"))}
-        />
-        <main className="app-main">{children}</main>
+    <div className={isHome || isVideo || isDashboard ? "min-h-screen bg-white text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100" : ""}>
+      <div>
+        <Header />
+            <main className="px-8">{children}</main>
         <Footer />
       </div>
     </div>

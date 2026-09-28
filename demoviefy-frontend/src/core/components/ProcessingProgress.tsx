@@ -3,89 +3,63 @@
 import { memo } from "react";
 
 type ProcessingProgressProps = {
+  modelName: string;
   progress: number;
   stage: string;
   etaSeconds: number | null;
   message: string | null;
 };
 
-const PIPELINE_STEPS = [
-  { id: "queued", label: "Fila" },
-  { id: "preparing", label: "Preparação" },
-  { id: "analyzing", label: "Análise" },
-  { id: "completed", label: "Concluído" },
-] as const;
-
-const STAGE_INDEX: Record<string, number> = {
-  idle: -1,
-  queued: 0,
-  preparing: 1,
-  analyzing: 2,
-  analysis_complete: 2,
-  transcribing: 2,
-  transcription_skipped: 2,
-  completed: 3,
-  error: 3,
+const STAGE_LABELS: Record<string, string> = {
+  queued: "Na fila",
+  preparing: "Preparando vídeo",
+  analyzing: "Analisando vídeo",
+  analysis_complete: "Análise concluída",
+  transcribing: "Transcrevendo vídeo",
+  transcription_skipped: "Transcrição ignorada",
+  completed: "Concluído",
+  error: "Erro no processamento",
 };
 
-function formatEta(value: number | null) {
-  if (value === null || value <= 0) {
-    return "Finalizando...";
-  }
-
-  if (value < 60) {
-    return `~${value}s restantes`;
-  }
-
-  const minutes = Math.floor(value / 60);
-  const seconds = value % 60;
-  return `~${minutes}m ${seconds}s restantes`;
-}
-
 export const ProcessingProgress = memo(function ProcessingProgress({
+  modelName,
   progress,
   stage,
   etaSeconds,
   message,
 }: ProcessingProgressProps) {
   const safeProgress = Math.max(0, Math.min(progress, 100));
-  const currentIndex = STAGE_INDEX[stage] ?? -1;
-
-  const currentStep = PIPELINE_STEPS.find((item) => item.id === stage)?.label ?? stage;
-  const displayStage = currentStep === "completed" ? "Concluído" : currentStep;
+  const statusMessage = message || STAGE_LABELS[stage] || stage;
 
   return (
-    <div className="processing-progress">
-      <div className="processing-progress-header">
-        <div className="progress-metrics">
-          <strong>{safeProgress}%</strong>
-          <span>{displayStage}</span>
-        </div>
-        <span className="progress-eta">{formatEta(etaSeconds)}</span>
+    <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-5 dark:border-neutral-700 dark:bg-neutral-800">
+      <p className="mb-3 truncate text-xs font-medium text-neutral-600 dark:text-neutral-300" title={modelName}>
+        {modelName}
+      </p>
+      <div
+        className="h-1.5 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700"
+        role="progressbar"
+        aria-label="Progresso do processamento"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={safeProgress}
+      >
+        <div
+          className="h-full rounded-full bg-blue-600 transition-all dark:bg-blue-800"
+          style={{ width: `${safeProgress}%` }}
+        />
       </div>
 
-      <div className="progress-bar" aria-hidden="true">
-        <span style={{ width: `${safeProgress}%` }} />
+      <div className="mt-2 flex items-start justify-between gap-4 text-xs text-neutral-500 dark:text-neutral-400">
+        <span className="min-w-0 truncate" aria-live="polite">
+          {statusMessage}
+        </span>
+
+        <span className="shrink-0 font-semibold tabular-nums text-neutral-700 dark:text-neutral-300">
+          {safeProgress}%
+          {etaSeconds !== null && ` · ~${etaSeconds}s`}
+        </span>
       </div>
-
-      <div className="pipeline-steps" aria-label="Etapas do processamento">
-        {PIPELINE_STEPS.map((step, index) => {
-          const isDone = index < currentIndex || stage === "completed";
-          const isCurrent = stage === step.id || (stage === "error" && index === Math.max(currentIndex, 0));
-
-          return (
-            <span
-              key={step.id}
-              className={`pipeline-step ${isDone ? "is-done" : ""} ${isCurrent ? "is-current" : ""}`}
-            >
-              <span className="step-indicator" />
-              <span className="step-label">{step.label}</span>
-            </span>
-          );
-        })}
-      </div>
-
-      <small>{message ?? "Aguardando proximo status..."}</small>
     </div>
   );
 });

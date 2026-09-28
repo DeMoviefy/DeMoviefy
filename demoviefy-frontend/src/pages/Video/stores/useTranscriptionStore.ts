@@ -1,10 +1,10 @@
 // src/pages/Video/stores/useTranscriptionStore.ts
 
 import { create } from "zustand";
-import { VideoService } from "src/pages/Upload/services/videoService";
-import { getApiErrorMessage } from "src/pages/Upload/utils/helpers";
+import { VideoService } from "src/core/services/videoService";
+import { getApiErrorMessage } from "src/core/utils/videoHelpers";
 import { useVideoDetailStore } from "src/pages/Video/stores/useVideoDetailStore";
-import type { VideoRecord, VideoTranscriptionResponse } from "src/pages/Upload/types";
+import type { VideoRecord, VideoTranscriptionResponse } from "src/core/types/videoTypes";
 import { toast } from "sonner";
 
 interface TranscriptionState {
@@ -19,10 +19,10 @@ interface TranscriptionState {
   isTranslating: boolean;
 
   setTranscriptionDraft: (draft: string) => void;
+  setTranscriptionSegments: (segments: VideoTranscriptionResponse["transcription"]["segments"]) => void;
   setLanguage: (lang: string) => void;
   setModel: (model: string) => void;
   setSelectedVariant: (variant: string) => void;
-  updateSegment: (id: number, field: "start" | "end" | "text", value: string) => void;
   translateTranscription: (targetLanguage: string) => Promise<void>;
 
   fetchTranscription: (video: VideoRecord, variant?: string) => Promise<void>;
@@ -44,6 +44,7 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
   isTranslating: false,
 
   setTranscriptionDraft: (transcriptionDraft) => set({ transcriptionDraft }),
+  setTranscriptionSegments: (transcriptionSegments) => set({ transcriptionSegments }),
   setLanguage: (lang) => set({ selectedLanguage: lang }),
   setModel: (selectedModel) => set({ selectedModel }),
   setSelectedVariant: (selectedVariant) => {
@@ -51,13 +52,6 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
     set({ selectedVariant });
     if (video) void get().fetchTranscription(video, selectedVariant);
   },
-  updateSegment: (id, field, value) => set((state) => ({
-    transcriptionSegments: state.transcriptionSegments.map((segment) =>
-      segment.id === id
-        ? { ...segment, [field]: field === "text" ? value : Number(value) }
-        : segment
-    ),
-  })),
   translateTranscription: async (targetLanguage) => {
     const video = useVideoDetailStore.getState().video;
     if (!video) return;
@@ -86,10 +80,13 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
       });
 
       if (status === 200) {
+        const hasTranscriptionContent = Boolean(
+          data.transcription.content?.trim() || data.transcription.segments?.length
+        );
         set({
           transcriptionMessage:
-            data.transcription.status === "unavailable"
-              ? data.transcription.error ?? "A transcrição automática não está disponível."
+            data.available === false || data.transcription.status === "unavailable" || !hasTranscriptionContent
+              ? data.transcription.error ?? "Não há uma transcrição disponível para este vídeo. Gere-a e depois confira-a neste editor."
               : `Transcrição carregada de ${data.storage.transcription_relative_path}.`,
         });
         return;
@@ -148,7 +145,7 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
       set({
         transcription: null,
         transcriptionDraft: "",
-        transcriptionMessage: "Transcrição removida. Você pode criar uma nova quando quiser.",
+        transcriptionMessage: "Não há uma transcrição disponível para este vídeo. Gere-a e depois confira-a neste editor.",
         transcriptionSegments: [],
       });
       toast.success("Transcrição excluída.");

@@ -1,9 +1,9 @@
 // src/pages/Video/stores/useVideoDetailStore.ts
 
 import { create } from "zustand";
-import { VideoService } from "src/pages/Upload/services/videoService";
-import { normalizeVideoRecord } from "src/pages/Upload/utils/normalizers";
-import type { VideoRecord } from "src/pages/Upload/types";
+import { VideoService } from "src/core/services/videoService";
+import { normalizeVideoRecord } from "src/core/utils/videoNormalizers";
+import type { VideoRecord } from "src/core/types/videoTypes";
 
 interface VideoDetailState {
   video: VideoRecord | null;

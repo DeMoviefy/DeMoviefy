@@ -1,8 +1,8 @@
 // src/pages/Video/hooks/useVideoPlayer.ts
 
 import { useRef } from "react"
-import { VideoService } from "src/pages/Upload/services/videoService"
-import type { VideoRecord } from "src/pages/Upload/types"
+import { VideoService } from "src/core/services/videoService"
+import type { VideoRecord } from "src/core/types/videoTypes"
 
 export function useVideoPlayer(
   video: VideoRecord | null,

@@ -1,11 +1,14 @@
 // src/pages/Video/stores/useAnalysisStore.ts
 
 import { create } from "zustand";
-import { VideoService } from "src/pages/Upload/services/videoService";
-import { prettifyJson, getApiErrorMessage, buildArtifactSignature } from "src/pages/Upload/utils/helpers";
+import { VideoService } from "src/core/services/videoService";
+import { useProcessingStore } from "src/core/stores/useProcessingStore";
+import { prettifyJson, getApiErrorMessage, buildArtifactSignature } from "src/core/utils/videoHelpers";
 import { toast } from "sonner";
 import { useTranscriptionStore } from "src/pages/Video/stores/useTranscriptionStore";
-import type { VideoAnalysisResponse, VideoRecord } from "src/pages/Upload/types";
+import { useVideoDetailStore } from "src/pages/Video/stores/useVideoDetailStore";
+import { normalizeVideoRecord } from "src/core/utils/videoNormalizers";
+import type { VideoAnalysisResponse, VideoRecord } from "src/core/types/videoTypes";
 
 type AnalysisStatus = "idle" | "loading" | "ready" | "pending" | "error";
 
@@ -103,6 +106,28 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
 
     try {
       await VideoService.deleteAnalysis(selectedVideo.id, selectedAnalysisVariantId);
+
+      try {
+        const updatedVideo = normalizeVideoRecord(await VideoService.getVideoById(selectedVideo.id));
+        useVideoDetailStore.setState({ video: updatedVideo });
+        useProcessingStore.setState((state) => {
+          const videos = state.videos.map((video) =>
+            video.id === updatedVideo.id ? updatedVideo : video
+          );
+          return {
+            videos,
+            stats: {
+              total: videos.length,
+              processing: videos.filter((video) => video.status.startsWith("PROCESSANDO")).length,
+              processed: videos.filter((video) => video.status === "PROCESSADO").length,
+              errors: videos.filter((video) => video.status.startsWith("ERRO")).length,
+            },
+          };
+        });
+      } catch (refreshError) {
+        console.error("Não foi possível atualizar o status do vídeo após excluir a análise.", refreshError);
+      }
+
       set({
         analysis: null,
         selectedAnalysisVariantId: null,
@@ -129,7 +154,6 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
 
       set({ analysis: null, analysisDraft: "{}" });
       useTranscriptionStore.getState().resetTranscription();
-      useTranscriptionStore.setState({ transcriptionMessage: "Transcrição removida." });
 
       get().resetArtifactSignature();
       return true;

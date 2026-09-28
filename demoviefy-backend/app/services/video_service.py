@@ -264,8 +264,8 @@ def get_video_transcription(video_id: int):
     transcription = load_transcription(video_id)
     if transcription is None:
         if video.status in {"PROCESSANDO", "PROCESSANDO_IA"}:
-            return jsonify(_empty_transcription_payload(video, storage, status="pending", error="A transcrição sera consultada novamente quando o processamento terminar.")), 202
-        return jsonify(_empty_transcription_payload(video, storage, status="missing", error="Transcrição não disponível.")), 404
+            return jsonify(_empty_transcription_payload(video, storage, status="pending", error="A transcrição será consultada novamente quando o processamento terminar.")), 202
+        return jsonify(_empty_transcription_payload(video, storage, status="missing", error="Não há uma transcrição disponível para este vídeo. Gere-a e depois confira-a neste editor.")), 404
     return jsonify({"video_id": video.id, "filename": video.filename, "available": True, "transcription": transcription, "storage": storage})
 
 
@@ -453,7 +453,7 @@ def process_video(flask_app, video_id, *, cancellation_requested=None):
         try:
             update_status(video, "PROCESSANDO_IA")
             ensure_storage_dirs()
-            save_processing_state(video_id, progress=5, stage="preparing", eta_seconds=None, message="Preparando video e configuracoes da análise.")
+            save_processing_state(video_id, progress=5, stage="preparing", eta_seconds=None, message="Preparando vídeo e configurações da análise.")
             ai_config = load_ai_config(video_id)
             annotated_path = annotated_video_path(video_id)
             annotated_temp_path = annotated_video_temp_path(video_id)

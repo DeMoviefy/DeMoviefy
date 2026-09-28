@@ -1,4 +1,4 @@
-// src/pages/Upload/components/CompatibilityBanner.tsx
+// src/pages/Dashboard/components/CompatibilityBanner.tsx
 
 import { CompatibilityService } from "src/core/services/compatibilityService";
 import type { BackendVersionResponse } from "src/core/types/compatibility";

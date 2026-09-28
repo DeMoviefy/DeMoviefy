@@ -1,57 +1,55 @@
-// src/pages/Upload/components/AnalysisMetrics.tsx
+// src/pages/Dashboard/components/AnalysisMetrics.tsx
 
 import { memo } from "react"
-import { formatSeconds } from "src/pages/Upload/utils/helpers"
-import type { VideoAnalysisResponse } from "src/pages/Upload/types"
+import { formatSeconds } from "src/core/utils/videoHelpers"
+import type { VideoAnalysisResponse } from "src/core/types/videoTypes"
 
 type AnalysisMetricsProps = {
-  summary: NonNullable<VideoAnalysisResponse["analysis"]>
-  taskLabel: string
-  modelName: string
+    summary: NonNullable<VideoAnalysisResponse["analysis"]> | null
+    modelName: string
 }
 
 export const AnalysisMetrics = memo(function AnalysisMetrics({
-  summary,
-  taskLabel,
-  modelName,
+    summary,
+    modelName,
 }: AnalysisMetricsProps) {
-  return (
-    <div className="analysis-metrics">
-      <div className="metric-card">
-        <span>Detecções</span>
-        <strong>{summary.total_detections}</strong>
-      </div>
-      <div className="metric-card">
-        <span>Frames amostrados</span>
-        <strong>{summary.sampled_frames}</strong>
-      </div>
-      <div className="metric-card">
-        <span>Stride / limite</span>
-        <strong>{summary.frame_stride} / {summary.max_frames}</strong>
-      </div>
-      <div className="metric-card">
-        <span>Tarefa</span>
-        <strong>{taskLabel}</strong>
-      </div>
-      <div className="metric-card">
-        <span>Modelo</span>
-        <strong>{modelName}</strong>
-      </div>
-      <div className="metric-card">
-        <span>Trecho</span>
-        <strong>
-          {formatSeconds(summary.clip_start_sec)} -{" "}
-          {summary.clip_end_sec === null ? "fim" : formatSeconds(summary.clip_end_sec)}
-        </strong>
-      </div>
-      <div className="metric-card">
-        <span>Confiança mínima</span>
-        <strong>
-          {typeof summary.confidence_threshold === "number"
-            ? `${(summary.confidence_threshold * 100).toFixed(0)}%`
-            : "-"}
-        </strong>
-      </div>
-    </div>
-  )
+    return (
+        <div>
+            {!summary ? (
+                <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400" aria-live="polite">
+                    Nenhuma análise disponível.
+                </p>
+            ) : (
+                <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3">
+                    <div>
+                        <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
+                            Modelo
+                        </span>
+                        <strong
+                            className="mt-1 block truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100"
+                            title={modelName}
+                        >
+                            {modelName}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
+                            Trecho
+                        </span>
+                        <strong className="mt-1 block text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                            {formatSeconds(summary.clip_start_sec)} -{" "}
+                            {summary.clip_end_sec === null
+                                ? "fim"
+                                : formatSeconds(summary.clip_end_sec)}
+                        </strong>
+                    </div>
+
+                    <div>
+                        {/* Aqui ficará o tipo de transcrição*/}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 })

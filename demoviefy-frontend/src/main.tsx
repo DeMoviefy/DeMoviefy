@@ -2,8 +2,6 @@ import { createRoot, type Root } from "react-dom/client";
 import { ErrorBoundary } from "src/core/components/ErrorBoundary";
 import  App  from "src/app/App"
 
-import "src/styles/global.css"
-
 import "src/index.css";
 import { StrictMode } from "react";
 

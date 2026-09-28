@@ -6,7 +6,7 @@
 import { useEffect, useRef } from "react";
 
 import { useAnalysisStore } from "src/pages/Video/stores/useAnalysisStore";
-import type { VideoRecord } from "src/pages/Upload/types";
+import type { VideoRecord } from "src/core/types/videoTypes";
 
 export function useVideoWorkbenchSync(video: VideoRecord | null) {
     const previousVideoRef = useRef<VideoRecord | null>(null);
@@ -38,12 +38,6 @@ export function useVideoWorkbenchSync(video: VideoRecord | null) {
             void useAnalysisStore.getState().syncAnalysisWithSelectedVideo(video);
         }
 
-        if (finishedProcessing){
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth",
-            });
-        }
 
         previousVideoRef.current = video;
     }, [video]);
