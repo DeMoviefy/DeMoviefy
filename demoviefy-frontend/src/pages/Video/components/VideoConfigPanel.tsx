@@ -86,7 +86,6 @@ export function VideoConfigPanel({
             {isOpen && (
                 <div id="video-reprocess-config" className="mt-2 rounded-lg border border-neutral-200 bg-white px-3 py-5 shadow-sm">
                     <VideoAnalysisConfig
-                        showSectionCards={false}
                         taskType={config.task_type}
                         modelPath={config.model_path}
                         clipStart={config.clip_start_sec}

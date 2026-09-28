@@ -128,7 +128,7 @@ export function NewVideoPanel() {
             </div>
 
             {file && (
-                <div className="flex flex-col gap-8">
+                <div className="rounded-lg border border-neutral-200 bg-white px-3 py-5 shadow-sm">
                     <VideoAnalysisConfig
                         taskType={uploadTask}
                         modelPath={uploadModelPath}
@@ -142,34 +142,36 @@ export function NewVideoPanel() {
                         onClipEndChange={setUploadClipEnd}
                     />
 
-                    {/* Enviar vídeo */}
-                    <button
-                        type="button"
-                        onClick={() => {
-                            handleUpload(uploadTask, uploadModelPath);
-                        }}
-                        disabled={uploading}
-                        className="w-full cursor-pointer rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                        Enviar vídeo
-                    </button>
+                    <div className="mt-8 flex items-center justify-end gap-8">
+                        {/* Cancelar envio */}
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setFile(null);
 
-                    {/* Remover vídeo */}
-                    <button
-                        type="button"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setFile(null);
+                                window.scrollTo({
+                                    top: 0,
+                                    behavior: "smooth",
+                                });
+                            }}
+                            className="cursor-pointer text-sm font-medium text-neutral-500 transition-colors hover:text-red-600"
+                        >
+                            Cancelar envio
+                        </button>
 
-                            window.scrollTo({
-                                top: 0,
-                                behavior: "smooth",
-                            });
-                        }}
-                        className="cursor-pointer text-sm font-medium text-neutral-500 transition-colors hover:text-red-600"
-                    >
-                        Cancelar envio
-                    </button>
+                        {/* Enviar vídeo */}
+                        <button
+                            type="button"
+                            onClick={() => {
+                                handleUpload(uploadTask, uploadModelPath);
+                            }}
+                            disabled={uploading}
+                            className="cursor-pointer rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            Enviar vídeo
+                        </button>
+                    </div>
                 </div>
             )}
         </section >

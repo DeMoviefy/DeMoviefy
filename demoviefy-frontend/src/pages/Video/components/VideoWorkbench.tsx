@@ -61,7 +61,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
     const transcriptionContent = transcription?.transcription.content ?? "";
     const hasTranscriptionChanges = transcriptionDraft !== transcriptionContent;
     const hasSelectedAnalysis = analysis !== null;
-    const isProcessing = currentVideo.status.startsWith("PROCESSANDO");
+    const isProcessing = currentVideo?.status.startsWith("PROCESSANDO") ?? false;
 
     const { annotatedVideoSrc, seekTo } = useVideoPlayer(
         currentVideo,
