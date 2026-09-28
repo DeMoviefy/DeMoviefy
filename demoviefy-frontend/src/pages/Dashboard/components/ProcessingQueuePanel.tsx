@@ -1,6 +1,7 @@
 // src/pages/Dashboard/components/ProcessingQueuePanel.tsx
 
 import { useState } from "react";
+import { FaRegClock } from "react-icons/fa";
 
 import { toast } from "sonner";
 
@@ -55,15 +56,18 @@ export function ProcessingQueuePanel() {
       </div>
 
       {processingVideos.length === 0 ? (
-        <div className="flex min-h-48 flex-col items-center justify-center rounded-xl border border-neutral-300 bg-neutral-50 px-6 py-8 text-center">
+        <div className="flex min-h-48 flex-col items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 px-6 py-8 text-center">
           <p className="text-sm font-semibold text-neutral-900">
-            Nenhum vídeo em processamento
+            Nenhum vídeo na fila
           </p>
 
-          <p className="mt-2 max-w-sm text-sm leading-6 text-neutral-500">
-            Assim que um vídeo começar a ser processado, ele aparecerá aqui
-            para você acompanhar o progresso.
+          <p className="mt-2 max-w-full text-sm leading-6 text-neutral-500">
+            Os vídeos em processamento aparecerão aqui.
           </p>
+          <FaRegClock
+            aria-hidden="true"
+            className="mt-4 size-6 text-neutral-400"
+          />
         </div>
       ) : (
         <div

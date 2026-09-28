@@ -109,7 +109,7 @@ export const DashboardVideoLibrary = memo(
                 <Link
                   key={video.id}
                   to={`/video/${video.id}`}
-                  className="group block rounded-lg px-2 py-3 transition-colors hover:bg-blue-50"
+                  className="group block rounded-lg border border-transparent px-2 py-3 transition-colors hover:border-blue-300 hover:bg-blue-50"
                 >
                   <div className="min-w-0">
                     <div className="flex items-start justify-between gap-3">

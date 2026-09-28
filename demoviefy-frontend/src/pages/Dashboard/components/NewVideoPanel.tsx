@@ -1,6 +1,7 @@
 // src/pages/Dashboard/components/NewVideoPanel.tsx
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { FaUpload } from "react-icons/fa";
 
 import { VideoAnalysisConfig } from "src/core/components/VideoAnalysisConfig";
 import { useCatalogStore } from "src/core/stores/useAICatalogStore";
@@ -77,7 +78,7 @@ export function NewVideoPanel() {
             <div
                 className={`flex min-h-48 cursor-pointer items-center justify-center rounded-xl border px-6 py-8 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${isDragging
                     ? "border-blue-400 bg-blue-100"
-                    : "border-neutral-300 bg-neutral-50 hover:border-blue-300 hover:bg-blue-100"
+                    : "border-neutral-200 bg-neutral-50 hover:border-blue-300 hover:bg-blue-50"
                     }`}
                 onDrop={handleDrop}
                 onDragOver={(e) => {
@@ -115,14 +116,18 @@ export function NewVideoPanel() {
                         </span>
                     </div>
                 ) : (
-                    <div>
+                    <div className="flex flex-col items-center">
                         <p className="text-sm font-semibold text-neutral-900">
-                            Arraste seu vídeo aqui
+                            Adicione um vídeo à sua biblioteca
                         </p>
 
                         <p className="mt-1.5 text-sm text-neutral-500">
-                            ou clique para selecionar um arquivo
+                            Arraste o arquivo até aqui ou clique para procurá-lo.
                         </p>
+                        <FaUpload
+                            aria-hidden="true"
+                            className="mt-4 size-7 text-neutral-400"
+                        />
                     </div>
                 )}
             </div>
