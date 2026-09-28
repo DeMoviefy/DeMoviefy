@@ -161,21 +161,22 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
     if (!selectedVideo) return;
 
     const { fetchTranscription } = get();
+    const toastId = "transcription-generation";
 
     try {
-      set({ transcriptionMessage: "Gerando transcrição automática. Isso pode levar alguns instantes." });
+      toast("O Whisper está gerando a transcrição. Isso pode levar alguns minutos.");
       const { selectedLanguage, selectedModel } = get();
       set({ isGenerating: true });
       const { message: apiMessage } = await VideoService.generateTranscription(selectedVideo.id, {
         language: selectedLanguage,
         modelName: selectedModel,
       });
-      toast(apiMessage);
+      toast.success(apiMessage, { id: toastId });
       await useVideoDetailStore.getState().fetchVideoById(selectedVideo.id);
       await fetchTranscription(selectedVideo, `${selectedLanguage || "auto"}-${selectedModel}`);
     } catch (error) {
       console.error(error);
-      toast.error(getApiErrorMessage(error, "Não foi possível gerar a transcrição automática. Verifique o Whisper e o ffmpeg."));
+      toast.error(getApiErrorMessage(error, "Não foi possível gerar a transcrição automática. Verifique o Whisper e o ffmpeg."), { id: toastId });
     } finally {
       set({ isGenerating: false });
     }

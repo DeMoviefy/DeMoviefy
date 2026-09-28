@@ -42,7 +42,7 @@ export function GenerateTranscription({
     const languageOptions = Array.from(new Set(["auto", "pt", "en", "es", ...availableLanguages]));
 
     return (
-        <section className="border-t border-neutral-100 pt-5 dark:border-neutral-800">
+        <section className="pt-5 dark:border-neutral-800">
             <div className="text-left">
                 <div className="flex items-center gap-3">
                     <h4 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">Gerar nova transcrição</h4>
@@ -90,11 +90,6 @@ export function GenerateTranscription({
                     >
                         {isGenerating ? "Gerando transcrição..." : "Gerar transcrição por IA"}
                     </button>
-                    {isGenerating && (
-                        <p className="mt-4 rounded-md bg-blue-50 px-4 py-3 text-sm text-blue-700 dark:bg-blue-950 dark:text-blue-300" role="status" aria-live="polite">
-                            O Whisper está gerando a transcrição. Isso pode levar alguns minutos.
-                        </p>
-                    )}
                 </div>
             )}
         </section>
