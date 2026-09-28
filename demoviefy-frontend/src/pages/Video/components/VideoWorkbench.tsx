@@ -12,7 +12,7 @@ import { AnalysisVersion } from "src/pages/Video/components/AnalysisVersion";
 import { AnalysisResults } from "src/pages/Video/components/AnalysisResults";
 import { AnalysisMetrics } from "src/pages/Video/components/AnalysisMetrics";
 import { TranscriptionVersion } from "src/pages/Video/components/TranscriptionVersion";
-import { TranscriptionEditor } from "src/pages/Video/components/TranscriptionEditor";
+import { TranscriptionWorkbench } from "src/pages/Video/components/TranscriptionWorkbench";
 import { VideoPreviewPanel } from "src/pages/Video/components/VideoPreviewPanel";
 import { WorkbenchEmptyState } from "src/pages/Video/components/WorkbenchEmptyState";
 
@@ -55,6 +55,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
     const summary = analysis?.analysis ?? null;
     const analysisVariants = analysis?.available_variants ?? [];
     const availableLanguages = transcription?.available_languages ?? [];
+    const hasTranscription = Boolean(transcription?.available);
     const transcriptionVariants = transcription?.variants ?? [
         { id: "default", label: "Transcrição principal", language: null },
     ];
@@ -105,7 +106,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                                     variants={transcriptionVariants}
                                     selectedVariant={selectedVariant}
                                     onVariantChange={setSelectedVariant}
-                                    hasTranscription={currentVideo.transcription_ready}
+                                    hasTranscription={hasTranscription}
                                     onDelete={onDeleteTranscription}
                                     disabled={isBusy || isProcessing || isGenerating || isTranslating}
                                 />
@@ -126,10 +127,11 @@ export const VideoWorkbench = memo(function VideoWorkbench({
 
                 <div className="flex min-w-0 flex-col gap-6">
                     <AnalysisResults state={analysisState} summary={summary} />
-                    <TranscriptionEditor
+                    <TranscriptionWorkbench
                         transcriptionDraft={transcriptionDraft}
                         transcriptionMessage={transcriptionMessage}
                         segments={transcriptionSegments}
+                        hasTranscription={hasTranscription}
                         hasChanges={hasTranscriptionChanges}
                         isBusy={isBusy}
                         onDraftChange={setTranscriptionDraft}

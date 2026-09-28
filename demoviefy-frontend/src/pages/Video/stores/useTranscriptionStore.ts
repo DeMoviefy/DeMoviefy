@@ -80,10 +80,13 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
       });
 
       if (status === 200) {
+        const hasTranscriptionContent = Boolean(
+          data.transcription.content?.trim() || data.transcription.segments?.length
+        );
         set({
           transcriptionMessage:
-            data.transcription.status === "unavailable"
-              ? data.transcription.error ?? "A transcrição automática não está disponível."
+            data.available === false || data.transcription.status === "unavailable" || !hasTranscriptionContent
+              ? data.transcription.error ?? "Não há uma transcrição disponível para este vídeo. Gere-a e depois confira-a neste editor."
               : `Transcrição carregada de ${data.storage.transcription_relative_path}.`,
         });
         return;
@@ -142,7 +145,7 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
       set({
         transcription: null,
         transcriptionDraft: "",
-        transcriptionMessage: "Transcrição removida. Você pode criar uma nova quando quiser.",
+        transcriptionMessage: "Não há uma transcrição disponível para este vídeo. Gere-a e depois confira-a neste editor.",
         transcriptionSegments: [],
       });
       toast.success("Transcrição excluída.");
