@@ -118,7 +118,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                             Detalhes da análise
                         </h3>
                         <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
-                            <div className="px-3 py-5">
+                            <div className="bg-neutral-50 px-3 py-5 dark:bg-neutral-900">
                                 <AnalysisMetrics summary={summary} modelName={currentVideo.ai_config.model_name} />
                             </div>
                             <div className="px-3 py-5">
