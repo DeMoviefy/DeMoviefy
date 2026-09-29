@@ -19,7 +19,13 @@ export function TranscriptionVersion({
     disabled,
 }: TranscriptionVersionProps) {
     return (
-        <div className="mt-5 flex min-w-0 items-end gap-3">
+        <div className="mt-5">
+            {!hasTranscription && (
+                <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400" aria-live="polite">
+                    Nenhuma transcrição disponível.
+                </p>
+            )}
+            {hasTranscription && <div className="flex min-w-0 items-end gap-3">
             <label className="block min-w-0 flex-1">
                 <span className="mb-1.5 block text-xs font-medium text-neutral-500 dark:text-neutral-400">
                     Versão da transcrição
@@ -51,6 +57,7 @@ export function TranscriptionVersion({
                     </button>
                 )}
             </ConfirmationDialog>
+            </div>}
         </div>
     );
 }
