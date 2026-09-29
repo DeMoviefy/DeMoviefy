@@ -12,7 +12,6 @@ import type { AiConfigPayload, VideoRecord } from "src/core/types/videoTypes"
 
 
 interface VideoConfigPanelProps {
-    video: VideoRecord
     config: AiConfigPayload
     onConfigChange: (config: AiConfigPayload) => void
     isBusy: boolean
@@ -20,7 +19,6 @@ interface VideoConfigPanelProps {
 }
 
 export function VideoConfigPanel({
-    video,
     config,
     onConfigChange,
     isBusy,
@@ -29,17 +27,7 @@ export function VideoConfigPanel({
 
 
     const [isOpen, setIsOpen] = useState(false)
-    const navigate = useNavigate();
     const { tasks, models } = useCatalogStore()
-    const onDeleteVideo = useAnalysisStore((state) => state.onDeleteVideo)
-
-    const handleDeleteVideo = async () => {
-        const deleted = await onDeleteVideo(video);
-
-        if (deleted) {
-            navigate("/dashboard");
-        }
-    }
 
     const update = (field: keyof AiConfigPayload, value: string | null) =>
         onConfigChange({ ...config, [field]: value })
@@ -116,25 +104,41 @@ export function VideoConfigPanel({
                 </div>
             )}
 
-            <div className="flex justify-start border-t border-neutral-100 py-4 dark:border-neutral-800">
-                <ConfirmationDialog
-                    title="Excluir vídeo"
-                    message="Tem certeza de que deseja excluir o vídeo? Esta ação é irreversível."
-                    onConfirm={handleDeleteVideo}
-                >
-                    {(open) => (
-                        <button
-                            type="button"
-                            className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:border-red-300 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 dark:border-red-900 dark:bg-red-950 dark:text-red-300 dark:hover:border-red-800 dark:hover:bg-red-900"
-                            onClick={open}
-                        >
-                            <FaTrashAlt aria-hidden="true" className="size-3" />
-                            Excluir vídeo
-                        </button>
-                    )}
-                </ConfirmationDialog>
-            </div>
         </section>
 
+    )
+}
+
+export function DeleteVideoButton({ video }: { video: VideoRecord }) {
+    const navigate = useNavigate();
+    const onDeleteVideo = useAnalysisStore((state) => state.onDeleteVideo)
+
+    const handleDeleteVideo = async () => {
+        const deleted = await onDeleteVideo(video);
+
+        if (deleted) {
+            navigate("/dashboard");
+        }
+    }
+
+    return (
+        <div className="flex justify-start border-t border-neutral-100 py-4 dark:border-neutral-800">
+            <ConfirmationDialog
+                title="Excluir vídeo"
+                message="Tem certeza de que deseja excluir o vídeo? Esta ação é irreversível."
+                onConfirm={handleDeleteVideo}
+            >
+                {(open) => (
+                    <button
+                        type="button"
+                        className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:border-red-300 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 dark:border-red-900 dark:bg-red-950 dark:text-red-300 dark:hover:border-red-800 dark:hover:bg-red-900"
+                        onClick={open}
+                    >
+                        <FaTrashAlt aria-hidden="true" className="size-3" />
+                        Excluir vídeo
+                    </button>
+                )}
+            </ConfirmationDialog>
+        </div>
     )
 }

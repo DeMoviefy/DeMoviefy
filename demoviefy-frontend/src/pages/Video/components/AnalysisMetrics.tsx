@@ -45,9 +45,6 @@ export const AnalysisMetrics = memo(function AnalysisMetrics({
                         </strong>
                     </div>
 
-                    <div>
-                        {/* Aqui ficará o tipo de transcrição*/}
-                    </div>
                 </div>
             )}
         </div>
