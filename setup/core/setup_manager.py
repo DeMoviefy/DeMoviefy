@@ -52,6 +52,11 @@ class SetupManager:
                 if self.pm.run_sync("setup", [str(py), "-m", "pip", "install", "-r", str(REQUIREMENTS)], ROOT) != 0:
                     raise RuntimeError("Failed installing backend deps")
                 
+                self.set_state(True, "Installing local translation models (pt/en/es)...")
+                translation_script = ROOT / "demoviefy-backend" / "scripts" / "install_translation_models.py"
+                if self.pm.run_sync("setup", [str(py), str(translation_script)], ROOT) != 0:
+                    raise RuntimeError("Failed installing Argos translation models")
+
                 if install_ai:
                     self.set_state(True, "Installing AI packages (this may take a while)...")
                     self.log("[setup] installing heavier AI dependencies from ai-requirements.txt...")

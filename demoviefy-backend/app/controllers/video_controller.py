@@ -41,6 +41,7 @@ from app.services.frame_ai_service import (
 from app.services.job_queue_service import get_job_queue
 from app.services.transcription_service import transcribe_video_with_timestamps, whisper_available
 from app.services.translation_service import translate_segments
+from app.services.translation_control import TranslationError
 from app.services.video_artifact_service import (
     delete_analysis,
     delete_metadata,
@@ -509,6 +510,9 @@ def translate_video_transcription_by_id(video_id: int):
             model_name=source.get("model_name"),
             variant=f"{target_language}-from-{source_variant or 'default'}",
         )
+    except TranslationError as exc:
+        current_app.logger.exception("transcription:translation_failed video_id=%s code=%s", video_id, exc.code)
+        return jsonify({"error": str(exc), "code": exc.code}), exc.status_code
     except RuntimeError as exc:
         current_app.logger.exception("transcription:translation_failed video_id=%s", video_id)
         return jsonify({"error": str(exc)}), 503

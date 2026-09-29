@@ -1,38 +1,30 @@
 from datetime import timedelta
 import srt
-from deep_translator import GoogleTranslator
+from app.services.argos_translation_service import ArgosTranslator, normalize_language
 
-TRANSLATION_BATCH_SIZE = 50
+from app.services.translation_control import TranslationControl
 
 
-def _translate_texts_in_batches(
-    translator: GoogleTranslator,
+def _translate_texts(
+    translator: ArgosTranslator,
     texts: list[str],
 ) -> list[str]:
-    translated: list[str] = []
-    for offset in range(0, len(texts), TRANSLATION_BATCH_SIZE):
-        batch = texts[offset : offset + TRANSLATION_BATCH_SIZE]
-        try:
-            translated.extend(translator.translate_batch(batch))
-        except Exception as exc:
-            raise RuntimeError(
-                f"Falha ao traduzir o lote {offset // TRANSLATION_BATCH_SIZE + 1}. "
-                "O provedor pode ter aplicado um limite temporário de requisições."
-            ) from exc
-    return translated
+    if not texts:
+        return []
+    control = TranslationControl()
+    return [control.translate(translator, text) for text in texts]
 
 
 def translate_segments(
     segments: list[dict],
     source_lang: str,
     target_lang: str,
-    proxy_url: str | None = None,
 ) -> list[dict]:
-    if source_lang.lower() == target_lang.lower():
+    source_lang, target_lang = normalize_language(source_lang), normalize_language(target_lang)
+    if source_lang == target_lang:
         raise ValueError("O idioma de origem e o idioma de destino são iguais.")
 
-    proxy_config = {"http": proxy_url, "https": proxy_url} if proxy_url else None
-    translator = GoogleTranslator(source=source_lang, target=target_lang, proxies=proxy_config)
+    translator = ArgosTranslator(source_lang, target_lang)
     source_segments = []
     for segment in segments:
         text = str(segment.get("text", "")).strip()
@@ -41,7 +33,7 @@ def translate_segments(
         source_segments.append((segment, text))
 
     texts = [text for _, text in source_segments]
-    translated_texts = _translate_texts_in_batches(translator, texts)
+    translated_texts = _translate_texts(translator, texts)
     if len(translated_texts) != len(source_segments):
         raise RuntimeError("O provedor retornou uma quantidade inesperada de traduções.")
 
@@ -59,17 +51,14 @@ def translate_segments(
 def translate_segments_to_srt(
     segments: list[dict],
     target_lang: str = "pt",
-    proxy_url: str | None = None,
+    source_lang: str | None = None,
 ) -> str:
     """Recebe a lista de 'segments' retornada pelo Whisper e gera o conteúdo formatado em SRT.
 
     Cada item em 'segments' deve conter: 'start', 'end' e 'text'.
     """
-    proxy_config = None
-    if proxy_url:
-        proxy_config = {"http": proxy_url, "https": proxy_url}
-
-    translator = GoogleTranslator(source="auto", target=target_lang, proxies=proxy_config)
+    # Argos requires the source language; Whisper already provides it.
+    translator = ArgosTranslator(source_lang, target_lang)
     source_segments = []
     for seg in segments:
         original_text = seg.get("text", "").strip()
@@ -77,7 +66,7 @@ def translate_segments_to_srt(
             continue
         source_segments.append((seg, original_text))
 
-    translated_texts = _translate_texts_in_batches(
+    translated_texts = _translate_texts(
         translator,
         [text for _, text in source_segments],
     )

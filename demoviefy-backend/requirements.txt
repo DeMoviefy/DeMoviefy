@@ -17,7 +17,7 @@ ultralytics
 darkdetect==0.8.0
 
 # Transcrição e Tradução
-deep-translator==1.11.4
+argostranslate==1.11.0
 srt==3.5.3
 openai-whisper>=20231117
 setuptools>=77.0.3
