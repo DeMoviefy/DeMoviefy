@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const apiBaseUrl = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:5000";
+export const apiBaseUrl = import.meta.env.VITE_API_URL ?? window.location.origin;
 export const frontendAppVersion = "1.3.0";
 export const frontendApiContractVersion = "2026-03-22.1";
 
