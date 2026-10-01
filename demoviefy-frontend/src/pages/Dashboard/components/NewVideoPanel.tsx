@@ -76,9 +76,9 @@ export function NewVideoPanel() {
             </div>
 
             <div
-                className={`flex min-h-48 cursor-pointer items-center justify-center rounded-xl border px-6 py-8 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${isDragging
-                    ? "border-blue-400 bg-blue-100 dark:border-blue-600 dark:bg-blue-950"
-                    : "border-neutral-200 bg-neutral-50 hover:border-blue-300 hover:bg-blue-50 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700"
+                className={`flex min-h-48 cursor-pointer items-center justify-center rounded-xl border border-dashed px-6 py-8 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${isDragging
+                    ? " bg-blue-100  dark:bg-blue-950"
+                    : "border-neutral-200 bg-neutral-50  hover:bg-zinc-200 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700"
                     }`}
                 onDrop={handleDrop}
                 onDragOver={(e) => {

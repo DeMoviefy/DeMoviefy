@@ -1,11 +1,17 @@
 # Video processing
 ffmpeg-python==0.2.0
 opencv-python==4.10.0.84
+numpy>=2.0.0
 
 # AI detection
-ultralytics==8.3.50
+ultralytics
 
-
+# Transcrição e Tradução
+deep-translator==1.11.4
+srt==3.5.3
+openai-whisper>=20231117
+setuptools>=77.0.3
+ffmpeg-python==0.2.0
 
 # Bibliotecas para transcrição. Deu algum erro na escola que deve ser investigado.
 

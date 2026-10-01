@@ -82,29 +82,19 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                         hasSelectedAnalysis={hasSelectedAnalysis}
                         annotatedVideoSrc={annotatedVideoSrc}
                     />
+
                     <div className="mt-6 min-w-0">
-                        <TranscriptionWorkbench
-                            transcriptionDraft={transcriptionDraft}
-                            transcriptionMessage={transcriptionMessage}
-                            segments={transcriptionSegments}
-                            hasTranscription={hasTranscription}
-                            hasChanges={hasTranscriptionChanges}
-                            isBusy={isBusy}
-                            onDraftChange={setTranscriptionDraft}
-                            onSave={onSaveTranscription}
-                            onGenerate={onGenerateTranscription}
-                            selectedLanguage={selectedLanguage}
-                            onLanguageChange={setLanguage}
-                            availableLanguages={availableLanguages}
-                            selectedModel={selectedModel}
-                            onModelChange={setModel}
-                            isGenerating={isGenerating}
-                            variants={transcriptionVariants}
-                            selectedVariant={selectedVariant}
-                            onSegmentsChange={setTranscriptionSegments}
-                            isTranslating={isTranslating}
-                            onTranslate={(language) => void translateTranscription(language)}
-                        />
+                    <AnalysisResults state={analysisState} summary={summary} />
+
+                    <div className="mt-6">
+                            <VideoConfigPanel
+                                config={config}
+                                onConfigChange={onConfigChange}
+                                isBusy={isBusy || isProcessing}
+                                onReprocess={onReprocess}
+                            />
+                        </div>
+
                         <div className="mt-8">
                             <DeleteVideoButton video={currentVideo} />
                         </div>
@@ -112,8 +102,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                 </div>
 
                 <div className="flex min-w-0 flex-col gap-6">
-                    <AnalysisResults state={analysisState} summary={summary} />
-                    <div className="min-w-0">
+                <div className="min-w-0">
                         <h3 className="mb-6 text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
                             Detalhes da análise
                         </h3>
@@ -142,15 +131,33 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                                 />
                             </div>
                         </div>
-                        <div className="mt-6">
-                            <VideoConfigPanel
-                                config={config}
-                                onConfigChange={onConfigChange}
-                                isBusy={isBusy || isProcessing}
-                                onReprocess={onReprocess}
-                            />
-                        </div>
+
                     </div>
+
+                <TranscriptionWorkbench
+                            transcriptionDraft={transcriptionDraft}
+                            transcriptionMessage={transcriptionMessage}
+                            segments={transcriptionSegments}
+                            hasTranscription={hasTranscription}
+                            hasChanges={hasTranscriptionChanges}
+                            isBusy={isBusy}
+                            onDraftChange={setTranscriptionDraft}
+                            onSave={onSaveTranscription}
+                            onGenerate={onGenerateTranscription}
+                            selectedLanguage={selectedLanguage}
+                            onLanguageChange={setLanguage}
+                            availableLanguages={availableLanguages}
+                            selectedModel={selectedModel}
+                            onModelChange={setModel}
+                            isGenerating={isGenerating}
+                            variants={transcriptionVariants}
+                            selectedVariant={selectedVariant}
+                            onSegmentsChange={setTranscriptionSegments}
+                            isTranslating={isTranslating}
+                            onTranslate={(language) => void translateTranscription(language)}
+                        />
+
+
                 </div>
             </div>
         </section>
