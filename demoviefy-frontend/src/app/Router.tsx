@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import Home from "src/pages/Home";
 import Dashboard from "src/pages/Dashboard";
 import Video from "src/pages/Video";
+import Login from "src/pages/Login";
+import Cadastro from "src/pages/Cadastro";
 
 // Define os títulos das páginas com base nas rotas
 const titlesMap: Record<string, string> = {
@@ -37,6 +39,8 @@ export default function Router() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/cadastro" element={<Cadastro />} />
                 <Route path="/video/:id" element={<Video />} />
                 <Route path="*" element={<Navigate replace to="/" />} />
             </Routes>
