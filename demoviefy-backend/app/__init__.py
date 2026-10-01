@@ -53,10 +53,12 @@ def create_app(test_config: dict | None = None):
 
     from .routes.ai_routes import ai_bp
     from .routes.system_routes import system_bp
+    from .routes.user_routes import user_bp
     from .routes.video_routes import video_bp
 
     app.register_blueprint(ai_bp)
     app.register_blueprint(system_bp)
+    app.register_blueprint(user_bp)
     app.register_blueprint(video_bp)
 
     # Criar banco automaticamente

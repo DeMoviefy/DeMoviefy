@@ -1,19 +1,42 @@
+import axios from "axios";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+
+import { UserService } from "src/core/services/userService";
 
 import "./index.css";
 
 export default function Cadastro() {
   const [feedback, setFeedback] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
     if (formData.get("password") !== formData.get("confirm-password")) {
       setFeedback("As senhas não coincidem.");
       return;
     }
-    setFeedback("Cadastro validado. A criação de conta ainda não está conectada ao servidor.");
+
+    setFeedback("");
+    setIsSubmitting(true);
+    try {
+      await UserService.register({
+        nome: String(formData.get("name")).trim(),
+        email: String(formData.get("email")).trim(),
+        senha: String(formData.get("password")),
+      });
+      setFeedback("Conta criada com sucesso. Você já pode entrar.");
+      form.reset();
+    } catch (error: unknown) {
+      const message = axios.isAxiosError<{ error?: string }>(error)
+        ? error.response?.data?.error
+        : undefined;
+      setFeedback(message ?? "Não foi possível criar sua conta. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -48,8 +71,10 @@ export default function Cadastro() {
             <input autoComplete="new-password" minLength={8} name="confirm-password" placeholder="Digite a senha novamente" required type="password" />
           </label>
 
-          <button className="auth-submit" type="submit">Criar conta</button>
-          {feedback && <p aria-live="polite" className="auth-feedback">{feedback}</p>}
+          <button className="auth-submit" disabled={isSubmitting} type="submit">
+            {isSubmitting ? "Criando conta..." : "Criar conta"}
+          </button>
+          {feedback && <p aria-live="polite" className="auth-feedback" role="status">{feedback}</p>}
           <p className="auth-switch">Já tem uma conta? <Link to="/login">Entrar</Link></p>
         </form>
       </div>
