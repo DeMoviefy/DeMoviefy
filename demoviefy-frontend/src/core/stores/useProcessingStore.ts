@@ -38,7 +38,7 @@ function deriveStats(videos: VideoRecord[]): VideoStats {
     };
 }
 
-const poller = createPoller(500);
+const poller = createPoller(3000);
 let refreshInFlight: Promise<void> | null = null;
 let refreshAgain = false;
 
