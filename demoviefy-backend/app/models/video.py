@@ -33,6 +33,9 @@ class Video(db.Model):
     status = db.Column(db.String(50), default="PROCESSANDO")
     job_id = db.Column(db.String(36), nullable=True, unique=True, index=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True, index=True)
+
+    user = db.relationship("User", back_populates="videos")
 
     def to_dict(self) -> dict:
         """

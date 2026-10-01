@@ -61,10 +61,12 @@ def create_app(test_config: dict | None = None):
 
     # Criar banco automaticamente
     with app.app_context():
+        from app.models import user as _user
         from app.models.video import Video
 
         db.create_all()
         _migrate_video_job_id()
+        _migrate_video_user_id()
         migrate_metadata_files(video_ids=[video.id for video in Video.query.all()], logger=app.logger)
 
     from flask import jsonify
@@ -87,4 +89,14 @@ def _migrate_video_job_id() -> None:
     columns = {column["name"] for column in inspect(db.engine).get_columns("videos")}
     if "job_id" not in columns:
         db.session.execute(text("ALTER TABLE videos ADD COLUMN job_id VARCHAR(36)"))
+        db.session.commit()
+
+
+def _migrate_video_user_id() -> None:
+    """Add the optional user foreign key to databases created before user accounts."""
+    columns = {column["name"] for column in inspect(db.engine).get_columns("videos")}
+    if "user_id" not in columns:
+        db.session.execute(
+            text("ALTER TABLE videos ADD COLUMN user_id INTEGER REFERENCES users(id)")
+        )
         db.session.commit()
