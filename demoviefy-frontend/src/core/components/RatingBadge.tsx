@@ -24,7 +24,7 @@ export function RatingBadge({ level, label }: RatingBadgeProps) {
       >
         {level === 1 ? 'L' : label.split(' ')[0]}
       </span>
-      <span className="text-sm font-medium text-[var(--text)]">
+      <span className="text-sm font-medium text-(--text)">
         {label}
       </span>
     </div>
