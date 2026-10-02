@@ -83,6 +83,7 @@ export function normalizeVideoAnalysisResponse(response: VideoAnalysisResponse |
             label_counts: response.analysis?.label_counts ?? {},
             avg_confidence_by_label: response.analysis?.avg_confidence_by_label ?? {},
             top_labels: response.analysis?.top_labels ?? [],
+            content_rating: response.analysis?.content_rating,
         },
         storage: {
             video_relative_path: response.storage?.video_relative_path ?? "",
