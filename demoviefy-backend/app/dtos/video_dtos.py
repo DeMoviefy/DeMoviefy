@@ -111,6 +111,7 @@ class AnalysisSummaryDTO:
     label_counts: dict[str, int] = field(default_factory=dict)
     avg_confidence_by_label: dict[str, float] = field(default_factory=dict)
     top_labels: list[str] = field(default_factory=list)
+    content_rating: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)

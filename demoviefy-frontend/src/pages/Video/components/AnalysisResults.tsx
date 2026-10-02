@@ -4,6 +4,10 @@ import type { VideoAnalysisResponse } from "src/core/types/videoTypes";
 
 
 
+import { AnalysisMetrics } from "src/pages/Video/components/AnalysisMetrics"
+import { AnalysisDetectionTable } from "src/pages/Video/components/AnalysisDetectionTable"
+import type { VideoAnalysisResponse } from "src/pages/Upload/types"
+
 type AnalysisResultsProps = {
     state: "idle" | "loading" | "ready" | "pending" | "error";
     summary: NonNullable<VideoAnalysisResponse["analysis"]> | null;
