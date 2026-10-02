@@ -1,12 +1,17 @@
 
 
 DANGER_LEVEL_MAP = {
-    "bottle": 2,
+    "glass bottle": 2,
+    "hammer": 3,
+    "scissor": 3,
     "fire": 4,
+    "axe": 4,
+    "chainsaw": 4,
     "knife": 5,
     "blood": 6,
     "gun": 6,
-    "weapon": 6
+    "weapon": 6,
+    "grenade": 6,
 }
 
 RATING_LABELS = {
