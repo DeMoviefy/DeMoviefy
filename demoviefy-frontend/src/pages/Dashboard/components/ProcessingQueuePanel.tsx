@@ -56,7 +56,7 @@ export function ProcessingQueuePanel() {
       </div>
 
       {processingVideos.length === 0 ? (
-        <div className="flex min-h-48 flex-col items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 px-6 py-8 text-center dark:border-neutral-700 dark:bg-neutral-800">
+        <div className="flex min-h-48 flex-col items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 px-6 py-8 text-center dark:border-transparent dark:bg-neutral-800">
           <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
             Nenhum vídeo na fila
           </p>

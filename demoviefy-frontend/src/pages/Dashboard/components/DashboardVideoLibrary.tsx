@@ -9,7 +9,7 @@ type DashboardVideoLibraryProps = {
   videos: VideoRecord[];
 };
 
-const VIDEOS_PER_PAGE = 3;
+const VIDEOS_PER_PAGE = 4;
 
 function formatDate(createdAt: string | null) {
   if (!createdAt) {
@@ -84,7 +84,7 @@ export const DashboardVideoLibrary = memo(
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Busque pelo nome do vídeo..."
             aria-label="Buscar vídeo"
-            className="w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-blue-400 dark:focus:bg-neutral-800 dark:focus:ring-blue-900"
+            className="w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-400 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder:text-neutral-500 "
           />
         </div>
 
@@ -109,7 +109,7 @@ export const DashboardVideoLibrary = memo(
                 <Link
                   key={video.id}
                   to={`/video/${video.id}`}
-                  className="group block rounded-lg border border-transparent px-2 py-3 transition-colors hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-neutral-800"
+                  className="group block rounded-lg border border-transparent px-2 py-3 transition-colors  hover:bg-blue-50 dark:hover:bg-neutral-800"
                 >
                   <div className="min-w-0">
                     <div className="flex items-start justify-between gap-3">

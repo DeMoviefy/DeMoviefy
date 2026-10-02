@@ -8,18 +8,11 @@ html {
   font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
-@custom-variant dark (&:where(.dark, .dark *));
+/*
+ * Keep the interface's physical scale close to the 1366×768 design baseline
+ * on common 24″ Full HD displays. Tailwind's rem-based type and spacing grow
+ * together, matching the visual size produced by 80% browser zoom.
+ */
 
-@theme {
-  --color-bg: var(--bg);
-  --color-bg-accent: var(--bg-accent);
-  --color-surface: var(--surface);
-  --color-surface-strong: var(--surface-strong);
-  --color-border: var(--border);
-  --color-text: var(--text);
-  --color-muted: var(--muted);
-  --color-brand: var(--brand);
-  --color-brand-strong: var(--brand-strong);
-  --color-brand-soft: var(--brand-soft);
-  --color-danger: var(--danger);
-}
+
+@custom-variant dark (&:where(.dark, .dark *))
