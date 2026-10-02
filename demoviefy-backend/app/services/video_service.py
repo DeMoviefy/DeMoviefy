@@ -1,4 +1,5 @@
 import mimetypes
+from contextlib import nullcontext
 from pathlib import Path
 
 from flask import current_app, jsonify, request, send_file
@@ -43,6 +44,7 @@ from app.services.video_artifact_service import (
     delete_analysis,
     delete_metadata,
     delete_transcription,
+    delete_video_artifacts,
     has_transcription,
     load_ai_config,
     load_processing_state,
@@ -264,8 +266,8 @@ def get_video_transcription(video_id: int):
     transcription = load_transcription(video_id)
     if transcription is None:
         if video.status in {"PROCESSANDO", "PROCESSANDO_IA"}:
-            return jsonify(_empty_transcription_payload(video, storage, status="pending", error="A transcrição sera consultada novamente quando o processamento terminar.")), 202
-        return jsonify(_empty_transcription_payload(video, storage, status="missing", error="Transcrição não disponível.")), 404
+            return jsonify(_empty_transcription_payload(video, storage, status="pending", error="A transcrição será consultada novamente quando o processamento terminar.")), 202
+        return jsonify(_empty_transcription_payload(video, storage, status="missing", error="Não há uma transcrição disponível para este vídeo. Gere-a e depois confira-a neste editor.")), 404
     return jsonify({"video_id": video.id, "filename": video.filename, "available": True, "transcription": transcription, "storage": storage})
 
 
@@ -282,7 +284,13 @@ def generate_video_transcription_by_id(video_id: int):
         return jsonify({"error": "Transcrição automática indisponível. Instale openai-whisper no ambiente atual ou ative a opção de transcrição no setup."}), 503
     payload = request.get_json(silent=True) or {}
     try:
-        transcription = transcribe_video_with_timestamps(video_path=str(filepath), model_name=str(payload.get("model_name") or current_app.config.get("TRANSCRIPTION_MODEL", "base")), language=payload.get("language") or current_app.config.get("TRANSCRIPTION_LANGUAGE"), logger=current_app.logger)
+        transcription = transcribe_video_with_timestamps(
+            video_id=video_id,
+            video_path=str(filepath),
+            model_name=str(payload.get("model_name") or current_app.config.get("TRANSCRIPTION_MODEL", "base")),
+            language=payload.get("language") or current_app.config.get("TRANSCRIPTION_LANGUAGE"),
+            logger=current_app.logger
+        )
         saved = save_transcription(video_id, **transcription)
     except Exception as exc:
         current_app.logger.exception("transcription:failed video_id=%s", video_id)
@@ -404,14 +412,25 @@ def delete_video_by_id(video_id: int):
     video = get_video(video_id)
     if not video:
         return jsonify({"error": "Vídeo não encontrado"}), 404
-    filepath = video_file_path(video.filename)
-    delete_video(video)
-    for path in (filepath,):
-        if path.exists():
-            path.unlink()
-    delete_analysis_artifacts(video.id)
-    delete_transcription(video_id)
-    delete_metadata(video_id)
+
+    job_queue = current_app.extensions.get("video_job_queue")
+    cleanup_lock = (
+        job_queue.cancel_and_wait(video.id, video.job_id)
+        if job_queue is not None
+        else nullcontext()
+    )
+    try:
+        with cleanup_lock:
+            delete_video_artifacts(video.id, video.filename, logger=current_app.logger)
+            delete_video(video)
+    except OSError:
+        current_app.logger.exception(
+            "action:delete_video_cleanup_failed video_id=%s filename=%s",
+            video_id,
+            video.filename,
+        )
+        return jsonify({"error": "Falha ao remover todos os arquivos relacionados ao vídeo"}), 500
+
     return jsonify({"message": "Vídeo removido com sucesso"})
 
 
@@ -447,7 +466,7 @@ def process_video(flask_app, video_id, *, cancellation_requested=None):
         try:
             update_status(video, "PROCESSANDO_IA")
             ensure_storage_dirs()
-            save_processing_state(video_id, progress=5, stage="preparing", eta_seconds=None, message="Preparando video e configuracoes da análise.")
+            save_processing_state(video_id, progress=5, stage="preparing", eta_seconds=None, message="Preparando vídeo e configurações da análise.")
             ai_config = load_ai_config(video_id)
             annotated_path = annotated_video_path(video_id)
             annotated_temp_path = annotated_video_temp_path(video_id)

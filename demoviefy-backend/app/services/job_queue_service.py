@@ -3,9 +3,11 @@
 import threading
 import time
 import uuid
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from enum import Enum
 from queue import Empty, Full, Queue
+from typing import Iterator
 
 
 class JobStatus(str, Enum):
@@ -82,6 +84,15 @@ class JobQueueService:
             job.cancellation_requested.set()
             job.status = JobStatus.CANCELLED
             return True
+
+    @contextmanager
+    def cancel_and_wait(self, video_id: int, job_id: str | None) -> Iterator[None]:
+        """Cancel active work and hold its per-video lock until it has stopped."""
+        self.cancel(video_id, job_id)
+        with self._lock:
+            video_lock = self._video_locks.setdefault(video_id, threading.Lock())
+        with video_lock:
+            yield
 
     def stop(self, timeout: float = 5) -> None:
         self._shutdown.set()

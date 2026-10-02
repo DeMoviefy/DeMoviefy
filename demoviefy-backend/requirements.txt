@@ -6,10 +6,10 @@ python-dotenv==1.0.1
 Werkzeug==3.0.3
 
 # Database
-# SQLAlchemy 2.0.30 is not compatible with Python 3.13; require a newer patch.
 SQLAlchemy>=2.0.36,<3
 
 # HTTP and utilities
 requests==2.32.3
-numpy==1.26.4
 gdown==6.0.0
+darkdetect==0.8.0
+

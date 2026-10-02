@@ -78,6 +78,13 @@ def transcription_file_path(video_id: int) -> Path:
     return TRANSCRIPTIONS_DIR / f"video_{video_id}.json"
 
 
+def transcription_variant_file_path(video_id: int, variant: str) -> Path:
+    safe_variant = "".join(character for character in variant if character.isalnum() or character in {"-", "_"})
+    if not safe_variant:
+        raise ValueError("Versão de transcrição inválida.")
+    return TRANSCRIPTIONS_DIR / f"video_{video_id}_{safe_variant}.json"
+
+
 def metadata_file_path(video_id: int) -> Path:
     return METADATA_DIR / f"video_{video_id}.json"
 

@@ -1,5 +1,3 @@
-// src/pages/Video/components/VideoWorkbench.tsx
-
 import { memo } from "react";
 
 import { useVideoPlayer } from "src/pages/Video/hooks/useVideoPlayer";
@@ -9,138 +7,159 @@ import { useProcessingStore } from "src/core/stores/useProcessingStore";
 import { useVideoWorkbenchSync } from "src/pages/Video/hooks/useVideoWorkbenchSync";
 
 import { WorkbenchHeader } from "src/pages/Video/components/WorkbenchHeader";
-import { VideoConfigPanel } from "src/pages/Video/components/VideoConfigPanel";
-import { AnalysisEditor } from "src/pages/Video/components/AnalysisEditor";
-import { AnalysisHeader } from "src/pages/Video/components/AnalysisHeader";
+import { DeleteVideoButton, VideoConfigPanel } from "src/pages/Video/components/VideoConfigPanel";
+import { AnalysisVersion } from "src/pages/Video/components/AnalysisVersion";
 import { AnalysisResults } from "src/pages/Video/components/AnalysisResults";
-import { TranscriptionEditor } from "src/pages/Video/components/TranscriptionEditor";
+import { AnalysisMetrics } from "src/pages/Video/components/AnalysisMetrics";
+import { TranscriptionVersion } from "src/pages/Video/components/TranscriptionVersion";
+import { TranscriptionWorkbench } from "src/pages/Video/components/TranscriptionWorkbench";
 import { VideoPreviewPanel } from "src/pages/Video/components/VideoPreviewPanel";
 import { WorkbenchEmptyState } from "src/pages/Video/components/WorkbenchEmptyState";
 
-import type { AiConfigPayload, VideoRecord } from "src/pages/Upload/types";
+import type { AiConfigPayload, VideoRecord } from "src/core/types/videoTypes";
 
 type VideoWorkbenchProps = {
     video: VideoRecord | null;
-  config: AiConfigPayload;
-  isBusy: boolean;
-  onConfigChange: (config: AiConfigPayload) => void;
-  onSaveConfig: () => void;
-  onReprocess: () => void;
+    config: AiConfigPayload;
+    isBusy: boolean;
+    onConfigChange: (config: AiConfigPayload) => void;
+    onReprocess: () => void;
 };
 
 export const VideoWorkbench = memo(function VideoWorkbench({
     video,
-  config,
-  isBusy,
-  onConfigChange,
-  onSaveConfig,
-  onReprocess,
+    config,
+    isBusy,
+    onConfigChange,
+    onReprocess,
 }: VideoWorkbenchProps) {
-
     const processingVideo = useProcessingStore((state) =>
         state.videos.find((item) => item.id === video?.id)
     );
-
-    const currentVideo = processingVideo ?? video; // Essa linha faz com que o poller seja atualizado.
+    const currentVideo = processingVideo ?? video;
 
     useVideoWorkbenchSync(currentVideo);
 
-  const {
-    analysis, analysisState, analysisMessage, selectedAnalysisVariantId, analysisDraft,
-    setSelectedAnalysisVariantId, setAnalysisDraft,
-    onDeleteAnalysis,
-  } = useAnalysisStore();
+    const {
+        analysis, analysisState, analysisMessage, selectedAnalysisVariantId,
+        setSelectedAnalysisVariantId, onDeleteAnalysis,
+    } = useAnalysisStore();
+    const {
+        transcription, transcriptionDraft, transcriptionMessage, setTranscriptionDraft,
+        onSaveTranscription, onDeleteTranscription, onGenerateTranscription,
+        selectedLanguage, setLanguage, selectedModel, setModel, isGenerating,
+        selectedVariant, setSelectedVariant, transcriptionSegments, setTranscriptionSegments,
+        isTranslating, translateTranscription,
+    } = useTranscriptionStore();
 
-  const {
-    transcription, transcriptionDraft, transcriptionMessage,
-    setTranscriptionDraft,
-    onSaveTranscription, onDeleteTranscription, onGenerateTranscription,
-  } = useTranscriptionStore();
+    const summary = analysis?.analysis ?? null;
+    const analysisVariants = analysis?.available_variants ?? [];
+    const availableLanguages = transcription?.available_languages ?? [];
+    const hasTranscription = Boolean(transcription?.available);
+    const transcriptionVariants = transcription?.variants ?? [
+        { id: "default", label: "Transcrição principal", language: null },
+    ];
+    const originalSegments = transcription?.transcription.segments ?? [];
+    const transcriptionContent = transcription?.transcription.content ?? "";
+    const hasTranscriptionChanges = transcriptionDraft !== transcriptionContent
+        || JSON.stringify(transcriptionSegments) !== JSON.stringify(originalSegments);
+    const hasSelectedAnalysis = analysis !== null;
+    const isProcessing = currentVideo?.status.startsWith("PROCESSANDO") ?? false;
 
-  const summary = analysis?.analysis ?? null;
-  const analysisVariants = analysis?.available_variants ?? [];
-  const hasMultipleAnalysisVariants = analysisVariants.length > 1;
-  const transcriptionSegments = transcription?.transcription.segments ?? [];
-  const hasSelectedAnalysis = analysis !== null;
+    const { annotatedVideoSrc } = useVideoPlayer(currentVideo, selectedAnalysisVariantId);
 
-  const { videoRef, annotatedVideoSrc, originalVideoSrc, seekTo } = useVideoPlayer(
-    currentVideo,
-    selectedAnalysisVariantId
-  );
+    if (!currentVideo) return <WorkbenchEmptyState />;
 
-  if (!currentVideo) return <WorkbenchEmptyState />;
-  return (
-    <section className="surface inspector-panel">
-      <WorkbenchHeader video={currentVideo} />
+    return (
+        <section className="flex w-full flex-col gap-6 py-4">
+            <WorkbenchHeader video={currentVideo} />
 
-      <div className="inspector-grid">
-        <div className="media-panel">
+            <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+                <div className="min-w-0">
+                    <VideoPreviewPanel
+                        video={currentVideo}
+                        analysisState={analysisState}
+                        hasSelectedAnalysis={hasSelectedAnalysis}
+                        annotatedVideoSrc={annotatedVideoSrc}
+                    />
 
-          <VideoPreviewPanel
-            video={currentVideo}
-            analysisState={analysisState}
-            hasSelectedAnalysis={hasSelectedAnalysis}
-            originalVideoSrc={originalVideoSrc}
-            annotatedVideoSrc={annotatedVideoSrc}
-            videoRef={videoRef}
-          />
+                    <div className="mt-6 min-w-0">
+                    <AnalysisResults state={analysisState} summary={summary} />
 
-        </div>
+                    <div className="mt-6">
+                            <VideoConfigPanel
+                                config={config}
+                                onConfigChange={onConfigChange}
+                                isBusy={isBusy || isProcessing}
+                                onReprocess={onReprocess}
+                            />
+                        </div>
 
-        <div className="analysis-panel">
-          <AnalysisHeader
-            message={analysisMessage}
-            variants={analysisVariants}
-            selectedVariantId={selectedAnalysisVariantId}
-            onVariantChange={(id) => {
-                setSelectedAnalysisVariantId(id, currentVideo);
+                        <div className="mt-8">
+                            <DeleteVideoButton video={currentVideo} />
+                        </div>
+                    </div>
+                </div>
 
-                // Gambiarra para, quando trocar a análise, ele ir para o topo.
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                });
-            }}
-        />
+                <div className="flex min-w-0 flex-col gap-6">
+                <div className="min-w-0">
+                        <h3 className="mb-6 text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
+                            Detalhes da análise
+                        </h3>
+                        <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+                            <div className="bg-neutral-50 px-3 py-5 dark:bg-neutral-900">
+                                <AnalysisMetrics summary={summary} modelName={currentVideo.ai_config.model_name} />
+                            </div>
+                            <div className="px-3 py-5">
+                                <AnalysisVersion
+                                    message={analysisMessage}
+                                    variants={analysisVariants}
+                                    selectedVariantId={selectedAnalysisVariantId}
+                                    onDelete={() => onDeleteAnalysis(currentVideo)}
+                                    onVariantChange={(id) => {
+                                        setSelectedAnalysisVariantId(id, currentVideo);
+                                        window.scrollTo({ top: 0, behavior: "smooth" });
+                                    }}
+                                />
+                                <TranscriptionVersion
+                                    variants={transcriptionVariants}
+                                    selectedVariant={selectedVariant}
+                                    onVariantChange={setSelectedVariant}
+                                    hasTranscription={hasTranscription}
+                                    onDelete={onDeleteTranscription}
+                                    disabled={isBusy || isProcessing || isGenerating || isTranslating}
+                                />
+                            </div>
+                        </div>
 
-          <AnalysisResults
-            state={analysisState}
-            summary={summary}
-            taskLabel={currentVideo.ai_config.task_label}
-            modelName={currentVideo.ai_config.model_name}
-          />
+                    </div>
 
-          <div className="editor-grid">
-            <VideoConfigPanel
-              video={currentVideo}
-              config={config}
-              onConfigChange={onConfigChange}
-              isBusy={isBusy}
-              onSaveConfig={onSaveConfig}
-              onReprocess={onReprocess}
-            />
+                <TranscriptionWorkbench
+                            transcriptionDraft={transcriptionDraft}
+                            transcriptionMessage={transcriptionMessage}
+                            segments={transcriptionSegments}
+                            hasTranscription={hasTranscription}
+                            hasChanges={hasTranscriptionChanges}
+                            isBusy={isBusy}
+                            onDraftChange={setTranscriptionDraft}
+                            onSave={onSaveTranscription}
+                            onGenerate={onGenerateTranscription}
+                            selectedLanguage={selectedLanguage}
+                            onLanguageChange={setLanguage}
+                            availableLanguages={availableLanguages}
+                            selectedModel={selectedModel}
+                            onModelChange={setModel}
+                            isGenerating={isGenerating}
+                            variants={transcriptionVariants}
+                            selectedVariant={selectedVariant}
+                            onSegmentsChange={setTranscriptionSegments}
+                            isTranslating={isTranslating}
+                            onTranslate={(language) => void translateTranscription(language)}
+                        />
 
-            <AnalysisEditor
-              analysisDraft={analysisDraft}
-              hasMultipleVariants={hasMultipleAnalysisVariants}
-              onDraftChange={setAnalysisDraft}
-              onDelete={() => onDeleteAnalysis(currentVideo)}
-            />
 
-            <TranscriptionEditor
-              transcriptionDraft={transcriptionDraft}
-              transcriptionMessage={transcriptionMessage}
-              segments={transcriptionSegments}
-              isBusy={isBusy}
-              onDraftChange={setTranscriptionDraft}
-              onSave={() => onSaveTranscription()}
-              onDelete={() => onDeleteTranscription()}
-              onGenerate={() => onGenerateTranscription()}
-              onSeek={seekTo}
-            />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+                </div>
+            </div>
+        </section>
+    );
 });

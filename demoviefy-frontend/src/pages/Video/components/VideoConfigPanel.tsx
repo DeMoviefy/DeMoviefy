@@ -1,146 +1,144 @@
-// src/pages/Upload/components/VideoConfigPanel.tsx
+// src/pages/Dashboard/components/VideoConfigPanel.tsx
 
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useCatalogStore } from "src/core/stores/useAICatalogStore"
-
+import { FaTrashAlt } from "react-icons/fa"
 import { ConfirmationDialog } from "src/core/components/ConfirmationDialog"
+import { VideoAnalysisConfig } from "src/core/components/VideoAnalysisConfig"
 
 import { useAnalysisStore } from "src/pages/Video/stores/useAnalysisStore"
-import type { AiConfigPayload, VideoRecord } from "src/pages/Upload/types"
+import type { AiConfigPayload, VideoRecord } from "src/core/types/videoTypes"
 
 
 interface VideoConfigPanelProps {
-  video: VideoRecord
-  config: AiConfigPayload
-  onConfigChange: (config: AiConfigPayload) => void
-  isBusy: boolean
-  onSaveConfig: () => void
-  onReprocess: () => void
+    config: AiConfigPayload
+    onConfigChange: (config: AiConfigPayload) => void
+    isBusy: boolean
+    onReprocess: () => void
 }
 
 export function VideoConfigPanel({
-  video,
-  config,
-  onConfigChange,
-  isBusy,
-  onSaveConfig,
-  onReprocess,
+    config,
+    onConfigChange,
+    isBusy,
+    onReprocess,
 }: VideoConfigPanelProps) {
 
-    const navigate = useNavigate();
-  const { tasks, models } = useCatalogStore()
-  const onDeleteVideo = useAnalysisStore((state) => state.onDeleteVideo)
 
-  const handleDeleteVideo = async () => {
-    const deleted = await onDeleteVideo(video);
+    const [isOpen, setIsOpen] = useState(false)
+    const { tasks, models } = useCatalogStore()
 
-    if (deleted) {
-        navigate("/upload");
-    }
-  }
-
-  const filteredModels = models.filter((m) => m.task_type === config.task_type)
-
-  const update = (field: keyof AiConfigPayload, value: string | null) =>
-    onConfigChange({ ...config, [field]: value })
+    const update = (field: keyof AiConfigPayload, value: string | null) =>
+        onConfigChange({ ...config, [field]: value })
 
 
     return (
-        <section className="editor-card">
-            <div className="section-heading">
+        <section>
+            <div className="py-5 text-left">
                 <div>
-                    <span className="eyebrow">IA</span>
-                    <h3>Configuração do vídeo</h3>
+                    <div className="flex items-center gap-3">
+                        <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
+                            Reprocessar vídeo
+                        </h3>
+                        <button
+                            type="button"
+                            onClick={() => setIsOpen((open) => !open)}
+                            aria-expanded={isOpen}
+                            aria-controls="video-reprocess-config"
+                            aria-label={isOpen ? "Recolher configurações" : "Expandir configurações"}
+                            className={`flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-all hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-100 ${isOpen ? "rotate-180" : ""}`}
+                        >
+                            <svg
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                className="size-4"
+                            >
+                                <path
+                                    d="m5 7.5 5 5 5-5"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+                        Execute uma nova análise do vídeo.
+                    </p>
                 </div>
             </div>
 
-            <div className="config-grid">
-                <label className="field-block">
-                    <span>Tarefa</span>
-                    <select value={config.task_type} onChange={(e) => update("task_type", e.target.value)}>
-                        {tasks.map((task) => (
-                            <option key={task.task_type} value={task.task_type}>
-                                {task.task_label}
-                            </option>
-                        ))}
-                    </select>
-                </label>
+            {isOpen && (
+                <div id="video-reprocess-config" className="mt-2 rounded-lg border border-neutral-200 bg-white px-3 py-5 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+                    <VideoAnalysisConfig
+                        taskType={config.task_type}
+                        modelPath={config.model_path}
+                        clipStart={config.clip_start_sec}
+                        clipEnd={config.clip_end_sec}
+                        tasks={tasks}
+                        models={models}
+                        onTaskChange={(value) => update("task_type", value)}
+                        onModelChange={(value) => update("model_path", value)}
+                        onClipStartChange={(value) => update("clip_start_sec", value)}
+                        onClipEndChange={(value) => update("clip_end_sec", value || null)}
+                    />
 
-                <label className="field-block">
-                    <span>Modelo</span>
-                    <select value={config.model_path} onChange={(e) => update("model_path", e.target.value)}>
-                        {filteredModels.map((model) => (
-                            <option key={model.relative_path} value={model.relative_path}>
-                                {model.name}
-                            </option>
-                        ))}
-                    </select>
-                </label>
+                    <div className="mt-8 flex flex-wrap items-center justify-end gap-3">
+                        <button
+                            type="button"
+                            className="cursor-pointer rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-800 dark:hover:bg-blue-700"
+                            onClick={() => {
+                                setIsOpen(false);
+                                onReprocess();
+                            }}
+                            disabled={isBusy}
+                        >
+                            {isBusy
+                                ? "Processando..."
+                                : "Reprocessar vídeo"}
+                        </button>
+                    </div>
+                </div>
+            )}
 
-                <label className="field-block">
-                    <span>Stride de frames</span>
-                    <input type="number" min="1" step="1" value={config.frame_stride}
-                        onChange={(e) => update("frame_stride", e.target.value)} />
-                </label>
+        </section>
 
-                <label className="field-block">
-                    <span>Confiança mínima</span>
-                    <input type="number" min="0" max="1" step="0.01" value={config.confidence_threshold}
-                        onChange={(e) => update("confidence_threshold", e.target.value)} />
-                </label>
+    )
+}
 
-                <label className="field-block">
-                    <span>Máximo de frames</span>
-                    <input type="number" min="1" step="1" value={config.max_frames}
-                        onChange={(e) => update("max_frames", e.target.value)} />
-                </label>
+export function DeleteVideoButton({ video }: { video: VideoRecord }) {
+    const navigate = useNavigate();
+    const onDeleteVideo = useAnalysisStore((state) => state.onDeleteVideo)
 
-                <label className="field-block">
-                    <span>Início da análise (s)</span>
-                    <input type="number" min="0" step="0.1" value={config.clip_start_sec}
-                        onChange={(e) => update("clip_start_sec", e.target.value)} />
-                </label>
+    const handleDeleteVideo = async () => {
+        const deleted = await onDeleteVideo(video);
 
-                <label className="field-block">
-                    <span>Fim da análise (s)</span>
-                    <input type="number" min="0" step="0.1" value={config.clip_end_sec ?? ""}
-                        onChange={(e) => update("clip_end_sec", e.target.value || null)}
-                        placeholder="Vazio = ate o fim" />
-                </label>
-            </div>
+        if (deleted) {
+            navigate("/dashboard");
+        }
+    }
 
-            <p className="field-help">
-                Ajuste densidade, confiança e recorte para controlar exatamente como a IA vai analisar esse vídeo.
-            </p>
-
-            <div className="action-row">
-
+    return (
+        <div className="flex justify-start border-t border-neutral-100 py-4 dark:border-neutral-800">
             <ConfirmationDialog
                 title="Excluir vídeo"
                 message="Tem certeza de que deseja excluir o vídeo? Esta ação é irreversível."
                 onConfirm={handleDeleteVideo}
-                >
+            >
                 {(open) => (
                     <button
-                    type="button"
-                    className="ghost-button danger-button"
-                    onClick={open}
+                        type="button"
+                        className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:border-red-300 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 dark:border-red-900 dark:bg-red-950 dark:text-red-300 dark:hover:border-red-800 dark:hover:bg-red-900"
+                        onClick={open}
                     >
-                    Excluir vídeo
+                        <FaTrashAlt aria-hidden="true" className="size-3" />
+                        Excluir vídeo
                     </button>
                 )}
-                </ConfirmationDialog>
-                        
-                <button type="button" className="ghost-button" onClick={onSaveConfig} disabled={isBusy}>
-                    Salvar configuração
-                </button>
-                <button type="button" className="primary-button" onClick={onReprocess} disabled={isBusy}>
-                    {isBusy
-                        ? `Processando... ${video.processing.processing_progress}%`
-                        : "Reprocessar vídeo"}
-                </button>
-            </div>
-        </section>
+            </ConfirmationDialog>
+        </div>
     )
 }
-

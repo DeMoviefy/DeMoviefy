@@ -1,4 +1,4 @@
-// src/pages/Upload/hooks/useCompatibility.ts
+// src/pages/Dashboard/hooks/useCompatibility.ts
 
 // Remover a mensagem de verificando compatibilidade de gerar texto na tela, somente quando houver mismatch
 

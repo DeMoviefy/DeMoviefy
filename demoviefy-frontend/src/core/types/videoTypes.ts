@@ -1,0 +1,157 @@
+//src/core/types/videoTypes.ts
+
+export type VideoStorage = {
+  video_relative_path: string;
+  video_absolute_path: string;
+  video_exists: boolean;
+  analysis_relative_path: string;
+  analysis_absolute_path: string;
+  analysis_exists: boolean;
+  annotated_relative_path: string;
+  annotated_absolute_path: string;
+  annotated_exists: boolean;
+  transcription_relative_path: string;
+  transcription_absolute_path: string;
+  transcription_exists: boolean;
+};
+
+export type AIModelOption = {
+  id: string;
+  name: string;
+  task_type: string;
+  task_label: string;
+  relative_path: string;
+  absolute_path: string;
+};
+
+export type AITaskOption = {
+  task_type: string;
+  task_label: string;
+};
+
+export type AIConfig = {
+  task_type: string;
+  task_label: string;
+  model_path: string;
+  model_relative_path: string;
+  model_name: string;
+  frame_stride: number;
+  confidence_threshold: number;
+  max_frames: number;
+  clip_start_sec: number;
+  clip_end_sec: number | null;
+};
+
+export type VideoRecord = {
+  id: number;
+  filename: string;
+  status: string;
+  created_at: string | null;
+  analysis_ready: boolean;
+  transcription_ready: boolean;
+  video_url: string;
+  annotated_url: string;
+  analysis_url: string;
+  transcription_url: string;
+  ai_config: AIConfig;
+  processing: {
+    processing_progress: number;
+    processing_stage: string;
+    processing_eta_seconds: number | null;
+    processing_message: string | null;
+  };
+  storage: VideoStorage;
+};
+
+export type VideoAnalysisSummary = {
+  video_path: string;
+  model_path: string;
+  task_type: string;
+  frame_stride: number;
+  confidence_threshold: number;
+  max_frames: number;
+  clip_start_sec: number;
+  clip_end_sec: number | null;
+  video_duration_sec: number | null;
+  sampled_frames: number;
+  processed_frames: number;
+  total_detections: number;
+  label_counts: Record<string, number>;
+  avg_confidence_by_label: Record<string, number>;
+  top_labels: string[];
+  content_rating?: {
+    danger_level: number;
+    rating_label: string;
+    trigger_objects: string[];
+  };
+};
+
+export type VideoAnalysisVariant = {
+  variant_id: string;
+  created_at: string | null;
+  task_type: string;
+  task_label: string;
+  model_name: string;
+  frame_stride: number;
+  clip_start_sec: number;
+  clip_end_sec: number | null;
+};
+
+export type VideoAnalysisResponse = {
+  video_id: number;
+  filename: string;
+  status: string;
+  available?: boolean;
+  message?: string;
+  selected_variant_id?: string | null;
+  available_variants?: VideoAnalysisVariant[];
+  ai_config: AIConfig;
+  storage: VideoStorage;
+  analysis: VideoAnalysisSummary;
+};
+
+export type VideoTranscriptionResponse = {
+  video_id: number;
+  filename: string;
+  available?: boolean;
+  storage: VideoStorage;
+  transcription: {
+    content: string;
+    source: string;
+    language: string | null;
+    model_name?: string | null;
+    status?: string;
+    error?: string | null;
+    segments: Array<{
+      id: number;
+      start: number;
+      end: number;
+      text: string;
+    }>;
+  };
+  available_languages?: string[];
+  selected_variant?: string;
+  variants?: Array<{
+    id: string;
+    label: string;
+    language: string | null;
+    model_name?: string | null;
+  }>;
+};
+
+export type ModelCatalogResponse = {
+  models: AIModelOption[];
+  tasks: AITaskOption[];
+};
+
+
+
+export type AiConfigPayload = {
+  task_type: string
+  model_path: string
+  frame_stride: string
+  confidence_threshold: string
+  max_frames: string
+  clip_start_sec: string
+  clip_end_sec: string | null
+};
