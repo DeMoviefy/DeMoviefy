@@ -133,7 +133,7 @@ export function NewVideoPanel() {
             </div>
 
             {file && (
-                <div className="rounded-lg border border-neutral-200 bg-white px-3 py-5 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+                <div className="rounded-lg border border-neutral-200 bg-white px-3 py-3 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
                     <VideoAnalysisConfig
                         taskType={uploadTask}
                         modelPath={uploadModelPath}
