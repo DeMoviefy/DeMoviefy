@@ -9,7 +9,8 @@ type DashboardVideoLibraryProps = {
   videos: VideoRecord[];
 };
 
-const VIDEOS_PER_PAGE = 4;
+const DEFAULT_VIDEOS_PER_PAGE = 4;
+const WIDE_SCREEN_VIDEOS_PER_PAGE = 6;
 
 function formatDate(createdAt: string | null) {
   if (!createdAt) {
@@ -29,6 +30,23 @@ export const DashboardVideoLibrary = memo(
   }: DashboardVideoLibraryProps) {
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
+    const [videosPerPage, setVideosPerPage] = useState(DEFAULT_VIDEOS_PER_PAGE);
+
+    useEffect(() => {
+      const wideScreen = window.matchMedia("(min-width: 1280px)");
+      const updatePageSize = () => {
+        setVideosPerPage(
+          wideScreen.matches
+            ? WIDE_SCREEN_VIDEOS_PER_PAGE
+            : DEFAULT_VIDEOS_PER_PAGE,
+        );
+      };
+
+      updatePageSize();
+      wideScreen.addEventListener("change", updatePageSize);
+
+      return () => wideScreen.removeEventListener("change", updatePageSize);
+    }, []);
 
     const filteredVideos = useMemo(() => {
       const normalizedSearch = search.trim().toLowerCase();
@@ -44,7 +62,7 @@ export const DashboardVideoLibrary = memo(
 
     const totalPages = Math.max(
       1,
-      Math.ceil(filteredVideos.length / VIDEOS_PER_PAGE),
+      Math.ceil(filteredVideos.length / videosPerPage),
     );
     const visiblePageCount = Math.min(totalPages, 5);
     const pageWindowStart = Math.min(
@@ -57,13 +75,13 @@ export const DashboardVideoLibrary = memo(
     );
 
     const visibleVideos = useMemo(() => {
-      const startIndex = (page - 1) * VIDEOS_PER_PAGE;
+      const startIndex = (page - 1) * videosPerPage;
 
       return filteredVideos.slice(
         startIndex,
-        startIndex + VIDEOS_PER_PAGE,
+        startIndex + videosPerPage,
       );
-    }, [filteredVideos, page]);
+    }, [filteredVideos, page, videosPerPage]);
 
     useEffect(() => {
       setPage(1);

@@ -1,18 +1,9 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap");
 @import "tailwindcss";
 
 @theme {
-  --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans: sans-serif;
 }
-
-html {
-  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-}
-
-/*
- * Keep the interface's physical scale close to the 1366×768 design baseline
- * on common 24″ Full HD displays. Tailwind's rem-based type and spacing grow
- * together, matching the visual size produced by 80% browser zoom.
- */
 
 
 @custom-variant dark (&:where(.dark, .dark *))

@@ -71,7 +71,7 @@ export function ProcessingQueuePanel() {
         </div>
       ) : (
         <div
-          className="max-h-96 overflow-y-auto pr-2"
+          className="max-h-96 overflow-y-auto pr-2 lg:max-h-[32rem] xl:max-h-[40rem]"
           role="region"
           aria-label="Vídeos em processamento"
           tabIndex={0}
