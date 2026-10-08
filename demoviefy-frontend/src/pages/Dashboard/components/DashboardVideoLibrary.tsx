@@ -142,9 +142,7 @@ export const DashboardVideoLibrary = memo(
                     </div>
 
                     <div className="mt-2 flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
-                      <span>#{video.id}</span>
-
-                      <span aria-hidden="true">·</span>
+                      <span><b>Data:</b></span>
 
                       <span className="truncate">
                         {formatDate(video.created_at)}
