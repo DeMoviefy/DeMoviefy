@@ -36,7 +36,7 @@ def create_video(*, filename: str) -> Video:
     Raises:
         SQLAlchemy exceptions if database operation fails
     """
-    video = Video(filename=filename)
+    video = Video(filename=filename, user_id=user_id)
     db.session.add(video)
     db.session.commit()
     return video

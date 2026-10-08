@@ -3,7 +3,7 @@ from fileinput import filename
 import mimetypes
 from pathlib import Path
 
-from flask import current_app, jsonify, request, send_file
+from flask import current_app, jsonify, request, send_file, session
 from werkzeug.utils import secure_filename
 
 from app.config.ai_settings import load_frame_ai_settings
@@ -134,6 +134,8 @@ def _empty_transcription_payload(video, storage: dict, *, status: str, error: st
     }
 
 
+# app/controllers/video_controller.py (continuação e finalização)
+
 def upload_video():
     if "file" not in request.files:
         current_app.logger.warning("upload_video:missing_file")
@@ -157,6 +159,88 @@ def upload_video():
             "max_frames": settings.max_frames,
             "confidence": settings.confidence,
         },
+    )
+
+    ensure_storage_dirs()
+    filepath = unique_video_file_path(filename)
+    stored_filename = filepath.name
+    file.save(filepath)
+    current_app.logger.info(
+        "upload_video:saved filename=%s stored_filename=%s path=%s",
+        filename,
+        stored_filename,
+        filepath,
+    )
+
+    # Recupera o user_id armazenado na sessão após o login
+    user_id = session.get("user_id")
+
+    # Cria o registro no banco associando o usuário proprietário
+    new_video = create_video(filename=stored_filename, user_id=user_id)
+    save_ai_config(
+        new_video.id,
+        task_type=ai_config["task_type"],
+        task_label=ai_config["task_label"],
+        model_path=ai_config["model_path"],
+        model_name=ai_config["model_name"],
+        frame_stride=runtime_config.frame_stride,
+        confidence_threshold=runtime_config.confidence_threshold,
+        max_frames=runtime_config.max_frames,
+        clip_start_sec=clip_config.clip_start_sec,
+        clip_end_sec=clip_config.clip_end_sec,
+    )
+    save_processing_state(
+        new_video.id,
+        progress=1,
+        stage="queued",
+        eta_seconds=None,
+        message="Upload concluído. Aguardando início do processamento.",
+    )
+
+    # Enfileira o job de IA no worker
+    try:
+        job_queue = get_job_queue()
+        job_id = job_queue.enqueue(new_video.id)
+        update_job_id(new_video, job_id)
+        current_app.logger.info(
+            "upload_video:job_enqueued video_id=%s job_id=%s user_id=%s",
+            new_video.id,
+            job_id,
+            user_id,
+        )
+    except Exception as exc:
+        current_app.logger.error(
+            "upload_video:enqueue_failed video_id=%s error=%s",
+            new_video.id,
+            exc,
+        )
+        return jsonify({"error": "Falha ao enfileirar processamento"}), 500
+
+    return jsonify(
+        {
+            "message": "Upload realizado com sucesso",
+            "video": _serialize_video(new_video),
+            "next_steps": {
+                "video_saved_in": to_repo_relative(filepath),
+                "analysis_will_be_saved_in": to_repo_relative(
+                    analysis_file_path(new_video.id)
+                ),
+                "annotated_will_be_saved_in": to_repo_relative(
+                    annotated_video_path(new_video.id)
+                ),
+                "transcription_will_be_saved_in": f"uploads/transcriptions/video_{new_video.id}.json",
+                "analysis_status": "PROCESSANDO_IA",
+                "clip_selection": {
+                    "clip_start_sec": clip_config.clip_start_sec,
+                    "clip_end_sec": clip_config.clip_end_sec,
+                },
+                "runtime_settings": {
+                    "frame_stride": runtime_config.frame_stride,
+                    "max_frames": runtime_config.max_frames,
+                    "confidence_threshold": runtime_config.confidence_threshold,
+                },
+            },
+        }
     )
 
     ensure_storage_dirs()

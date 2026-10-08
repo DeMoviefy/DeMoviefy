@@ -1,9 +1,47 @@
-from flask import jsonify, request
 from sqlalchemy.exc import IntegrityError
-from werkzeug.security import generate_password_hash
-
+from flask import jsonify, request, session
+from werkzeug.security import check_password_hash, generate_password_hash
+from app.repositories.user_repository import get_user_by_email, create_user
 from app import db
-from app.repositories.user_repository import create_user, get_user_by_email
+
+def login_user():
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"error": "Envie as credenciais em JSON."}), 400
+
+    email = str(data.get("email", "")).strip().lower()
+    senha = str(data.get("senha", ""))
+
+    if not email or not senha:
+        return jsonify({"error": "E-mail e senha são obrigatórios."}), 400
+
+    user = get_user_by_email(email)
+    if not user or not check_password_hash(user.senha, senha):
+        return jsonify({"error": "E-mail ou senha incorretos."}), 401
+
+    # Armazena o ID do usuário na sessão do Flask
+    session["user_id"] = user.id
+
+    return jsonify({
+        "message": "Login realizado com sucesso.",
+        "user": {
+            "id": user.id,
+            "nome": user.nome,
+            "email": user.email
+        }
+    }), 200
+
+def get_current_user():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Não autenticado."}), 401
+    
+    from app.models.user import User
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({"error": "Usuário não encontrado."}), 404
+
+    return jsonify({"id": user.id, "nome": user.nome, "email": user.email})
 
 
 def register_user():
