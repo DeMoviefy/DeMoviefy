@@ -14,8 +14,12 @@ def register_user():
     nome = data.get("nome")
     email = data.get("email")
     senha = data.get("senha")
+    senha_confirmada = data.get("senha-confirmada")
     if not all(isinstance(value, str) for value in (nome, email, senha)):
         return jsonify({"error": "Nome, e-mail e senha são obrigatórios."}), 400
+    
+    if senha_confirmada != senha:
+        return jsonify({"error": "Senhas não coincidem"}), 400
 
     nome = nome.strip()
     email = email.strip().lower()

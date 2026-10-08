@@ -4,6 +4,7 @@ export type RegisterUserInput = {
   nome: string;
   email: string;
   senha: string;
+  senha_confirmada: string;
 };
 
 export type RegisteredUser = {

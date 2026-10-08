@@ -14,10 +14,6 @@ export default function Cadastro() {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
-    if (formData.get("password") !== formData.get("confirm-password")) {
-      setFeedback("As senhas não coincidem.");
-      return;
-    }
 
     setFeedback("");
     setIsSubmitting(true);
@@ -26,6 +22,7 @@ export default function Cadastro() {
         nome: String(formData.get("name")).trim(),
         email: String(formData.get("email")).trim(),
         senha: String(formData.get("password")),
+        senha_confirmada: String(formData.get("confirm-password")),
       });
       setFeedback("Conta criada com sucesso. Você já pode entrar.");
       form.reset();
