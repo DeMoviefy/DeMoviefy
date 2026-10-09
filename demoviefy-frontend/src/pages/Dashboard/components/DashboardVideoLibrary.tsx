@@ -141,13 +141,7 @@ export const DashboardVideoLibrary = memo(
                       <StatusBadge status={video.status} />
                     </div>
 
-                    <div className="mt-2 flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
-                      <span><b>Data:</b></span>
 
-                      <span className="truncate">
-                        {formatDate(video.created_at)}
-                      </span>
-                    </div>
 
                     <div className="mt-2 pt-2">
                       <div className="flex justify-between gap-3 text-xs">
@@ -161,6 +155,14 @@ export const DashboardVideoLibrary = memo(
                             : "Sem transcrição"}
                         </span>
                       </div>
+
+                        <div className="mt-3 flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
+                        <span><b>Data:</b></span>
+
+                        <span className="truncate">
+                            {formatDate(video.created_at)}
+                        </span>
+                        </div>
 
                     </div>
                   </div>
