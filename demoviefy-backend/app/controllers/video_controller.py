@@ -322,10 +322,15 @@ def upload_video():
 
 
 def list_videos():
-    videos = list_videos_repo()
+    user_id = session.get("user_id")
+    # Se houver usuário autenticado, lista somente os vídeos dele
+    if user_id:
+        videos = list_videos_repo(user_id=user_id)
+    else:
+        videos = list_videos_repo()
+
     payload = [_serialize_video(video) for video in videos]
     return jsonify(payload)
-
 
 def get_video_analysis(video_id: int):
     video = get_video(video_id)
