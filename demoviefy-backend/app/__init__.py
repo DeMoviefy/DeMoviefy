@@ -23,6 +23,7 @@ db = SQLAlchemy()
 def create_app(test_config: dict | None = None):
     """Create the Flask application, optionally with isolated test settings."""
     app = Flask(__name__)
+    app.secret_key = 'secret_password'
     ai_settings = load_frame_ai_settings()
 
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///demoviefy.db"

@@ -1,8 +1,13 @@
 from sqlalchemy.exc import IntegrityError
-from flask import jsonify, request, session
+from flask import jsonify, request, session, make_response
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.repositories.user_repository import get_user_by_email, create_user
 from app import db
+
+def set_cookie():
+    response = make_response("Cookie created!")
+    response.set_cookie('username', 'john', max_age=3600)
+    return response
 
 def login_user():
     data = request.get_json(silent=True)
@@ -52,7 +57,8 @@ def register_user():
     nome = data.get("nome")
     email = data.get("email")
     senha = data.get("senha")
-    senha_confirmada = data.get("senha-confirmada")
+    senha_confirmada = data.get("senha_confirmada")
+    print(senha, senha_confirmada)
     if not all(isinstance(value, str) for value in (nome, email, senha)):
         return jsonify({"error": "Nome, e-mail e senha são obrigatórios."}), 400
     

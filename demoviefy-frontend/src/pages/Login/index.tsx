@@ -1,14 +1,37 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+
+import { UserService } from "src/core/services/userService";
 
 import "./index.css";
 
 export default function Login() {
   const [feedback, setFeedback] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setFeedback("O login ainda não está conectado ao servidor.");
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    setFeedback("");
+    setIsSubmitting(true);
+    try {
+      await UserService.login({
+        email: String(formData.get("email")).trim(),
+        senha: String(formData.get("password")),
+      });
+      setFeedback("penis");
+      form.reset();
+    } catch (error: unknown) {
+      const message = axios.isAxiosError<{ error?: string }>(error)
+        ? error.response?.data?.error
+        : undefined;
+      setFeedback(message ?? "Não foi possível criar sua conta. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
