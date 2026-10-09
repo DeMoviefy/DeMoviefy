@@ -2,55 +2,42 @@ import type { VideoTranscriptionResponse } from "src/core/types/videoTypes";
 import { GenerateTranscription } from "src/pages/Video/components/GenerateTranscription";
 import { TranscriptionTextEditor } from "src/pages/Video/components/TranscriptionTextEditor";
 import { TranslateTranscription } from "src/pages/Video/components/TranslateTranscription";
+import { useTranscriptionStore } from "src/pages/Video/stores/useTranscriptionStore";
 
-type TranscriptionSegment = VideoTranscriptionResponse["transcription"]["segments"][number];
 type TranscriptionVariant = NonNullable<VideoTranscriptionResponse["variants"]>[number];
 
 type TranscriptionWorkbenchProps = {
-    transcriptionDraft: string;
-    transcriptionMessage: string;
-    segments: TranscriptionSegment[];
-    hasTranscription: boolean;
-    hasChanges: boolean;
     isBusy: boolean;
-    onDraftChange: (value: string) => void;
-    onSegmentsChange: (segments: TranscriptionSegment[]) => void;
-    onSave: () => void | Promise<void>;
-    onGenerate: () => void;
-    selectedLanguage: string;
-    onLanguageChange: (language: string) => void;
-    availableLanguages: string[];
-    selectedModel: string;
-    onModelChange: (model: string) => void;
-    isGenerating: boolean;
-    variants: TranscriptionVariant[];
-    selectedVariant: string;
-    isTranslating: boolean;
-    onTranslate: (targetLanguage: string) => void;
 };
 
-export function TranscriptionWorkbench({
-    transcriptionDraft,
-    transcriptionMessage,
-    segments,
-    hasTranscription,
-    hasChanges,
-    isBusy,
-    onDraftChange,
-    onSegmentsChange,
-    onSave,
-    onGenerate,
-    selectedLanguage,
-    onLanguageChange,
-    availableLanguages,
-    selectedModel,
-    onModelChange,
-    isGenerating,
-    variants,
-    selectedVariant,
-    isTranslating,
-    onTranslate,
-}: TranscriptionWorkbenchProps) {
+export function TranscriptionWorkbench({ isBusy }: TranscriptionWorkbenchProps) {
+    const {
+        transcription,
+        transcriptionDraft,
+        transcriptionMessage,
+        transcriptionSegments: segments,
+        selectedLanguage,
+        selectedModel,
+        selectedVariant,
+        isGenerating,
+        isTranslating,
+        setTranscriptionDraft,
+        setTranscriptionSegments,
+        setLanguage,
+        setModel,
+        onSaveTranscription,
+        onGenerateTranscription,
+        translateTranscription,
+    } = useTranscriptionStore();
+    const variants: TranscriptionVariant[] = transcription?.variants ?? [
+        { id: "default", label: "Transcrição principal", language: null },
+    ];
+    const availableLanguages = transcription?.available_languages ?? [];
+    const originalSegments = transcription?.transcription.segments ?? [];
+    const transcriptionContent = transcription?.transcription.content ?? "";
+    const hasTranscription = Boolean(transcription?.available);
+    const hasChanges = transcriptionDraft !== transcriptionContent
+        || JSON.stringify(segments) !== JSON.stringify(originalSegments);
     const sourceLanguage = variants.find((variant) => variant.id === selectedVariant)?.language ?? selectedLanguage;
     const isWorking = isBusy || isGenerating || isTranslating;
 
@@ -70,29 +57,44 @@ export function TranscriptionWorkbench({
                 hasChanges={hasChanges}
                 isBusy={isWorking}
                 selectedVariant={selectedVariant}
-                onDraftChange={onDraftChange}
-                onSegmentsChange={onSegmentsChange}
-                onSave={onSave}
+                onDraftChange={setTranscriptionDraft}
+                onSegmentsChange={setTranscriptionSegments}
+                onSave={onSaveTranscription}
             />
 
-            <GenerateTranscription
-                selectedModel={selectedModel}
-                selectedLanguage={selectedLanguage}
-                availableLanguages={availableLanguages}
-                isBusy={isWorking}
-                isGenerating={isGenerating}
-                onModelChange={onModelChange}
-                onLanguageChange={onLanguageChange}
-                onGenerate={onGenerate}
-            />
+            <section>
+                <div className="py-5 text-left">
+                    <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
+                        Gerar ou traduzir transcrição
+                    </h3>
+                    <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+                        Gere uma nova versão ou traduza a transcrição selecionada.
+                    </p>
+                </div>
 
-            <TranslateTranscription
-                sourceLanguage={sourceLanguage}
-                hasTranscription={hasTranscription}
-                isBusy={isWorking}
-                isTranslating={isTranslating}
-                onTranslate={onTranslate}
-            />
+                <div className="mt-2 rounded-lg border border-neutral-200 bg-white px-3 py-5 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+                    <GenerateTranscription
+                        selectedModel={selectedModel}
+                        selectedLanguage={selectedLanguage}
+                        availableLanguages={availableLanguages}
+                        isBusy={isWorking}
+                        isGenerating={isGenerating}
+                        onModelChange={setModel}
+                        onLanguageChange={setLanguage}
+                        onGenerate={onGenerateTranscription}
+                    />
+
+                    <TranslateTranscription
+                        sourceLanguage={sourceLanguage}
+                        hasTranscription={hasTranscription}
+                        variants={variants}
+                        selectedVariant={selectedVariant}
+                        isBusy={isWorking}
+                        isTranslating={isTranslating}
+                        onTranslate={(sourceVariant, language) => void translateTranscription(language, sourceVariant)}
+                    />
+                </div>
+            </section>
         </section>
     );
 }

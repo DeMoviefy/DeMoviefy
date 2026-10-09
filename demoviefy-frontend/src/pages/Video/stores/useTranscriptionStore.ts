@@ -23,7 +23,7 @@ interface TranscriptionState {
   setLanguage: (lang: string) => void;
   setModel: (model: string) => void;
   setSelectedVariant: (variant: string) => void;
-  translateTranscription: (targetLanguage: string) => Promise<void>;
+  translateTranscription: (targetLanguage: string, sourceVariant?: string) => Promise<void>;
 
   fetchTranscription: (video: VideoRecord, variant?: string) => Promise<void>;
   resetTranscription: () => void;
@@ -52,14 +52,14 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
     set({ selectedVariant });
     if (video) void get().fetchTranscription(video, selectedVariant);
   },
-  translateTranscription: async (targetLanguage) => {
+  translateTranscription: async (targetLanguage, sourceVariant = get().selectedVariant) => {
     const video = useVideoDetailStore.getState().video;
     if (!video) return;
     try {
       set({ isTranslating: true });
-      await VideoService.translateTranscription(video.id, get().selectedVariant, targetLanguage);
+      await VideoService.translateTranscription(video.id, sourceVariant, targetLanguage);
       toast.success("Tradução gerada. Ela já está disponível na lista de versões.");
-      await get().fetchTranscription(video, `${targetLanguage}-from-${get().selectedVariant}`);
+      await get().fetchTranscription(video, get().selectedVariant);
     } catch (error) {
       console.error(error);
       toast.error(getApiErrorMessage(error, "Não foi possível gerar a tradução."));
