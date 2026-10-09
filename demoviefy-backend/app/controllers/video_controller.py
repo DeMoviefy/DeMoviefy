@@ -39,7 +39,12 @@ from app.services.frame_ai_service import (
     resolve_annotated_video_for_web,
 )
 from app.services.job_queue_service import get_job_queue
-from app.services.transcription_service import transcribe_video_with_timestamps, whisper_available
+from app.services.transcription_service import (
+    get_transcription_progress,
+    transcribe_video_with_timestamps,
+    update_transcription_progress,
+    whisper_available,
+)
 from app.services.translation_service import translate_segments
 from app.services.video_artifact_service import (
     delete_analysis,
@@ -404,6 +409,7 @@ def generate_video_transcription_by_id(video_id: int):
     language = payload.get("language") or current_app.config.get("TRANSCRIPTION_LANGUAGE")
     model_name = str(payload.get("model_name") or current_app.config.get("TRANSCRIPTION_MODEL", "base"))
     variant = f"{language or 'auto'}-{model_name}"
+    update_transcription_progress(video_id, status="running", progress=0)
     try:
         transcription = transcribe_video_with_timestamps(
             video_id=video_id,
@@ -411,9 +417,15 @@ def generate_video_transcription_by_id(video_id: int):
             model_name=model_name,
             language=language,
             logger=current_app.logger,
+            progress_callback=lambda progress: update_transcription_progress(
+                video_id, status="running", progress=progress
+            ),
         )
         saved = save_transcription(video_id, **transcription, variant=variant)
+        update_transcription_progress(video_id, status="completed", progress=100)
     except Exception as exc:
+        progress = get_transcription_progress(video_id).get("progress") or 0
+        update_transcription_progress(video_id, status="failed", progress=progress)
         current_app.logger.exception("transcription:failed video_id=%s", video_id)
         return jsonify({"error": str(exc)}), 500
 
@@ -424,6 +436,12 @@ def generate_video_transcription_by_id(video_id: int):
             "transcription": saved,
         }
     )
+
+
+def get_video_transcription_progress(video_id: int):
+    if not get_video(video_id):
+        return jsonify({"error": "Vídeo não encontrado"}), 404
+    return jsonify(get_transcription_progress(video_id))
 
 
 def save_video_transcription_by_id(video_id: int):

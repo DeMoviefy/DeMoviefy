@@ -20,6 +20,7 @@ export function TranscriptionWorkbench({ isBusy }: TranscriptionWorkbenchProps) 
         selectedModel,
         selectedVariant,
         isGenerating,
+        transcriptionProgress,
         isTranslating,
         setTranscriptionDraft,
         setTranscriptionSegments,
@@ -79,6 +80,7 @@ export function TranscriptionWorkbench({ isBusy }: TranscriptionWorkbenchProps) 
                         availableLanguages={availableLanguages}
                         isBusy={isWorking}
                         isGenerating={isGenerating}
+                        transcriptionProgress={transcriptionProgress}
                         onModelChange={setModel}
                         onLanguageChange={setLanguage}
                         onGenerate={onGenerateTranscription}

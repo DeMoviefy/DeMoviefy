@@ -10,8 +10,11 @@ import json
 import os
 import subprocess
 import sys
+import threading
+import uuid
 from functools import lru_cache
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 from app.config.paths import TRANSCRIPTIONS_DIR, TRANSCRIPTION_ENV_DIR, TRANSCRIPTION_SCRIPT_PATH
@@ -78,6 +81,7 @@ def _transcribe_with_local_whisper(
     model_name: str,
     language: str | None,
     logger: Any | None,
+    progress_callback=None,
 ) -> dict[str, Any]:
     if logger:
         logger.info(
@@ -88,7 +92,28 @@ def _transcribe_with_local_whisper(
         )
 
     model = _load_whisper_model(model_name)
-    result = model.transcribe(video_path, verbose=False, language=language)
+    if progress_callback is None:
+        result = model.transcribe(video_path, verbose=False, language=language)
+    else:
+        import importlib
+
+        with _whisper_progress_lock:
+            whisper_transcribe = importlib.import_module("whisper.transcribe")
+            original_tqdm_module = whisper_transcribe.tqdm
+            original_tqdm = original_tqdm_module.tqdm
+
+            class ProgressTqdm(original_tqdm):
+                def update(self, n=1):
+                    result = super().update(n)
+                    if self.total:
+                        progress_callback(round(self.n * 100 / self.total))
+                    return result
+
+            whisper_transcribe.tqdm = SimpleNamespace(tqdm=ProgressTqdm)
+            try:
+                result = model.transcribe(video_path, verbose=False, language=language)
+            finally:
+                whisper_transcribe.tqdm = original_tqdm_module
     
     segments = [
         {
@@ -218,6 +243,7 @@ def transcribe_video_with_timestamps(
     language: str | None = None,
     logger: Any | None = None,
     proxy_url: str | None = None,
+    progress_callback=None,
 ) -> dict[str, Any]:
     worker_python = resolve_transcription_python()
     worker_error: Exception | None = None
@@ -243,6 +269,7 @@ def transcribe_video_with_timestamps(
             model_name=model_name,
             language=language,
             logger=logger,
+            progress_callback=progress_callback,
         )
         return payload
 
@@ -259,10 +286,12 @@ def transcribe_video_with_timestamps(
 
 __all__ = [
     "delete_transcription",
+    "get_transcription_progress",
     "has_transcription",
     "load_transcription",
     "resolve_transcription_python",
     "save_transcription",
     "transcribe_video_with_timestamps",
+    "update_transcription_progress",
     "whisper_available",
 ]

@@ -6,6 +6,7 @@ from app.controllers.video_controller import (
     delete_video_by_id,
     delete_video_transcription_by_id,
     generate_video_transcription_by_id,
+    get_video_transcription_progress,
     get_annotated_video_file,
     get_video_analysis,
     get_video_details,
@@ -36,6 +37,7 @@ video_bp.add_url_rule("/videos/<int:video_id>/transcription", view_func=save_vid
 video_bp.add_url_rule("/videos/<int:video_id>/transcription/translate", view_func=translate_video_transcription_by_id, methods=["POST"])
 video_bp.add_url_rule("/videos/<int:video_id>/transcription", view_func=delete_video_transcription_by_id, methods=["DELETE"])
 video_bp.add_url_rule("/videos/<int:video_id>/transcription/generate", view_func=generate_video_transcription_by_id, methods=["POST"])
+video_bp.add_url_rule("/videos/<int:video_id>/transcription/progress", view_func=get_video_transcription_progress, methods=["GET"])
 video_bp.add_url_rule("/videos/<int:video_id>/ai-config", view_func=update_video_ai_config, methods=["PUT"])
 video_bp.add_url_rule("/videos/<int:video_id>/reprocess", view_func=reprocess_video_by_id, methods=["POST"])
 video_bp.add_url_rule("/videos/<int:video_id>/cancel", view_func=cancel_video_processing_by_id, methods=["POST"])

@@ -4,6 +4,7 @@ type GenerateTranscriptionProps = {
     availableLanguages: string[];
     isBusy: boolean;
     isGenerating: boolean;
+    transcriptionProgress: number | null;
     onModelChange: (model: string) => void;
     onLanguageChange: (language: string) => void;
     onGenerate: () => void;
@@ -32,6 +33,7 @@ export function GenerateTranscription({
     availableLanguages,
     isBusy,
     isGenerating,
+    transcriptionProgress,
     onModelChange,
     onLanguageChange,
     onGenerate,
@@ -70,6 +72,27 @@ export function GenerateTranscription({
                     {isGenerating ? "Gerando transcrição..." : "Gerar transcrição por IA"}
                 </button>
             </div>
+            {isGenerating && (
+                <div className="mt-3">
+                    <div className="mb-1 flex justify-between text-sm text-neutral-600 dark:text-neutral-300">
+                        <span>Progresso da transcrição</span>
+                        <span>{transcriptionProgress ?? 0}%</span>
+                    </div>
+                    <div
+                        className="h-2 overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700"
+                        role="progressbar"
+                        aria-label="Progresso da transcrição"
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={transcriptionProgress ?? 0}
+                    >
+                        <div
+                            className="h-full rounded-full bg-blue-600 transition-[width] duration-300 dark:bg-blue-400"
+                            style={{ width: `${transcriptionProgress ?? 0}%` }}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

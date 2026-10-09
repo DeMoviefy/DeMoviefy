@@ -125,6 +125,13 @@ export class VideoService {
         return data
     }
 
+    static async getTranscriptionProgress(id: number): Promise<{ status: string; progress: number | null }> {
+        const { data } = await api.get<{ status: string; progress: number | null }>(
+            `/videos/${id}/transcription/progress`,
+        );
+        return data;
+    }
+
     static getAnnotatedVideoUrl(video: VideoRecord, variantId: string | null): string {
         return toApiUrlWithQuery(video.annotated_url, {
             v: video.storage.annotated_exists ? video.created_at ?? video.id : null,

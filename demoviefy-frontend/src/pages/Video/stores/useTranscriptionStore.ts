@@ -16,6 +16,7 @@ interface TranscriptionState {
   selectedVariant: string;
   transcriptionSegments: VideoTranscriptionResponse["transcription"]["segments"];
   isGenerating: boolean;
+  transcriptionProgress: number | null;
   isTranslating: boolean;
 
   setTranscriptionDraft: (draft: string) => void;
@@ -41,6 +42,7 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
   selectedVariant: "default",
   transcriptionSegments: [],
   isGenerating: false,
+  transcriptionProgress: null,
   isTranslating: false,
 
   setTranscriptionDraft: (transcriptionDraft) => set({ transcriptionDraft }),
@@ -162,11 +164,23 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
 
     const { fetchTranscription } = get();
     const toastId = "transcription-generation";
+    let progressInterval: ReturnType<typeof setInterval> | undefined;
+    let shouldPollProgress = true;
 
     try {
       toast("O Whisper está gerando a transcrição. Isso pode levar alguns minutos.");
       const { selectedLanguage, selectedModel } = get();
-      set({ isGenerating: true });
+      set({ isGenerating: true, transcriptionProgress: 0 });
+      const refreshProgress = async () => {
+        try {
+          const { progress } = await VideoService.getTranscriptionProgress(selectedVideo.id);
+          if (shouldPollProgress && progress !== null) set({ transcriptionProgress: progress });
+        } catch {
+          // A chamada de geração segue sendo a fonte do resultado e dos erros.
+        }
+      };
+      void refreshProgress();
+      progressInterval = setInterval(() => void refreshProgress(), 750);
       const { message: apiMessage } = await VideoService.generateTranscription(selectedVideo.id, {
         language: selectedLanguage,
         modelName: selectedModel,
@@ -178,7 +192,9 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
       console.error(error);
       toast.error(getApiErrorMessage(error, "Não foi possível gerar a transcrição automática. Verifique o Whisper e o ffmpeg."), { id: toastId });
     } finally {
-      set({ isGenerating: false });
+      shouldPollProgress = false;
+      if (progressInterval) clearInterval(progressInterval);
+      set({ isGenerating: false, transcriptionProgress: null });
     }
   },
 }));
