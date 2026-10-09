@@ -10,11 +10,17 @@ import { ProcessingQueuePanel } from "src/pages/Dashboard/components/ProcessingQ
 
 export default function VideoDashboard() {
     const initializedRef = useRef(false);
-    const [isLibraryOpen, setIsLibraryOpen] = useState(true);
+    const libraryStateInitializedRef = useRef(false);
+    const previousVideoCountRef = useRef(0);
+    const [isLibraryOpen, setIsLibraryOpen] = useState(
+        () => useProcessingStore.getState().videos.length > 0,
+    );
 
     const fetchCatalog = useCatalogStore((state) => state.fetchCatalog);
     const refresh = useProcessingStore((state) => state.refresh);
     const stats = useProcessingStore((state) => state.stats);
+    const videoCount = useProcessingStore((state) => state.videos.length);
+    const videosInitialized = useProcessingStore((state) => state.initialized);
 
     useEffect(() => {
         if (initializedRef.current) {
@@ -23,6 +29,23 @@ export default function VideoDashboard() {
         initializedRef.current = true;
         void Promise.all([fetchCatalog(), refresh()]);
     }, [fetchCatalog, refresh]);
+
+    useEffect(() => {
+        if (!videosInitialized) return;
+
+        if (!libraryStateInitializedRef.current) {
+            libraryStateInitializedRef.current = true;
+            previousVideoCountRef.current = videoCount;
+            setIsLibraryOpen(videoCount > 0);
+            return;
+        }
+
+        if (previousVideoCountRef.current === 0 && videoCount > 0) {
+            setIsLibraryOpen(true);
+        }
+
+        previousVideoCountRef.current = videoCount;
+    }, [videoCount, videosInitialized]);
 
     return (
         <div className="relative flex min-h-[calc(100vh-6rem)] w-full flex-col pt-4">

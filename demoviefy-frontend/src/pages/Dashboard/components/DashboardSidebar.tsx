@@ -13,7 +13,7 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
 
   return (
     <aside
-      className={`flex h-full shrink-0 flex-col overflow-hidden transition-[width] duration-200 ease-in-out ${isOpen ? "w-72" : "w-12"}`}
+      className={`flex h-full shrink-0 flex-col overflow-visible transition-[width] duration-200 ease-in-out ${isOpen ? "w-72" : "w-12"}`}
     >
       <div id="dashboard-video-library" className="flex min-h-0 flex-1 flex-col">
         <div className={`flex min-h-9 items-center pb-2 ${isOpen ? "justify-between pr-8" : "justify-start"}`}>
@@ -29,13 +29,13 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
             aria-label={isOpen ? "Recolher biblioteca de vídeos" : "Expandir biblioteca de vídeos"}
             title={isOpen ? "Recolher biblioteca" : "Expandir biblioteca"}
             onClick={onToggle}
-            className={`inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100 ${isOpen ? "" : "-translate-x-2"}`}
+            className={`inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100 ${isOpen ? "" : "-ml-2"}`}
           >
             <FaBars aria-hidden="true" className="size-4" />
           </button>
         </div>
 
-        <div id="dashboard-video-library-content" hidden={!isOpen} className="min-h-0 flex-1">
+        <div id="dashboard-video-library-content" hidden={!isOpen} className="min-h-0 flex-1 overflow-hidden">
           <DashboardVideoLibrary videos={videos} />
         </div>
       </div>
