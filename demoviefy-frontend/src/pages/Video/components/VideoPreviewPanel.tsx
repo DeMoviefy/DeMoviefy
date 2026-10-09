@@ -1,11 +1,21 @@
-import { useEffect, useState } from "react";
-import type { VideoRecord } from "src/core/types/videoTypes";
+import { useEffect, useRef, useState } from "react";
+import type { VideoRecord, VideoTranscriptionResponse } from "src/core/types/videoTypes";
+import { createWebVtt } from "src/core/utils/videoHelpers";
+
+type VideoTranscriptionTrack = {
+    segments: VideoTranscriptionResponse["transcription"]["segments"];
+    label: string;
+    language: string;
+};
+
+const EMPTY_TRANSCRIPTION_SEGMENTS: VideoTranscriptionResponse["transcription"]["segments"] = [];
 
 interface VideoPreviewPanelProps {
     video: VideoRecord;
     analysisState: "idle" | "loading" | "ready" | "pending" | "error";
     annotatedVideoSrc: string;
     hasSelectedAnalysis: boolean;
+    transcriptionTrack: VideoTranscriptionTrack | null;
 }
 
 function getAnnotatedPreviewState(
@@ -38,8 +48,38 @@ function getAnnotatedPreviewState(
     };
 }
 
-export function VideoPreviewPanel({ video, analysisState, annotatedVideoSrc, hasSelectedAnalysis }: VideoPreviewPanelProps) {
+export function VideoPreviewPanel({
+    video,
+    analysisState,
+    annotatedVideoSrc,
+    hasSelectedAnalysis,
+    transcriptionTrack,
+}: VideoPreviewPanelProps) {
     const [annotatedPlaybackError, setAnnotatedPlaybackError] = useState(false);
+    const [subtitleTrack, setSubtitleTrack] = useState<{
+        segments: VideoTranscriptionTrack["segments"];
+        url: string;
+    } | null>(null);
+    const subtitleTrackRef = useRef<HTMLTrackElement>(null);
+    const transcriptionSegments = transcriptionTrack?.segments ?? EMPTY_TRANSCRIPTION_SEGMENTS;
+    const activeSubtitleUrl = subtitleTrack?.segments === transcriptionSegments ? subtitleTrack.url : "";
+
+    useEffect(() => {
+        if (transcriptionSegments.length === 0) {
+            setSubtitleTrack(null);
+            return;
+        }
+
+        const url = URL.createObjectURL(new Blob([createWebVtt(transcriptionSegments)], { type: "text/vtt" }));
+        setSubtitleTrack({ segments: transcriptionSegments, url });
+        return () => URL.revokeObjectURL(url);
+    }, [transcriptionSegments]);
+
+    useEffect(() => {
+        if (activeSubtitleUrl && subtitleTrackRef.current) {
+            subtitleTrackRef.current.track.mode = "showing";
+        }
+    }, [activeSubtitleUrl]);
 
     useEffect(() => {
         setAnnotatedPlaybackError(false);
@@ -65,6 +105,17 @@ export function VideoPreviewPanel({ video, analysisState, annotatedVideoSrc, has
                     src={annotatedVideoSrc}
                     onError={() => setAnnotatedPlaybackError(true)}
                 >
+                    {activeSubtitleUrl && transcriptionTrack && (
+                        <track
+                            ref={subtitleTrackRef}
+                            key={activeSubtitleUrl}
+                            kind="subtitles"
+                            src={activeSubtitleUrl}
+                            srcLang={transcriptionTrack.language || "pt"}
+                            label={`Transcrição: ${transcriptionTrack.label}`}
+                            default
+                        />
+                    )}
                     Seu navegador não suporta reproduzir este vídeo.
                 </video>
             ) : (

@@ -55,6 +55,15 @@ export const VideoWorkbench = memo(function VideoWorkbench({
     const transcriptionVariants = transcription?.variants ?? [
         { id: "default", label: "Transcrição principal", language: null },
     ];
+    const loadedTranscriptionVariant = transcription?.selected_variant ?? "default";
+    const selectedTranscriptionVariant = transcriptionVariants.find((variant) => variant.id === selectedVariant);
+    const playerTranscriptionTrack = hasTranscription && selectedVariant === loadedTranscriptionVariant
+        ? {
+            segments: transcription?.transcription.segments ?? [],
+            label: selectedTranscriptionVariant?.label ?? "Transcrição",
+            language: selectedTranscriptionVariant?.language ?? transcription?.transcription.language ?? "pt",
+        }
+        : null;
     const hasSelectedAnalysis = analysis !== null;
     const isProcessing = currentVideo?.status.startsWith("PROCESSANDO") ?? false;
 
@@ -73,6 +82,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                         analysisState={analysisState}
                         hasSelectedAnalysis={hasSelectedAnalysis}
                         annotatedVideoSrc={annotatedVideoSrc}
+                        transcriptionTrack={playerTranscriptionTrack}
                     />
 
                     <div className="mt-6 min-w-0">

@@ -2,11 +2,12 @@
 
 import type { AxiosError } from "axios";
 
-import type { 
-    AIModelOption, 
-    AITaskOption, 
+import type {
+    AIModelOption,
+    AITaskOption,
     VideoRecord,
-    VideoAnalysisVariant
+    VideoAnalysisVariant,
+    VideoTranscriptionResponse,
 } from "src/core/types/videoTypes";
 
 // Transforma em JSON
@@ -68,6 +69,33 @@ export function formatTimecode(seconds: number): string {
   return hours > 0
     ? `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${remaining.toString().padStart(2, "0")}`
     : `${minutes.toString().padStart(2, "0")}:${remaining.toString().padStart(2, "0")}`
+}
+
+function formatSubtitleTimestamp(seconds: number, separator: "," | "."): string {
+    const milliseconds = Math.max(0, Math.round(seconds * 1000));
+    const hours = Math.floor(milliseconds / 3_600_000);
+    const minutes = Math.floor((milliseconds % 3_600_000) / 60_000);
+    const remainingSeconds = Math.floor((milliseconds % 60_000) / 1000);
+    const remainder = milliseconds % 1000;
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}${separator}${String(remainder).padStart(3, "0")}`;
+}
+
+export function formatSrtTime(seconds: number): string {
+    return formatSubtitleTimestamp(seconds, ",");
+}
+
+export function formatVttTime(seconds: number): string {
+    return formatSubtitleTimestamp(seconds, ".");
+}
+
+export function createWebVtt(segments: VideoTranscriptionResponse["transcription"]["segments"]): string {
+    const cues = segments
+        .filter((segment) => segment.text.trim() && segment.end > segment.start)
+        .map((segment) => {
+            const text = segment.text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            return `${formatVttTime(segment.start)} --> ${formatVttTime(segment.end)}\n${text}`;
+        });
+    return `WEBVTT\n\n${cues.join("\n\n")}`;
 }
 
 export function formatPercent(value: number | undefined) {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { VideoTranscriptionResponse } from "src/core/types/videoTypes";
+import { formatSrtTime } from "src/core/utils/videoHelpers";
 
 type TranscriptionSegment = VideoTranscriptionResponse["transcription"]["segments"][number];
 
@@ -14,15 +15,6 @@ type TranscriptionTextEditorProps = {
     onSegmentsChange: (segments: TranscriptionSegment[]) => void;
     onSave: () => void | Promise<void>;
 };
-
-function formatSrtTime(seconds: number): string {
-    const milliseconds = Math.max(0, Math.round(seconds * 1000));
-    const hours = Math.floor(milliseconds / 3_600_000);
-    const minutes = Math.floor((milliseconds % 3_600_000) / 60_000);
-    const remainingSeconds = Math.floor((milliseconds % 60_000) / 1000);
-    const remainder = milliseconds % 1000;
-    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")},${String(remainder).padStart(3, "0")}`;
-}
 
 function formatSrt(segments: TranscriptionSegment[], fallbackText: string): string {
     if (segments.length === 0) {
