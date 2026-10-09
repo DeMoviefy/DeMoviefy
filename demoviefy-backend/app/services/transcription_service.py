@@ -26,6 +26,34 @@ from app.services.video_artifact_service import (
 )
 from app.services.translation_service import translate_segments_to_srt
 
+_progress_lock = threading.Lock()
+_whisper_progress_lock = threading.Lock()
+
+
+def update_transcription_progress(video_id: int, *, status: str, progress: int = 0) -> None:
+    TRANSCRIPTIONS_DIR.mkdir(parents=True, exist_ok=True)
+    progress_path = TRANSCRIPTIONS_DIR / f"video_{video_id}.progress.json"
+    temporary_path = progress_path.with_name(f".{progress_path.name}.{uuid.uuid4().hex}.tmp")
+    payload = {"status": status, "progress": max(0, min(int(progress), 100))}
+    try:
+        with _progress_lock:
+            with open(temporary_path, "w", encoding="utf-8") as file:
+                json.dump(payload, file)
+                file.flush()
+                os.fsync(file.fileno())
+            os.replace(temporary_path, progress_path)
+    finally:
+        temporary_path.unlink(missing_ok=True)
+
+
+def get_transcription_progress(video_id: int) -> dict[str, Any]:
+    progress_path = TRANSCRIPTIONS_DIR / f"video_{video_id}.progress.json"
+    with _progress_lock:
+        if not progress_path.exists():
+            return {"status": "idle", "progress": None}
+        with open(progress_path, "r", encoding="utf-8") as file:
+            return json.load(file)
+
 
 def _local_whisper_available() -> bool:
     try:
