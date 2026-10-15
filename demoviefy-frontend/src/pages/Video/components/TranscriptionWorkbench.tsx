@@ -66,11 +66,8 @@ export function TranscriptionWorkbench({ isBusy }: TranscriptionWorkbenchProps) 
             <section>
                 <div className="py-5 text-left">
                     <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
-                        Gerar ou traduzir transcrição
+                        Opções de Transcrição
                     </h3>
-                    <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-                        Gere uma nova versão ou traduza a transcrição selecionada.
-                    </p>
                 </div>
 
                 <div className="mt-2 rounded-lg border border-neutral-200 bg-white px-3 py-5 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
