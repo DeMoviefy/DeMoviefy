@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { toast } from "sonner";
 import { createPoller } from "src/core/utils/createPoller";
 import { VideoService } from "src/core/services/videoService";
+import { UserService, type AuthenticatedUser, type SessionStatus } from "src/core/services/userService";
 import { normalizeVideoRecord } from "src/core/utils/videoNormalizers";
 import { getApiErrorMessage } from "src/core/utils/videoHelpers";
 import type { VideoRecord } from "src/core/types/videoTypes";
@@ -20,7 +21,12 @@ interface ProcessingState {
     stats: VideoStats;
     loading: boolean;
     initialized: boolean;
+    isGuest: boolean | null;
+    currentUser: AuthenticatedUser | null;
+    guestVideoCount: number;
+    guestVideoLimit: number;
 
+    setSessionStatus: (session: SessionStatus) => void;
     refresh: () => Promise<void>;
     startPolling: () => void;
     stopPolling: () => void;
@@ -54,6 +60,17 @@ export const useProcessingStore = create<ProcessingState>((set, get) => ({
 
     loading: false,
     initialized: false,
+    isGuest: null,
+    currentUser: null,
+    guestVideoCount: 0,
+    guestVideoLimit: 3,
+
+    setSessionStatus: (session) => set({
+        isGuest: session.is_guest,
+        currentUser: session.user,
+        guestVideoCount: session.guest_video_count,
+        guestVideoLimit: session.guest_video_limit,
+    }),
 
     refresh: async () => {
         if (refreshInFlight) {
@@ -66,6 +83,7 @@ export const useProcessingStore = create<ProcessingState>((set, get) => ({
             set({ loading: true });
 
             try {
+                const session = await UserService.getSessionStatus();
                 const videos = (await VideoService.listVideos()).map(normalizeVideoRecord);
 
                 const previousStats = get().stats;
@@ -73,7 +91,15 @@ export const useProcessingStore = create<ProcessingState>((set, get) => ({
 
                 const stats = deriveStats(videos);
 
-                set({ videos, stats, initialized: true });
+                set({
+                    videos,
+                    stats,
+                    initialized: true,
+                    isGuest: session.is_guest,
+                    currentUser: session.user,
+                    guestVideoCount: session.guest_video_count,
+                    guestVideoLimit: session.guest_video_limit,
+                });
 
                 if (wasInitialized) {
 

@@ -23,6 +23,7 @@ from app.repositories.video_repository import (
     create_video,
     delete_video,
     get_video,
+    list_all_videos as list_all_videos_repo,
     list_videos as list_videos_repo,
     update_job_id,
     update_status,
@@ -37,7 +38,12 @@ from app.services.frame_ai_service import (
     load_analysis,
     resolve_annotated_video_for_web,
 )
-from app.services.frame_ai_service import ProcessingCancelled, analyze_video_frames, save_analysis
+from app.services.frame_ai_service import (
+    ProcessingCancelled,
+    ProcessingDependencyError,
+    analyze_video_frames,
+    save_analysis,
+)
 from app.services.job_queue_service import get_job_queue
 from app.services.transcription_service import save_transcription, transcribe_video_with_timestamps, whisper_available
 from app.services.video_artifact_service import (
@@ -504,12 +510,23 @@ def process_video(flask_app, video_id, *, cancellation_requested=None):
             if annotated_temp_path.exists():
                 annotated_temp_path.unlink()
             flask_app.logger.info("process_video:cancelled video_id=%s", video_id)
-        except Exception:
+        except Exception as exc:
             db.session.rollback()
             video = get_video(video_id)
             if video:
                 update_status(video, "ERRO_IA")
-            save_processing_state(video_id, progress=100, stage="error", eta_seconds=None, message="Falha durante o processamento.")
+            message = (
+                str(exc)
+                if isinstance(exc, ProcessingDependencyError)
+                else "Falha durante o processamento."
+            )
+            save_processing_state(
+                video_id,
+                progress=100,
+                stage="error",
+                eta_seconds=None,
+                message=message,
+            )
             annotated_temp_path = annotated_video_temp_path(video_id)
             if annotated_temp_path.exists():
                 annotated_temp_path.unlink()

@@ -15,6 +15,8 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
+from sqlalchemy.engine import URL
+
 from app import create_app, db
 from app.models.video import Video
 from app.repositories.video_repository import create_video, update_status
@@ -110,8 +112,24 @@ class DeMoviefyTestPlan(unittest.TestCase):
         self.app = create_app({
             "TESTING": True,
             "SQLALCHEMY_DATABASE_URI": "sqlite://",
+            "ADMIN_USER_ID": None,
         })
         self.client = self.app.test_client()
+        registration = self.client.post("/users", json={
+            "nome": "Usuário de teste",
+            "email": "owner@example.com",
+            "senha": "senha-segura-123",
+            "senha_confirmada": "senha-segura-123",
+        })
+        if registration.status_code != 201:
+            raise AssertionError(f"Failed to create test user: {registration.get_json()}")
+        self.user_id = registration.get_json()["id"]
+        login = self.client.post("/users/login", json={
+            "email": "owner@example.com",
+            "senha": "senha-segura-123",
+        })
+        if login.status_code != 200:
+            raise AssertionError(f"Failed to authenticate test user: {login.get_json()}")
 
     def tearDown(self):
         with self.app.app_context():
@@ -127,7 +145,7 @@ class DeMoviefyTestPlan(unittest.TestCase):
     def create_video(self, status="PROCESSADO"):
         """Create a database record for tests that start after upload."""
         with self.app.app_context():
-            video = create_video(filename="video_teste.mp4")
+            video = create_video(filename="video_teste.mp4", user_id=self.user_id)
             update_status(video, status)
             return video.id
 
@@ -286,6 +304,228 @@ class DeMoviefyTestPlan(unittest.TestCase):
         self.assertIn("arquivos relacionados", response.get_json()["error"])
         with self.app.app_context():
             self.assertIsNotNone(Video.query.filter_by(id=video_id).first())
+
+    def test_ct12_limits_video_visibility_to_owner_and_admin(self):
+        owned_video_id = self.create_video()
+
+        second_client = self.app.test_client()
+        registration = second_client.post("/users", json={
+            "nome": "Outro usuário",
+            "email": "other@example.com",
+            "senha": "senha-segura-123",
+            "senha_confirmada": "senha-segura-123",
+        })
+        self.assertEqual(registration.status_code, 201)
+        other_user_id = registration.get_json()["id"]
+        self.assertEqual(
+            second_client.post("/users/login", json={
+                "email": "other@example.com",
+                "senha": "senha-segura-123",
+            }).status_code,
+            200,
+        )
+
+        with self.app.app_context():
+            other_video = create_video(filename="video_outro.mp4", user_id=other_user_id)
+            other_video_id = other_video.id
+
+        owner_video_ids = {video["id"] for video in self.client.get("/videos").get_json()}
+        self.assertEqual(owner_video_ids, {owned_video_id})
+        self.assertEqual(second_client.get("/videos").get_json()[0]["id"], other_video_id)
+        self.assertEqual(second_client.get(f"/videos/{owned_video_id}").status_code, 404)
+
+        self.app.config["ADMIN_USER_ID"] = other_user_id
+        admin_video_ids = {
+            video["id"] for video in second_client.get("/videos").get_json()
+        }
+        self.assertEqual(admin_video_ids, {owned_video_id, other_video_id})
+        self.assertEqual(second_client.get(f"/videos/{owned_video_id}").status_code, 200)
+
+    def test_sec05_allows_private_guest_video_access_without_account(self):
+        guest_client = self.app.test_client()
+
+        self.assertEqual(guest_client.get("/videos").status_code, 200)
+        upload_response = guest_client.post(
+                "/videos",
+                data={"file": (BytesIO(b"test video"), "video.mp4")},
+                content_type="multipart/form-data",
+            )
+        self.assertEqual(upload_response.status_code, 200)
+        video_id = upload_response.get_json()["video"]["id"]
+        self.assertEqual(
+            guest_client.get(f"/videos/{video_id}").status_code,
+            200,
+        )
+
+    def test_ct13_limits_guest_uploads_and_isolates_guest_sessions(self):
+        guest_client = self.app.test_client()
+        session_status = guest_client.get("/users/session").get_json()
+        self.assertTrue(session_status["is_guest"])
+        self.assertEqual(session_status["guest_video_count"], 0)
+
+        responses = [
+            guest_client.post(
+                "/videos",
+                data={"file": (BytesIO(b"guest video"), f"guest_{index}.mp4")},
+                content_type="multipart/form-data",
+            )
+            for index in range(3)
+        ]
+        self.assertEqual([response.status_code for response in responses], [200, 200, 200])
+        guest_video_ids = {
+            video["id"] for video in guest_client.get("/videos").get_json()
+        }
+        self.assertEqual(len(guest_video_ids), 3)
+
+        limit_response = guest_client.post(
+            "/videos",
+            data={"file": (BytesIO(b"extra video"), "guest_extra.mp4")},
+            content_type="multipart/form-data",
+        )
+        self.assertEqual(limit_response.status_code, 403)
+        self.assertEqual(limit_response.get_json()["code"], "guest_video_limit_reached")
+
+        another_guest = self.app.test_client()
+        self.assertEqual(another_guest.get("/videos").get_json(), [])
+        self.assertEqual(
+            another_guest.get(f"/videos/{next(iter(guest_video_ids))}").status_code,
+            404,
+        )
+        self.assertEqual(
+            guest_client.get("/users/session").get_json()["guest_video_count"],
+            3,
+        )
+
+    def test_ct14_purges_guest_videos_when_backend_restarts(self):
+        database_url = URL.create(
+            "sqlite",
+            database=str(self.root / "startup-cleanup.db"),
+        )
+        first_app = create_app({
+            "TESTING": True,
+            "SQLALCHEMY_DATABASE_URI": database_url,
+            "ADMIN_USER_ID": None,
+        })
+        registration = first_app.test_client().post("/users", json={
+            "nome": "Usuário persistente",
+            "email": "persistent@example.com",
+            "senha": "senha-segura-123",
+            "senha_confirmada": "senha-segura-123",
+        })
+        self.assertEqual(registration.status_code, 201)
+
+        with first_app.app_context():
+            guest_video = create_video(
+                filename="guest_restart.mp4",
+                guest_token="guest-token-from-before-restart",
+            )
+            guest_video_id = guest_video.id
+            owned_video = create_video(
+                filename="account_video.mp4",
+                user_id=registration.get_json()["id"],
+            )
+            owned_video_id = owned_video.id
+            db.session.remove()
+            db.engine.dispose()
+
+        with patch(
+            "app.services.video_artifact_service.delete_video_artifacts"
+        ) as cleanup:
+            restarted_app = create_app({
+                "TESTING": True,
+                "SQLALCHEMY_DATABASE_URI": database_url,
+                "ADMIN_USER_ID": None,
+            })
+
+        cleanup.assert_called_once_with(
+            guest_video_id,
+            "guest_restart.mp4",
+            logger=restarted_app.logger,
+        )
+        with restarted_app.app_context():
+            self.assertIsNone(db.session.get(Video, guest_video_id))
+            self.assertIsNotNone(db.session.get(Video, owned_video_id))
+            db.session.remove()
+            db.engine.dispose()
+
+    def test_missing_video_dependency_sets_actionable_processing_error(self):
+        from app.services.frame_ai_service import ProcessingDependencyError
+        from app.services.video_service import process_video
+
+        video_id = self.create_video(status="PROCESSANDO")
+        video_path = self.root / "video_teste.mp4"
+        video_path.write_bytes(b"test video")
+        dependency_error = ProcessingDependencyError(
+            "A análise de vídeo exige OpenCV. Instale os pacotes de IA."
+        )
+
+        with (
+            patch("app.services.video_service.video_file_path", return_value=video_path),
+            patch("app.services.video_service.ensure_storage_dirs"),
+            patch("app.services.video_service.load_ai_config", return_value=dict(AI_CONFIG)),
+            patch("app.services.video_service.save_processing_state") as save_state,
+            patch(
+                "app.services.video_service.analyze_video_frames",
+                side_effect=dependency_error,
+            ),
+        ):
+            with self.assertRaises(ProcessingDependencyError):
+                process_video(self.app, video_id)
+
+        with self.app.app_context():
+            video = db.session.get(Video, video_id)
+            self.assertEqual(video.status, "ERRO_IA")
+
+        self.assertEqual(
+            save_state.call_args.kwargs["message"],
+            str(dependency_error),
+        )
+
+    def test_missing_opencv_raises_typed_processing_dependency_error(self):
+        import builtins
+
+        from app.services.frame_ai_service import (
+            ProcessingDependencyError,
+            analyze_video_frames,
+        )
+
+        original_import = builtins.__import__
+
+        def import_without_opencv(name, *args, **kwargs):
+            if name == "cv2":
+                raise ModuleNotFoundError("No module named 'cv2'")
+            return original_import(name, *args, **kwargs)
+
+        with patch("builtins.__import__", side_effect=import_without_opencv):
+            with self.assertRaisesRegex(
+                ProcessingDependencyError,
+                "Instalar Pacotes de IA",
+            ):
+                analyze_video_frames(video_path="missing-dependency.mp4")
+
+    def test_missing_video_dependency_does_not_retry_job(self):
+        from app.services.frame_ai_service import ProcessingDependencyError
+        from app.services.job_queue_service import JobQueueService, JobStatus, VideoJob
+
+        job_queue = JobQueueService(self.app, worker_count=0)
+        job = VideoJob(job_id="missing-dependency", video_id=123)
+        dependency_error = ProcessingDependencyError(
+            "A análise de vídeo exige OpenCV."
+        )
+
+        with (
+            patch(
+                "app.services.video_service.process_video",
+                side_effect=dependency_error,
+            ),
+            patch("app.services.job_queue_service.threading.Timer") as timer,
+        ):
+            job_queue._execute(job)
+
+        self.assertEqual(job.status, JobStatus.FAILED)
+        self.assertEqual(job.attempt, 1)
+        self.assertEqual(job.error, str(dependency_error))
+        timer.assert_not_called()
 
     def test_sec01_sanitizes_traversal_filename(self):
         response = self.upload("../../outside.mp4")

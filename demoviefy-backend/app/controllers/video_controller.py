@@ -3,7 +3,7 @@ from fileinput import filename
 import mimetypes
 from pathlib import Path
 
-from flask import current_app, jsonify, request, send_file, session
+from flask import current_app, g, jsonify, request, send_file
 from werkzeug.utils import secure_filename
 
 from app.config.ai_settings import load_frame_ai_settings
@@ -24,6 +24,7 @@ from app.repositories.video_repository import (
     create_video,
     delete_video,
     get_video,
+    list_all_videos as list_all_videos_repo,
     list_videos as list_videos_repo,
     update_job_id,
     update_status,
@@ -172,11 +173,13 @@ def upload_video():
         filepath,
     )
 
-    # Recupera o user_id armazenado na sessão após o login
-    user_id = session.get("user_id")
-
-    # Cria o registro no banco associando o usuário proprietário
-    new_video = create_video(filename=stored_filename, user_id=user_id)
+    user_id = g.video_user.id if g.video_user is not None else None
+    guest_token = g.video_guest_token
+    new_video = create_video(
+        filename=stored_filename,
+        user_id=user_id,
+        guest_token=guest_token,
+    )
     save_ai_config(
         new_video.id,
         task_type=ai_config["task_type"],
@@ -243,91 +246,13 @@ def upload_video():
         }
     )
 
-    ensure_storage_dirs()
-    filepath = unique_video_file_path(filename)
-    stored_filename = filepath.name
-    file.save(filepath)
-    current_app.logger.info(
-        "upload_video:saved filename=%s stored_filename=%s path=%s",
-        filename,
-        stored_filename,
-        filepath,
-    )
-
-    new_video = create_video(filename=stored_filename)
-    save_ai_config(
-        new_video.id,
-        task_type=ai_config["task_type"],
-        task_label=ai_config["task_label"],
-        model_path=ai_config["model_path"],
-        model_name=ai_config["model_name"],
-        frame_stride=runtime_config.frame_stride,
-        confidence_threshold=runtime_config.confidence_threshold,
-        max_frames=runtime_config.max_frames,
-        clip_start_sec=clip_config.clip_start_sec,
-        clip_end_sec=clip_config.clip_end_sec,
-    )
-    save_processing_state(
-        new_video.id,
-        progress=1,
-        stage="queued",
-        eta_seconds=None,
-        message="Upload concluído. Aguardando inicio do processamento.",
-    )
-
-    # Enqueue job instead of starting thread
-    try:
-        job_queue = get_job_queue()
-        job_id = job_queue.enqueue(new_video.id)
-        update_job_id(new_video, job_id)
-        current_app.logger.info(
-            "upload_video:job_enqueued video_id=%s job_id=%s",
-            new_video.id,
-            job_id,
-        )
-    except Exception as exc:
-        current_app.logger.error(
-            "upload_video:enqueue_failed video_id=%s error=%s",
-            new_video.id,
-            exc,
-        )
-        return jsonify({"error": "Falha ao enfileirar processamento"}), 500
-
-    return jsonify(
-        {
-            "message": "Upload realizado com sucesso",
-            "video": _serialize_video(new_video),
-            "next_steps": {
-                "video_saved_in": to_repo_relative(filepath),
-                "analysis_will_be_saved_in": to_repo_relative(
-                    analysis_file_path(new_video.id)
-                ),
-                "annotated_will_be_saved_in": to_repo_relative(
-                    annotated_video_path(new_video.id)
-                ),
-                "transcription_will_be_saved_in": f"uploads/transcriptions/video_{new_video.id}.json",
-                "analysis_status": "PROCESSANDO_IA",
-                "clip_selection": {
-                    "clip_start_sec": clip_config.clip_start_sec,
-                    "clip_end_sec": clip_config.clip_end_sec,
-                },
-                "runtime_settings": {
-                    "frame_stride": runtime_config.frame_stride,
-                    "max_frames": runtime_config.max_frames,
-                    "confidence_threshold": runtime_config.confidence_threshold,
-                },
-            },
-        }
-    )
-
-
 def list_videos():
-    user_id = session.get("user_id")
-    # Se houver usuário autenticado, lista somente os vídeos dele
-    if user_id:
-        videos = list_videos_repo(user_id=user_id)
+    if g.video_is_admin:
+        videos = list_all_videos_repo()
+    elif g.video_user is not None:
+        videos = list_videos_repo(user_id=g.video_user.id)
     else:
-        videos = list_videos_repo()
+        videos = list_videos_repo(guest_token=g.video_guest_token)
 
     payload = [_serialize_video(video) for video in videos]
     return jsonify(payload)

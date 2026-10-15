@@ -1,13 +1,15 @@
+import secrets
+
 from sqlalchemy.exc import IntegrityError
-from flask import jsonify, request, session, make_response
+from flask import jsonify, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.repositories.user_repository import get_user_by_email, create_user
 from app import db
+from app.models.user import User
+from app.models.video import Video
+from app.repositories.video_repository import count_guest_videos
 
-def set_cookie():
-    response = make_response("Cookie created!")
-    response.set_cookie('username', 'john', max_age=3600)
-    return response
+GUEST_VIDEO_LIMIT = 3
 
 def login_user():
     data = request.get_json(silent=True)
@@ -24,7 +26,16 @@ def login_user():
     if not user or not check_password_hash(user.senha, senha):
         return jsonify({"error": "E-mail ou senha incorretos."}), 401
 
-    # Armazena o ID do usuário na sessão do Flask
+    guest_token = session.get("guest_token")
+    if guest_token:
+        Video.query.filter_by(guest_token=guest_token).update(
+            {"user_id": user.id, "guest_token": None},
+            synchronize_session=False,
+        )
+        db.session.commit()
+
+    session.clear()
+    session.permanent = True
     session["user_id"] = user.id
 
     return jsonify({
@@ -49,6 +60,32 @@ def get_current_user():
     return jsonify({"id": user.id, "nome": user.nome, "email": user.email})
 
 
+def get_session_status():
+    user_id = session.get("user_id")
+    user = db.session.get(User, user_id) if user_id else None
+    if user is not None:
+        session.permanent = True
+        return jsonify({
+            "is_guest": False,
+            "user": {"id": user.id, "nome": user.nome, "email": user.email},
+            "guest_video_count": 0,
+            "guest_video_limit": GUEST_VIDEO_LIMIT,
+        })
+
+    session.pop("user_id", None)
+    guest_token = session.get("guest_token")
+    if not guest_token:
+        guest_token = secrets.token_urlsafe(32)
+        session["guest_token"] = guest_token
+    session.permanent = True
+    return jsonify({
+        "is_guest": True,
+        "user": None,
+        "guest_video_count": count_guest_videos(guest_token),
+        "guest_video_limit": GUEST_VIDEO_LIMIT,
+    })
+
+
 def register_user():
     data = request.get_json(silent=True)
     if not isinstance(data, dict):
@@ -58,7 +95,6 @@ def register_user():
     email = data.get("email")
     senha = data.get("senha")
     senha_confirmada = data.get("senha_confirmada")
-    print(senha, senha_confirmada)
     if not all(isinstance(value, str) for value in (nome, email, senha)):
         return jsonify({"error": "Nome, e-mail e senha são obrigatórios."}), 400
     

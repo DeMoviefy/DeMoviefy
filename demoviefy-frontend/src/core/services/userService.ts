@@ -18,9 +18,22 @@ export type LoginInput = {
   senha: string;
 };
 
-export type Logadao = {
+export type AuthenticatedUser = {
+  id: number;
+  nome: string;
   email: string;
-  senha: string;
+};
+
+export type LoginResponse = {
+  message: string;
+  user: AuthenticatedUser;
+};
+
+export type SessionStatus = {
+  is_guest: boolean;
+  user: AuthenticatedUser | null;
+  guest_video_count: number;
+  guest_video_limit: number;
 };
 
 export class UserService {
@@ -28,8 +41,13 @@ export class UserService {
     const { data } = await api.post<RegisteredUser>("/users", input);
     return data;
   }
-  static async login(input:LoginInput): Promise<Logadao> {
-    const { data } = await api.post<Logadao>("/users/login", input);
+  static async login(input: LoginInput): Promise<LoginResponse> {
+    const { data } = await api.post<LoginResponse>("/users/login", input);
     return data;
-  };
+  }
+
+  static async getSessionStatus(): Promise<SessionStatus> {
+    const { data } = await api.get<SessionStatus>("/users/session");
+    return data;
+  }
 }

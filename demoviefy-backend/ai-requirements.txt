@@ -7,8 +7,6 @@ numpy>=2.0.0
 ultralytics
 
 # Transcrição e Tradução
-deep-translator==1.11.4
-srt==3.5.3
 openai-whisper>=20231117
 setuptools>=77.0.3
 ffmpeg-python==0.2.0
@@ -26,4 +24,3 @@ ffmpeg-python==0.2.0
 # Keep torch aligned with backend ultralytics dependency to avoid incompatible torchvision pins.
 # If you need a different torch version, check run_form.py and this file contents.
 #torch==2.11.0
-

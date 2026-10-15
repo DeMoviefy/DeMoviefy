@@ -1,12 +1,14 @@
 import { useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import { UserService } from "src/core/services/userService";
+import { useProcessingStore } from "src/core/stores/useProcessingStore";
 
 import "./index.css";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -18,17 +20,22 @@ export default function Login() {
     setFeedback("");
     setIsSubmitting(true);
     try {
-      await UserService.login({
+      const response = await UserService.login({
         email: String(formData.get("email")).trim(),
         senha: String(formData.get("password")),
       });
-      setFeedback("penis");
-      form.reset();
+      useProcessingStore.getState().setSessionStatus({
+        is_guest: false,
+        user: response.user,
+        guest_video_count: 0,
+        guest_video_limit: 3,
+      });
+      navigate("/dashboard", { replace: true });
     } catch (error: unknown) {
       const message = axios.isAxiosError<{ error?: string }>(error)
         ? error.response?.data?.error
         : undefined;
-      setFeedback(message ?? "Não foi possível criar sua conta. Tente novamente.");
+      setFeedback(message ?? "Não foi possível entrar. Verifique sua conexão e tente novamente.");
     } finally {
       setIsSubmitting(false);
     }
@@ -58,8 +65,10 @@ export default function Login() {
             <input autoComplete="current-password" name="password" placeholder="Sua senha" required type="password" />
           </label>
 
-          <button className="auth-submit" type="submit">Entrar</button>
-          {feedback && <p aria-live="polite" className="auth-feedback">{feedback}</p>}
+          <button className="auth-submit" disabled={isSubmitting} type="submit">
+            {isSubmitting ? "Entrando..." : "Entrar"}
+          </button>
+          {feedback && <p aria-live="polite" className="auth-feedback" role="alert">{feedback}</p>}
           <p className="auth-switch">Ainda não tem uma conta? <Link to="/cadastro">Cadastre-se</Link></p>
         </form>
       </div>

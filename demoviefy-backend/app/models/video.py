@@ -34,6 +34,7 @@ class Video(db.Model):
     job_id = db.Column(db.String(36), nullable=True, unique=True, index=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True, index=True)
+    guest_token = db.Column(db.String(64), nullable=True, index=True)
 
     user = db.relationship("User", back_populates="videos")
 
