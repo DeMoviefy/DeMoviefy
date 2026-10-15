@@ -87,6 +87,30 @@ class UserRegistrationTests(unittest.TestCase):
         self.assertEqual(current_user.status_code, 200)
         self.assertEqual(current_user.get_json()["email"], "ana@example.com")
 
+    def test_logout_clears_account_session_and_starts_guest_session(self):
+        self.client.post("/users", json={
+            "nome": "Ana Silva",
+            "email": "ana@example.com",
+            "senha": "senha-segura-123",
+            "senha_confirmada": "senha-segura-123",
+        })
+        self.client.post("/users/login", json={
+            "email": "ana@example.com",
+            "senha": "senha-segura-123",
+        })
+
+        response = self.client.post("/users/logout")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.get_json()["message"],
+            "Logout realizado com sucesso.",
+        )
+        self.assertEqual(self.client.get("/users/me").status_code, 401)
+        session_status = self.client.get("/users/session")
+        self.assertTrue(session_status.get_json()["is_guest"])
+        self.assertIsNone(session_status.get_json()["user"])
+
     def test_video_endpoints_create_a_guest_session_without_login(self):
         response = self.client.get("/videos")
         self.assertEqual(response.status_code, 200)

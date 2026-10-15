@@ -46,6 +46,10 @@ export class UserService {
     return data;
   }
 
+  static async logout(): Promise<void> {
+    await api.post("/users/logout");
+  }
+
   static async getSessionStatus(): Promise<SessionStatus> {
     const { data } = await api.get<SessionStatus>("/users/session");
     return data;

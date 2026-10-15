@@ -47,6 +47,12 @@ def login_user():
         }
     }), 200
 
+
+def logout_user():
+    session.clear()
+    return jsonify({"message": "Logout realizado com sucesso."}), 200
+
+
 def get_current_user():
     user_id = session.get("user_id")
     if not user_id:
