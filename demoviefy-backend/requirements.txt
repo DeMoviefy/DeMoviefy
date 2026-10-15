@@ -12,4 +12,5 @@ SQLAlchemy>=2.0.36,<3
 requests==2.32.3
 gdown==6.0.0
 darkdetect==0.8.0
-
+deep-translator==1.11.4
+srt==3.5.3

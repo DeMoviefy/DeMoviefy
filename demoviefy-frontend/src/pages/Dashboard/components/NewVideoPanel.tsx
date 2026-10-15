@@ -2,9 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FaUpload } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 import { VideoAnalysisConfig } from "src/core/components/VideoAnalysisConfig";
 import { useCatalogStore } from "src/core/stores/useAICatalogStore";
+import { useProcessingStore } from "src/core/stores/useProcessingStore";
 import { useUploadStore } from "src/core/stores/useUploadStore";
 import { useUpload } from "src/pages/Dashboard/hooks/useUpload";
 
@@ -38,6 +40,10 @@ export function NewVideoPanel() {
     } = useUpload();
 
     const uploading = useUploadStore((state) => state.uploading);
+    const isGuest = useProcessingStore((state) => state.isGuest);
+    const guestVideoCount = useProcessingStore((state) => state.guestVideoCount);
+    const guestVideoLimit = useProcessingStore((state) => state.guestVideoLimit);
+    const guestLimitReached = isGuest === true && guestVideoCount >= guestVideoLimit;
 
     const handleDrop = useCallback(
         (e: React.DragEvent<HTMLDivElement>) => {
@@ -75,6 +81,35 @@ export function NewVideoPanel() {
                 </p>
             </div>
 
+            {isGuest && (
+                <p className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-900 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-100">
+                    Você está no modo convidado e pode enviar até {guestVideoLimit} vídeos sem conta ({guestVideoCount} enviados).
+                    Para salvar os vídeos na sua conta, entre ou crie uma conta e depois entre; os vídeos desta sessão serão transferidos.
+                    {" "}
+                    <Link className="font-semibold underline" to="/login">Entrar</Link>
+                    {" "}·{" "}
+                    <Link className="font-semibold underline" to="/cadastro">Criar conta</Link>
+                </p>
+            )}
+
+            {guestLimitReached ? (
+                <div className="rounded-xl border border-amber-200 bg-amber-50 p-6 text-center dark:border-amber-900 dark:bg-amber-950">
+                    <p className="font-semibold text-neutral-900 dark:text-neutral-100">
+                        Você usou os {guestVideoLimit} vídeos de convidado.
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-neutral-600 dark:text-neutral-300">
+                        Entre ou crie uma conta e depois entre para continuar. Os vídeos desta sessão serão transferidos para a biblioteca da conta.
+                    </p>
+                    <div className="mt-4 flex justify-center gap-3">
+                        <Link to="/login" className="rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-500">
+                            Entrar
+                        </Link>
+                        <Link to="/cadastro" className="rounded-md border border-neutral-300 px-5 py-2.5 text-sm font-medium text-neutral-800 hover:bg-white dark:border-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-900">
+                            Criar conta
+                        </Link>
+                    </div>
+                </div>
+            ) : (
             <div
                 className={`flex min-h-48 cursor-pointer items-center justify-center rounded-xl border border-dashed px-6 py-8 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${isDragging
                     ? " bg-blue-100  dark:bg-blue-950"
@@ -131,8 +166,9 @@ export function NewVideoPanel() {
                     </div>
                 )}
             </div>
+            )}
 
-            {file && (
+            {file && !guestLimitReached && (
                 <div className="rounded-lg border border-neutral-200 bg-white px-3 py-5 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
                     <VideoAnalysisConfig
                         taskType={uploadTask}

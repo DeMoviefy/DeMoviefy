@@ -20,7 +20,12 @@ VALID_VIDEO_STATUSES = {
 }
 
 
-def create_video(*, filename: str) -> Video:
+def create_video(
+    *,
+    filename: str,
+    user_id: int | None = None,
+    guest_token: str | None = None,
+) -> Video:
     """
     Create a new video record in the database.
     
@@ -29,6 +34,8 @@ def create_video(*, filename: str) -> Video:
     
     Args:
         filename (str): The name of the uploaded video file
+        user_id (int | None): ID of the account that owns the video
+        guest_token (str | None): Private guest-session owner token
         
     Returns:
         Video: The newly created Video object with an assigned ID
@@ -36,22 +43,36 @@ def create_video(*, filename: str) -> Video:
     Raises:
         SQLAlchemy exceptions if database operation fails
     """
-    video = Video(filename=filename)
+    if (user_id is None) == (guest_token is None):
+        raise ValueError("A video must belong to exactly one user or guest session.")
+
+    video = Video(filename=filename, user_id=user_id, guest_token=guest_token)
     db.session.add(video)
     db.session.commit()
     return video
 
 
-def list_videos() -> list[Video]:
-    """
-    Retrieve all video records from the database.
+def list_videos(*, user_id: int | None = None, guest_token: str | None = None) -> list[Video]:
+    """Retrieve videos belonging to one account or guest session, newest first."""
+    if (user_id is None) == (guest_token is None):
+        raise ValueError("Specify exactly one video owner.")
+    query = Video.query.filter_by(user_id=user_id) if user_id is not None else Video.query.filter_by(guest_token=guest_token)
+    return query.order_by(Video.created_at.desc()).all()
+
+
+def count_guest_videos(guest_token: str) -> int:
+    return Video.query.filter_by(guest_token=guest_token).count()
+
+
+def list_all_videos() -> list[Video]:
+    """Retrieve every video record for explicitly authorized administrator requests.
     
     Fetches all videos sorted by creation date in descending order
     (newest first).
     
     Returns:
         list[Video]: List of all Video objects in the database.
-                     Returns empty list if no videos exist.
+                Returns empty list if no videos exist.
     """
     return Video.query.order_by(Video.created_at.desc()).all()
 

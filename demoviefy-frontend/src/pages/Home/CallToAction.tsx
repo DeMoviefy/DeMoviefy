@@ -13,10 +13,10 @@ export default function CallToAction() {
         </p>
 
         <Link
-          to="/dashboard"
+          to="/login"
           className="mt-8 inline-block rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white hover:bg-blue-500 dark:bg-blue-800 dark:hover:bg-blue-700"
         >
-          Começar agora
+          Entrar para começar
         </Link>
       </div>
     </section>

@@ -9,6 +9,8 @@ from enum import Enum
 from queue import Empty, Full, Queue
 from typing import Iterator
 
+from app.services.frame_ai_service import ProcessingDependencyError
+
 
 class JobStatus(str, Enum):
     PENDING = "pending"
@@ -132,6 +134,16 @@ class JobQueueService:
             job.error = str(exc)
             if job.cancellation_requested.is_set():
                 job.status = JobStatus.CANCELLED
+                self._finish(job)
+                return
+            if isinstance(exc, ProcessingDependencyError):
+                job.status = JobStatus.FAILED
+                self.app.logger.error(
+                    "job:failed_permanent id=%s video_id=%s error=%s",
+                    job.job_id,
+                    job.video_id,
+                    job.error,
+                )
                 self._finish(job)
                 return
             if job.attempt >= job.max_attempts or self._shutdown.is_set():
