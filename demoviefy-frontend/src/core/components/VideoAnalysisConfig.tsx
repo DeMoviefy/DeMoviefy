@@ -1,3 +1,13 @@
+import { useTranslation } from "react-i18next";
+
+export const TASK_TRANSLATION_KEYS = {
+  object_detection: "task_object_detection",
+  image_classification: "task_image_classification",
+  instance_segmentation: "task_instance_segmentation",
+  oriented_bounding_boxes: "task_oriented_bounding_boxes",
+  pose_estimation: "task_pose_estimation",
+} as const;
+
 type VideoAnalysisConfigProps = {
     taskType: string
     modelPath: string
@@ -33,6 +43,7 @@ export function VideoAnalysisConfig({
   onClipStartChange,
   onClipEndChange,
 }: VideoAnalysisConfigProps) {
+  const { t } = useTranslation();
   const filteredModels = models.filter(
     (model) => model.task_type === taskType
   )
@@ -43,11 +54,11 @@ export function VideoAnalysisConfig({
         <div className="flex items-start gap-3">
           <div>
             <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
-              Configuração
+              {t("configuration")}
             </h3>
   
             <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-              Defina como o vídeo será processado.
+              {t("configDescription")}
             </p>
           </div>
         </div>
@@ -58,7 +69,7 @@ export function VideoAnalysisConfig({
               htmlFor="video-analysis-task"
               className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
             >
-              Tarefa IA
+              {t("aiTask")}
             </label>
   
             <select
@@ -67,11 +78,13 @@ export function VideoAnalysisConfig({
               onChange={(e) => onTaskChange(e.target.value)}
               className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"
             >
-              <option value="">Selecione uma tarefa</option>
+              <option value="">{t("selectTask")}</option>
   
               {tasks.map((task) => (
                 <option key={task.task_type} value={task.task_type}>
-                  {task.task_label}
+                  {task.task_type in TASK_TRANSLATION_KEYS
+                    ? t(TASK_TRANSLATION_KEYS[task.task_type as keyof typeof TASK_TRANSLATION_KEYS])
+                    : task.task_label}
                 </option>
               ))}
             </select>
@@ -83,7 +96,7 @@ export function VideoAnalysisConfig({
                 htmlFor="video-analysis-model"
                 className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
               >
-                Modelo
+                {t("model")}
               </label>
   
               <select
@@ -92,7 +105,7 @@ export function VideoAnalysisConfig({
                 onChange={(e) => onModelChange(e.target.value)}
                 className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"
               >
-                <option value="">Selecione um modelo</option>
+                <option value="">{t("selectModel")}</option>
   
                 {filteredModels.map((model) => (
                   <option key={model.relative_path} value={model.relative_path}>
@@ -110,11 +123,11 @@ export function VideoAnalysisConfig({
         <div className="flex items-start gap-3">
           <div>
             <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
-              Trecho do vídeo
+              {t("videoSegment")}
             </h3>
   
             <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-              Opcionalmente, defina o intervalo que será analisado.
+              {t("segmentDescription")}
             </p>
           </div>
         </div>
@@ -125,7 +138,7 @@ export function VideoAnalysisConfig({
               htmlFor="video-analysis-clip-start"
               className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
             >
-              Começo (s)
+              {t("startSeconds")}
             </label>
   
             <input
@@ -143,7 +156,7 @@ export function VideoAnalysisConfig({
               htmlFor="video-analysis-clip-end"
               className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
             >
-              Fim (s)
+              {t("endSeconds")}
             </label>
   
             <input
@@ -153,7 +166,7 @@ export function VideoAnalysisConfig({
               value={clipEnd ?? ""}
               onChange={(e) => onClipEndChange(e.target.value)}
               className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-blue-400 dark:focus:ring-blue-900"
-              placeholder="Vídeo inteiro"
+              placeholder={t("fullVideo")}
             />
           </div>
         </div>
@@ -161,3 +174,4 @@ export function VideoAnalysisConfig({
     </div>
   )
 }
+

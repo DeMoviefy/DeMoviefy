@@ -1,15 +1,17 @@
+import { useTranslation } from "react-i18next";
+
 export default function FeaturesSection() {
+  const { t } = useTranslation();
   return (
     <section className="w-full pb-24 pt-8 lg:pb-32 lg:pt-16">
       <div className="grid items-start gap-16 lg:grid-cols-2 lg:gap-24">
         <div>
           <h2 className="text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">
-            Do vídeo às informações que importam.
+            {t("featureTitle")}
           </h2>
 
           <p className="mt-6 max-w-2xl text-lg leading-8 text-neutral-400 lg:text-xl">
-            O DeMoviefy automatiza diferentes etapas da análise audiovisual,
-            reunindo informações relevantes em uma única plataforma.
+            {t("featureDescription")}
           </p>
 
           {/* TODO: Quando trocar o placeholder da imagem, pegar uma que tenha um tamanho horizontal bom e um vertical pequeno, para ficar com as proporções legais. */}
@@ -25,34 +27,31 @@ export default function FeaturesSection() {
         <div className="grid gap-10 lg:pt-2">
           <div>
             <h3 className="text-xl font-semibold tracking-tight">
-              Legendas automáticas
+              {t("subtitles")}
             </h3>
 
             <p className="mt-3 max-w-xl text-base leading-7 text-neutral-400">
-              Gere legendas a partir do áudio do vídeo e transforme o conteúdo
-              falado em informações pesquisáveis.
+              {t("autoCaptionDescription")}
             </p>
           </div>
 
           <div>
             <h3 className="text-xl font-semibold tracking-tight">
-              <span className="text-blue-600 dark:text-blue-400">Conteúdo sensível</span>
+              <span className="text-blue-600 dark:text-blue-400">{t("sensitiveContent")}</span>
             </h3>
 
             <p className="mt-3 max-w-xl text-base leading-7 text-neutral-400">
-              Identifique e categorize conteúdos sensíveis presentes no vídeo,
-              facilitando o processo de revisão e moderação.
+              {t("sensitiveDescription")}
             </p>
           </div>
 
           <div>
             <h3 className="text-xl font-semibold tracking-tight">
-              Classificação indicativa
+              {t("rating")}
             </h3>
 
             <p className="mt-3 max-w-xl text-base leading-7 text-neutral-400">
-              Obtenha uma estimativa de classificação indicativa adequada ao
-              conteúdo analisado.
+              {t("ratingDescription")}
             </p>
           </div>
 
@@ -62,8 +61,7 @@ export default function FeaturesSection() {
             </h3>
 
             <p className="mt-3 max-w-xl text-base leading-7 text-neutral-400">
-              Navegue diretamente pelos momentos relevantes do vídeo por meio
-              de marcações geradas durante a análise.
+              {t("timestampDescription")}
             </p>
           </div>
         </div>

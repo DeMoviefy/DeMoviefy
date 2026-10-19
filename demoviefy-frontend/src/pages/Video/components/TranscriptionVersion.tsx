@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { VideoTranscriptionResponse } from "src/core/types/videoTypes";
 import { ConfirmationDialog } from "src/core/components/ConfirmationDialog";
 
@@ -18,17 +19,18 @@ export function TranscriptionVersion({
     onDelete,
     disabled,
 }: TranscriptionVersionProps) {
+    const { t } = useTranslation();
     return (
         <div className="mt-5">
             {!hasTranscription && (
                 <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400" aria-live="polite">
-                    Nenhuma transcrição disponível.
+                    {t("noTranscriptionAvailable")}
                 </p>
             )}
             {hasTranscription && <div className="flex min-w-0 items-end gap-3">
             <label className="block min-w-0 flex-1">
                 <span className="mb-1.5 block text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                    Versão da transcrição
+                    {t("transcriptionVersion")}
                 </span>
                 <select
                     value={selectedVariant}
@@ -42,8 +44,8 @@ export function TranscriptionVersion({
                 </select>
             </label>
             <ConfirmationDialog
-                title="Excluir transcrição"
-                message="Tem certeza que deseja excluir esta transcrição? Essa ação não pode ser desfeita."
+                title={t("deleteTranscription")}
+                message={t("deleteTranscriptionConfirm")}
                 onConfirm={onDelete}
             >
                 {(open) => (
@@ -53,7 +55,7 @@ export function TranscriptionVersion({
                         onClick={open}
                         disabled={disabled || !hasTranscription}
                     >
-                        Excluir transcrição
+                        {t("deleteTranscription")}
                     </button>
                 )}
             </ConfirmationDialog>

@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+import { getYoloClassLabel } from "src/core/utils/yoloClassLabels";
 import { AnalysisDetectionTable } from "src/pages/Video/components/AnalysisDetectionTable";
 import { RatingBadge } from "src/core/components/RatingBadge";
 import type { VideoAnalysisResponse } from "src/core/types/videoTypes";
@@ -9,14 +11,15 @@ type AnalysisResultsProps = {
 };
 
 export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
+    const { t, i18n } = useTranslation();
     if (state === "loading" || state === "pending") {
         return (
             <section className="flex flex-col gap-3">
                 <h3 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-                    Resultados da Análise
+                    {t("analysisResults")}
                 </h3>
                 <p className="text-sm leading-6 text-neutral-500 dark:text-neutral-400" aria-live="polite">
-                    Processando análise. Os resultados aparecerão aqui quando terminar.
+                    {t("processingAnalysis")}
                 </p>
             </section>
         );
@@ -26,10 +29,10 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
         return (
             <section className="flex flex-col gap-3">
                 <h3 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-                    Resultados da Análise
+                    {t("analysisResults")}
                 </h3>
                 <p className="text-sm leading-6 text-neutral-500 dark:text-neutral-400" aria-live="polite">
-                    Não há uma análise disponível para este vídeo.
+                    {t("unavailableAnalysis")}
                 </p>
             </section>
         );
@@ -40,7 +43,7 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
             {summary.content_rating && (
                 <div className="p-5 mb-6 border rounded-2xl border-(--border) bg-(--surface)">
                     <h3 className="mb-4 text-xs font-bold tracking-widest uppercase text-(--muted)">
-                        Classificação Sugerida
+                        {t("suggestedRating")}
                     </h3>
 
                     <RatingBadge
@@ -51,14 +54,14 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
                     {summary.content_rating.danger_level > 1 && (
                         <p className="mt-3 text-sm text-(--muted)">
 
-                            <strong>Motivo:</strong> Presença de {summary.content_rating.trigger_objects.join(', ')}.
+                            <strong>{t("reason")}</strong> {summary.content_rating.trigger_objects.map((label) => getYoloClassLabel(label, i18n.resolvedLanguage ?? i18n.language)).join(", ")}.
                         </p>
                     )}
                 </div>
             )}
             <section className="flex flex-col gap-4">
                 <h3 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-                    Resultados da Análise
+                    {t("analysisResults")}
                 </h3>
                 <AnalysisDetectionTable summary={summary} />
             </section>

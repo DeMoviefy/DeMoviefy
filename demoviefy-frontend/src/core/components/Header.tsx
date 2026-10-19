@@ -5,12 +5,14 @@ import { FaMoon, FaSignOutAlt, FaSun } from "react-icons/fa";
 import { useThemeStore } from "src/core/stores/useThemeStore";
 import { UserService } from "src/core/services/userService";
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
+import { useTranslation } from "react-i18next";
 
 import demoviefyLight from "src/assets/DeMoviefy-Light.png";
 import demoviefyDark from "src/assets/DeMoviefy-Dark.png";
 
 
 export default function Header() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const theme = useThemeStore((state) => state.theme);
@@ -31,10 +33,10 @@ export default function Header() {
       });
       await useProcessingStore.getState().refresh();
       navigate("/", { replace: true });
-      toast.success("Você saiu da sua conta.");
+      toast.success(t("signedOutToast"));
     } catch (error: unknown) {
       console.error("Não foi possível encerrar a sessão.", error);
-      toast.error("Não foi possível sair. Tente novamente.");
+      toast.error(t("signOutError"));
     } finally {
       setIsLoggingOut(false);
     }
@@ -71,8 +73,8 @@ export default function Header() {
           <button
             type="button"
             onClick={toggleTheme}
-            aria-label={theme === "light" ? "Ativar tema escuro" : "Ativar tema claro"}
-            title={theme === "light" ? "Ativar tema escuro" : "Ativar tema claro"}
+            aria-label={theme === "light" ? t("darkTheme") : t("lightTheme")}
+            title={theme === "light" ? t("darkTheme") : t("lightTheme")}
             className="mr-2 inline-flex size-9 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
           >
             {theme === "dark" ? <FaMoon aria-hidden="true" /> : <FaSun aria-hidden="true" />}
@@ -87,17 +89,17 @@ export default function Header() {
               
             }
           >
-            Dashboard
+            {t("dashboard")}
           </NavLink>
           <span
             aria-live="polite"
             className="mr-2 rounded-md px-3 py-2 text-sm font-medium text-neutral-600 dark:text-neutral-300"
           >
             {isGuest === null
-              ? "Verificando sessão..."
+              ? t("checkingSession")
               : isGuest
-                ? "Modo convidado"
-                : `Conectado: ${currentUser?.nome ?? "conta"}`}
+                ? t("guestMode")
+                : t("connected", { name: currentUser?.nome ?? "DeMoviefy" })}
           </span>
           {isGuest !== false && (
             <>
@@ -111,13 +113,13 @@ export default function Header() {
                   }`
                 }
               >
-                Entrar
+                {t("login")}
               </NavLink>
               <NavLink
                 to="/cadastro"
                 className="rounded-md bg-blue-600 px-4 py-2 text-base font-medium text-white transition-colors hover:bg-blue-500 dark:bg-blue-800 dark:hover:bg-blue-700 lg:px-6"
               >
-                Criar conta
+                {t("createAccount")}
               </NavLink>
             </>
           )}
@@ -129,9 +131,19 @@ export default function Header() {
               className="ml-2 inline-flex items-center gap-2 rounded-md px-4 py-2 text-base font-medium text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 disabled:cursor-wait disabled:opacity-60 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-neutral-100 lg:px-6"
             >
               <FaSignOutAlt aria-hidden="true" />
-              {isLoggingOut ? "Saindo..." : "Sair"}
+              {isLoggingOut ? t("loggingOut") : t("logout")}
             </button>
           )}
+          <label className="sr-only" htmlFor="language-select">{t("language")}</label>
+          <select
+            id="language-select"
+            value={i18n.language === "en" ? "en" : "pt-BR"}
+            onChange={(event) => void i18n.changeLanguage(event.target.value)}
+            className="ml-2 rounded-md border border-neutral-200 bg-white px-2 py-2 text-sm text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
+          >
+            <option value="pt-BR">{t("portuguese")}</option>
+            <option value="en">{t("english")}</option>
+          </select>
         </nav>
       </div>
     </header>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { VideoTranscriptionResponse } from "src/core/types/videoTypes";
 
 type TranscriptionSegment = VideoTranscriptionResponse["transcription"]["segments"][number];
@@ -68,7 +69,17 @@ export function TranscriptionTextEditor({
     onSegmentsChange,
     onSave,
 }: TranscriptionTextEditorProps) {
+    const { t } = useTranslation();
     const [srtDraft, setSrtDraft] = useState(() => formatSrt(segments, draft));
+    const localizedMessage = message === "Não há uma transcrição disponível para este vídeo. Gere-a e depois confira-a neste editor."
+        ? t("transcriptionPlaceholder")
+        : message === "A transcrição ainda está em processamento."
+            ? t("transcriptionPending")
+            : message === "Ainda não existe transcrição salva."
+                ? t("noSavedTranscription")
+                : message === "Não foi possível carregar a transcrição."
+                    ? t("transcriptionLoadError")
+                    : message;
 
     useEffect(() => {
         if (!hasChanges) setSrtDraft(formatSrt(segments, draft));
@@ -87,9 +98,9 @@ export function TranscriptionTextEditor({
                 value={srtDraft}
                 onChange={(event) => handleChange(event.target.value)}
                 readOnly={isBusy}
-                placeholder={message || "Não há uma transcrição disponível para este vídeo. Gere-a e depois confira-a neste editor."}
+                placeholder={localizedMessage || t("transcriptionPlaceholder")}
                 spellCheck={false}
-                aria-label="Transcrição no formato SRT"
+                aria-label={t("srtTranscription")}
             />
             <div className="flex justify-end">
                 <button
@@ -98,7 +109,7 @@ export function TranscriptionTextEditor({
                     onClick={() => void onSave()}
                     disabled={isBusy || !hasChanges}
                 >
-                    Salvar transcrição
+                    {t("saveTranscription")}
                 </button>
             </div>
         </div>

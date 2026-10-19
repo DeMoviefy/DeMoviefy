@@ -1,6 +1,8 @@
 // src/core/components/ProcessingProgress.tsx
 
 import { memo } from "react";
+import { useTranslation } from "react-i18next";
+import { getAnalyzingFrameProgress } from "src/core/utils/videoHelpers";
 
 type ProcessingProgressProps = {
   modelName: string;
@@ -10,17 +12,6 @@ type ProcessingProgressProps = {
   message: string | null;
 };
 
-const STAGE_LABELS: Record<string, string> = {
-  queued: "Na fila",
-  preparing: "Preparando vídeo",
-  analyzing: "Analisando vídeo",
-  analysis_complete: "Análise concluída",
-  transcribing: "Transcrevendo vídeo",
-  transcription_skipped: "Transcrição ignorada",
-  completed: "Concluído",
-  error: "Erro no processamento",
-};
-
 export const ProcessingProgress = memo(function ProcessingProgress({
   modelName,
   progress,
@@ -28,8 +19,17 @@ export const ProcessingProgress = memo(function ProcessingProgress({
   etaSeconds,
   message,
 }: ProcessingProgressProps) {
+  const { t } = useTranslation();
+  const stageLabels: Record<string, string> = {
+    queued: t("queued"), preparing: t("preparingVideo"), analyzing: t("analyzingVideo"),
+    analysis_complete: t("analysisComplete"), transcribing: t("transcribingVideo"),
+    transcription_skipped: t("transcriptionSkipped"), completed: t("completed"), error: t("processingError"),
+  };
   const safeProgress = Math.max(0, Math.min(progress, 100));
-  const statusMessage = message || STAGE_LABELS[stage] || stage;
+  const frameProgress = getAnalyzingFrameProgress(message);
+  const statusMessage = frameProgress
+    ? t("analyzingFrames", frameProgress)
+    : message || stageLabels[stage] || stage;
 
   return (
     <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-5 dark:border-neutral-700 dark:bg-neutral-800">
@@ -39,7 +39,7 @@ export const ProcessingProgress = memo(function ProcessingProgress({
       <div
         className="h-1.5 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700"
         role="progressbar"
-        aria-label="Progresso do processamento"
+        aria-label={t("processingProgress")}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={safeProgress}

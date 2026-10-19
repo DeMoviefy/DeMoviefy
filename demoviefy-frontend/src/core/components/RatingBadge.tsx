@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 interface RatingBadgeProps {
   level: number;
   label: string;
@@ -13,20 +15,25 @@ const RATING_COLORS: Record<number, string> = {
 };
 
 export function RatingBadge({ level, label }: RatingBadgeProps) {
+  const { t } = useTranslation();
   const bgColor = RATING_COLORS[level] || RATING_COLORS[1];
+  const ratingKeys = ["", "ratingFree", "rating10", "rating12", "rating14", "rating16", "rating18"] as const;
+  const labelKey = ratingKeys[level];
+  const displayLabel = labelKey ? t(labelKey) : label;
 
   return (
     <div className="flex items-center gap-2">
       <span 
         className="flex items-center justify-center font-bold text-white rounded-md w-8 h-8 text-sm"
         style={{ backgroundColor: bgColor }}
-        title={`Nível de periculosidade: ${level}/6`}
+        title={t("dangerLevel", { level })}
       >
         {level === 1 ? 'L' : label.split(' ')[0]}
       </span>
       <span className="text-sm font-medium text-(--text)">
-        {label}
+        {displayLabel}
       </span>
     </div>
   );
 }
+

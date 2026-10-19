@@ -1,20 +1,17 @@
+import { useTranslation } from "react-i18next";
+
 type StatusBadgeProps = {
     status: string;
 };
 
-const STATUS_LABELS: Record<string, string> = {
-    PROCESSANDO: "Na fila",
-    PROCESSANDO_IA: "Processando",
-    PROCESSADO: "Concluído",
-    SEM_ANALISE: "Sem análise",
-    CANCELADO: "Cancelado",
-    ERRO_ARQUIVO: "Erro no arquivo",
-    ERRO_IA: "Erro na análise",
-};
-
 export function StatusBadge({ status }: StatusBadgeProps) {
+    const { t } = useTranslation();
     const normalized = status.toUpperCase();
-    const label = STATUS_LABELS[normalized] ?? status;
+    const statusLabels: Record<string, string> = {
+        PROCESSANDO: t("queued"), PROCESSANDO_IA: t("processing"), PROCESSADO: t("statusProcessed"),
+        SEM_ANALISE: t("statusNoAnalysis"), CANCELADO: t("statusCancelled"), ERRO_ARQUIVO: t("statusFileError"), ERRO_IA: t("statusAnalysisError"),
+    };
+    const label = statusLabels[normalized] ?? status;
     const tone =
         normalized === "PROCESSADO"
             ? "success"
@@ -42,3 +39,4 @@ export function StatusBadge({ status }: StatusBadgeProps) {
         </span>
     );
 }
+

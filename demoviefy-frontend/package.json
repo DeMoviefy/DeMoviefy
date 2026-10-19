@@ -12,8 +12,10 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.5",
+    "i18next": "^26.5.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-i18next": "^17.1.0",
     "react-icons": "^5.7.0",
     "react-router-dom": "^7.13.0",
     "sonner": "^2.0.7",
