@@ -2,6 +2,7 @@
 
 import { StatusBadge } from "src/core/components/StatusBadge"
 import { ProcessingProgress } from "src/core/components/ProcessingProgress"
+import { formatVideoModelName } from "src/core/utils/videoHelpers"
 import type { VideoRecord } from "src/core/types/videoTypes"
 
 type WorkbenchHeaderProps = {
@@ -30,7 +31,7 @@ export function WorkbenchHeader({ video }: WorkbenchHeaderProps) {
   
       {video.status.startsWith("PROCESSANDO") && (
         <ProcessingProgress
-          modelName={video.ai_config.model_name}
+          modelName={formatVideoModelName(video.ai_config.model_name)}
           progress={video.processing.processing_progress}
           stage={video.processing.processing_stage}
           etaSeconds={video.processing.processing_eta_seconds}

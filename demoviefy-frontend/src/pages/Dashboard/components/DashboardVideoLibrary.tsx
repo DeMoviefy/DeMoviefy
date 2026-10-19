@@ -4,6 +4,7 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 import { StatusBadge } from "src/core/components/StatusBadge";
 import type { VideoRecord } from "src/core/types/videoTypes";
+import { formatVideoModelName } from "src/core/utils/videoHelpers";
 
 type DashboardVideoLibraryProps = {
   videos: VideoRecord[];
@@ -146,7 +147,7 @@ export const DashboardVideoLibrary = memo(
                     <div className="mt-2 pt-2">
                       <div className="flex justify-between gap-3 text-xs">
                         <span className="truncate font-medium text-neutral-700 dark:text-neutral-300">
-                          {video.ai_config.model_name}
+                          {formatVideoModelName(video.ai_config.model_name)}
                         </span>
 
                         <span className="shrink-0 text-neutral-500 dark:text-neutral-400">

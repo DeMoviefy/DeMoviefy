@@ -1,8 +1,10 @@
+import { useEffect } from "react";
 import type { VideoTranscriptionResponse } from "src/core/types/videoTypes";
 import { GenerateTranscription } from "src/pages/Video/components/GenerateTranscription";
 import { TranscriptionTextEditor } from "src/pages/Video/components/TranscriptionTextEditor";
 import { TranslateTranscription } from "src/pages/Video/components/TranslateTranscription";
 import { useTranscriptionStore } from "src/pages/Video/stores/useTranscriptionStore";
+import { useVideoDetailStore } from "src/pages/Video/stores/useVideoDetailStore";
 
 type TranscriptionVariant = NonNullable<VideoTranscriptionResponse["variants"]>[number];
 
@@ -11,6 +13,7 @@ type TranscriptionWorkbenchProps = {
 };
 
 export function TranscriptionWorkbench({ isBusy }: TranscriptionWorkbenchProps) {
+    const videoId = useVideoDetailStore((state) => state.video?.id);
     const {
         transcription,
         transcriptionDraft,
@@ -30,6 +33,11 @@ export function TranscriptionWorkbench({ isBusy }: TranscriptionWorkbenchProps) 
         onGenerateTranscription,
         translateTranscription,
     } = useTranscriptionStore();
+
+    useEffect(() => {
+        setModel("small");
+    }, [videoId, setModel]);
+
     const variants: TranscriptionVariant[] = transcription?.variants ?? [
         { id: "default", label: "Transcrição principal", language: null },
     ];

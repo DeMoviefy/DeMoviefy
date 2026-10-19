@@ -1,3 +1,5 @@
+import { formatVideoModelName, getVideoModelSizeOrder } from "src/core/utils/videoHelpers";
+
 type VideoAnalysisConfigProps = {
     taskType: string
     modelPath: string
@@ -33,9 +35,9 @@ export function VideoAnalysisConfig({
   onClipStartChange,
   onClipEndChange,
 }: VideoAnalysisConfigProps) {
-  const filteredModels = models.filter(
-    (model) => model.task_type === taskType
-  )
+  const filteredModels = models
+    .filter((model) => model.task_type === taskType)
+    .sort((a, b) => getVideoModelSizeOrder(a.name) - getVideoModelSizeOrder(b.name))
 
   return (
     <div className="flex flex-col gap-6">
@@ -92,11 +94,9 @@ export function VideoAnalysisConfig({
                 onChange={(e) => onModelChange(e.target.value)}
                 className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"
               >
-                <option value="">Selecione um modelo</option>
-  
                 {filteredModels.map((model) => (
                   <option key={model.relative_path} value={model.relative_path}>
-                    {model.name}
+                    {formatVideoModelName(model.name)}
                   </option>
                 ))}
               </select>

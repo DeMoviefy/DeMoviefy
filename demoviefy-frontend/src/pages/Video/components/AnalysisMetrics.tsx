@@ -1,7 +1,7 @@
 // src/pages/Dashboard/components/AnalysisMetrics.tsx
 
 import { memo } from "react"
-import { formatSeconds } from "src/core/utils/videoHelpers"
+import { formatSeconds, formatVideoModelName } from "src/core/utils/videoHelpers"
 import type { VideoAnalysisResponse } from "src/core/types/videoTypes"
 
 type AnalysisMetricsProps = {
@@ -27,9 +27,9 @@ export const AnalysisMetrics = memo(function AnalysisMetrics({
                         </span>
                         <strong
                             className="mt-1 block truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100"
-                            title={modelName}
+                            title={formatVideoModelName(modelName)}
                         >
-                            {modelName}
+                            {formatVideoModelName(modelName)}
                         </strong>
                     </div>
 

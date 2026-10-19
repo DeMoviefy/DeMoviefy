@@ -11,18 +11,18 @@ type GenerateTranscriptionProps = {
 };
 
 const MODEL_OPTIONS = [
-    { value: "tiny", label: "Rápida (tiny)" },
-    { value: "base", label: "Equilibrada (base)" },
-    { value: "small", label: "Mais precisa (small)" },
-    { value: "medium", label: "Alta precisão (medium)" },
-    { value: "large", label: "Máxima precisão (large)" },
+    { value: "tiny", label: "Muito rápida" },
+    { value: "base", label: "Rápida" },
+    { value: "small", label: "Equilibrada" },
+    { value: "medium", label: "Precisa" },
+    { value: "large", label: "Muito precisa" },
 ];
 
 const LANGUAGE_LABELS: Record<string, string> = {
     auto: "Detectar automaticamente",
     pt: "Português",
-    en: "English",
-    es: "Español",
+    en: "Inglês",
+    es: "Espanhol",
 };
 
 const SELECT_CLASS = "mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-blue-400 dark:focus:ring-blue-900";

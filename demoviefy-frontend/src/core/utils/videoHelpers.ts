@@ -23,16 +23,47 @@ export function getApiErrorMessage(error: unknown, fallback: string) {
     return axiosError.response?.data?.error ?? axiosError.response?.data?.message ?? fallback;
 }
 
-// Retorna o caminho relativo do diretório para o primeiro modelo encontrado para uma determinada tarefa.
+// Prefere o modelo equilibrado da tarefa e usa o primeiro disponível como fallback.
 
 export function chooseFirstModel(models: AIModelOption[], taskType: string): string {
-    return models.find((model) => model.task_type === taskType)?.relative_path ?? "";
+    const taskModels = models.filter((model) => model.task_type === taskType);
+    const balancedModel = taskModels.find((model) => getVideoModelSize(model.name) === "m");
+    return balancedModel?.relative_path ?? taskModels[0]?.relative_path ?? "";
 }
 
 // Define que a tarefa padrão para os modelos é a detecção de objetos.
 
 export function choosePreferredTask(tasks: AITaskOption[]): string {
     return tasks.find((task) => task.task_type === "object_detection")?.task_type ?? tasks[0]?.task_type ?? "object_detection";
+}
+
+const VIDEO_MODEL_SIZE_LABELS: Record<string, string> = {
+    n: "Muito rápida",
+    s: "Rápida",
+    m: "Equilibrada",
+    l: "Precisa",
+    x: "Muito precisa",
+};
+
+const VIDEO_MODEL_SIZE_ORDER: Record<string, number> = { n: 0, s: 1, m: 2, l: 3, x: 4 };
+
+export function getVideoModelSize(modelName: string): string | undefined {
+    const fileName = modelName.split(/[\\/]/).pop() ?? modelName;
+    const modelStem = fileName.replace(/\.pt$/i, "");
+    return (
+        modelStem.match(/yolo(?:v?\d+)([nsmlx])(?:[-_.]|$)/i)?.[1]?.toLowerCase()
+        ?? modelStem.match(/(?:^|[-_.])([nsmlx])$/i)?.[1]?.toLowerCase()
+    );
+}
+
+export function getVideoModelSizeOrder(modelName: string): number {
+    const size = getVideoModelSize(modelName);
+    return size ? VIDEO_MODEL_SIZE_ORDER[size] : Number.MAX_SAFE_INTEGER;
+}
+
+export function formatVideoModelName(modelName: string): string {
+    const size = getVideoModelSize(modelName);
+    return size ? VIDEO_MODEL_SIZE_LABELS[size] : modelName;
 }
 
 // Cria uma assinatura única baseada no estado e configurações do vídeo para controlar o cache do useEffect.
@@ -114,5 +145,5 @@ export function formatSeconds(value: number | null | undefined) {
 
 export function formatVariantLabel(variant: VideoAnalysisVariant) {
   const createdAt = variant.created_at ? new Date(variant.created_at).toLocaleString() : "Sem data";
-  return `${variant.task_label} - ${variant.model_name} - ${createdAt}`;
+  return `${variant.task_label} - ${formatVideoModelName(variant.model_name)} - ${createdAt}`;
 }

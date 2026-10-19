@@ -13,7 +13,11 @@ type TranslateTranscriptionProps = {
     onTranslate: (sourceVariant: string, targetLanguage: string) => void;
 };
 
-const LANGUAGES = ["pt", "en", "es"];
+const LANGUAGES = [
+    { value: "en", label: "Inglês" },
+    { value: "es", label: "Espanhol" },
+    { value: "pt", label: "Português" },
+];
 const SELECT_CLASS = "mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-blue-400 dark:focus:ring-blue-900";
 
 export function TranslateTranscription({
@@ -48,13 +52,13 @@ export function TranslateTranscription({
                     >
                         {hasTranscription
                             ? variants.map((variant) => <option key={variant.id} value={variant.id}>{variant.label}</option>)
-                            : <option value="">Nenhuma transcrição disponível</option>}
+                            : <option value="">Nenhuma versão disponível</option>}
                     </select>
                 </label>
                 <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                     Idioma da tradução
                     <select value={targetLanguage} onChange={(event) => setTargetLanguage(event.target.value)} className={SELECT_CLASS} disabled={isBusy || !hasTranscription}>
-                        {LANGUAGES.map((language) => <option key={language} value={language}>{language.toUpperCase()}</option>)}
+                        {LANGUAGES.map((language) => <option key={language.value} value={language.value}>{language.label}</option>)}
                     </select>
                 </label>
             </div>

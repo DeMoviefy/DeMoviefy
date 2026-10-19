@@ -6,7 +6,7 @@ import { FaRegClock } from "react-icons/fa";
 import { toast } from "sonner";
 
 import { StatusBadge } from "src/core/components/StatusBadge";
-import { getApiErrorMessage } from "src/core/utils/videoHelpers";
+import { formatVideoModelName, getApiErrorMessage } from "src/core/utils/videoHelpers";
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
 import { VideoUploadService } from "src/pages/Dashboard/services/videoUploadService";
 
@@ -92,7 +92,7 @@ export function ProcessingQueuePanel() {
                     </div>
 
                     <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs font-medium text-neutral-600 dark:text-neutral-300">
-                      <span>{video.ai_config.model_name}</span>
+                      <span>{formatVideoModelName(video.ai_config.model_name)}</span>
                     </div>
                   </div>
 
