@@ -139,6 +139,7 @@ export function NewVideoPanel() {
                         modelPath={uploadModelPath}
                         clipStart={uploadClipStart}
                         clipEnd={uploadClipEnd}
+                        videoSource={file}
                         tasks={tasks}
                         models={models}
                         onTaskChange={handleUploadTaskChange}

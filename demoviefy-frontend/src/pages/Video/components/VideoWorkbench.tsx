@@ -91,6 +91,8 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                         <div className="mt-6">
                             <VideoConfigPanel
                                 config={config}
+                                videoSource={currentVideo.video_url}
+                                durationSeconds={analysis?.video_id === currentVideo.id ? summary?.video_duration_sec ?? null : null}
                                 onConfigChange={onConfigChange}
                                 isBusy={isBusy || isProcessing}
                                 onReprocess={onReprocess}

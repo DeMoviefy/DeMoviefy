@@ -13,6 +13,8 @@ import type { AiConfigPayload, VideoRecord } from "src/core/types/videoTypes"
 
 interface VideoConfigPanelProps {
     config: AiConfigPayload
+    videoSource: string
+    durationSeconds: number | null
     onConfigChange: (config: AiConfigPayload) => void
     isBusy: boolean
     onReprocess: () => void
@@ -20,6 +22,8 @@ interface VideoConfigPanelProps {
 
 export function VideoConfigPanel({
     config,
+    videoSource,
+    durationSeconds,
     onConfigChange,
     isBusy,
     onReprocess,
@@ -78,6 +82,8 @@ export function VideoConfigPanel({
                         modelPath={config.model_path}
                         clipStart={config.clip_start_sec}
                         clipEnd={config.clip_end_sec}
+                        videoSource={videoSource}
+                        knownDurationSeconds={durationSeconds}
                         tasks={tasks}
                         models={models}
                         onTaskChange={(value) => update("task_type", value)}

@@ -71,7 +71,7 @@ export function ProcessingQueuePanel() {
         </div>
       ) : (
         <div
-          className="max-h-96 overflow-y-auto pr-2 lg:max-h-[32rem] xl:max-h-[40rem]"
+          className="max-h-96 overflow-y-auto pr-2 lg:max-h-128 xl:max-h-160"
           role="region"
           aria-label="Vídeos em processamento"
           tabIndex={0}
@@ -92,7 +92,7 @@ export function ProcessingQueuePanel() {
                     </div>
 
                     <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs font-medium text-neutral-600 dark:text-neutral-300">
-                      <span>{formatVideoModelName(video.ai_config.model_name)}</span>
+                      <span>Análise: {formatVideoModelName(video.ai_config.model_name)}</span>
                     </div>
                   </div>
 
@@ -109,16 +109,21 @@ export function ProcessingQueuePanel() {
                     />
                   </div>
 
-                  <div className="mt-2 flex items-start justify-between gap-4 text-xs text-neutral-500 dark:text-neutral-400">
+                  <div className="mt-2 flex items-center justify-between gap-4 text-xs text-neutral-500 dark:text-neutral-400">
                     <span className="min-w-0 truncate">
                       {video.processing.processing_message}
                     </span>
 
-                    <span className="shrink-0 font-semibold tabular-nums text-neutral-700 dark:text-neutral-300">
-                      {video.processing.processing_progress}%
-                      {video.processing.processing_eta_seconds !== null &&
-                        ` · ~${video.processing.processing_eta_seconds}s`}
-                    </span>
+                    <div className="flex shrink-0 items-center gap-3 whitespace-nowrap tabular-nums">
+                      <span className="font-semibold text-neutral-700 dark:text-neutral-300">
+                        {video.processing.processing_progress}%
+                      </span>
+                      {video.processing.processing_eta_seconds !== null && (
+                        <span className="text-neutral-500 dark:text-neutral-400">
+                          ~{video.processing.processing_eta_seconds}s
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <button
