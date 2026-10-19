@@ -3,10 +3,12 @@ import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 
 import { UserService } from "src/core/services/userService";
+import { useTranslation } from "react-i18next";
 
 import "./index.css";
 
 export default function Cadastro() {
+  const { t } = useTranslation();
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -24,7 +26,7 @@ export default function Cadastro() {
         senha: String(formData.get("password")),
         senha_confirmada: String(formData.get("confirm-password")),
       });
-      setFeedback("Conta criada com sucesso. Você já pode entrar.");
+      setFeedback(t("accountCreated"));
       form.reset();
     } catch (error: unknown) {
       const message = axios.isAxiosError<{ error?: string }>(error)
@@ -41,38 +43,38 @@ export default function Cadastro() {
       <div className="auth-panel signup-panel">
         <div className="auth-intro">
           <span className="auth-kicker">DeMoviefy</span>
-          <h1>Seu próximo filme começa aqui.</h1>
-          <p>Crie sua conta para organizar e descobrir histórias para assistir.</p>
+          <h1>{t("signupTitle")}</h1>
+          <p>{t("signupDescription")}</p>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-heading">
-            <span className="auth-kicker">Nova conta</span>
-            <h2>Cadastre-se</h2>
+            <span className="auth-kicker">{t("newAccount")}</span>
+            <h2>{t("register")}</h2>
           </div>
 
           <label className="auth-field">
-            <span>Nome</span>
-            <input autoComplete="name" name="name" placeholder="Seu nome" required />
+            <span>{t("name")}</span>
+            <input autoComplete="name" name="name" placeholder={t("yourName")} required />
           </label>
           <label className="auth-field">
-            <span>E-mail</span>
-            <input autoComplete="email" name="email" placeholder="voce@exemplo.com" required type="email" />
+            <span>{t("email")}</span>
+            <input autoComplete="email" name="email" placeholder="you@example.com" required type="email" />
           </label>
           <label className="auth-field">
-            <span>Senha</span>
-            <input autoComplete="new-password" minLength={8} name="password" placeholder="No mínimo 8 caracteres" required type="password" />
+            <span>{t("password")}</span>
+            <input autoComplete="new-password" minLength={8} name="password" placeholder={t("minPassword")} required type="password" />
           </label>
           <label className="auth-field">
-            <span>Confirme sua senha</span>
-            <input autoComplete="new-password" minLength={8} name="confirm-password" placeholder="Digite a senha novamente" required type="password" />
+            <span>{t("confirmPassword")}</span>
+            <input autoComplete="new-password" minLength={8} name="confirm-password" placeholder={t("repeatPassword")} required type="password" />
           </label>
 
           <button className="auth-submit" disabled={isSubmitting} type="submit">
-            {isSubmitting ? "Criando conta..." : "Criar conta"}
+            {isSubmitting ? t("creatingAccount") : t("createAccount")}
           </button>
           {feedback && <p aria-live="polite" className="auth-feedback" role="status">{feedback}</p>}
-          <p className="auth-switch">Já tem uma conta? <Link to="/login">Entrar</Link></p>
+          <p className="auth-switch">{t("hasAccount")} <Link to="/login">{t("login")}</Link></p>
         </form>
       </div>
     </section>

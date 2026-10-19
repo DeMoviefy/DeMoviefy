@@ -4,10 +4,12 @@ import axios from "axios";
 
 import { UserService } from "src/core/services/userService";
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
+import { useTranslation } from "react-i18next";
 
 import "./index.css";
 
 export default function Login() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,30 +48,30 @@ export default function Login() {
       <div className="auth-panel signin-panel">
         <div className="auth-intro">
           <span className="auth-kicker">DeMoviefy</span>
-          <h1>Que bom ter você de volta.</h1>
-          <p>Entre para continuar sua jornada pelo mundo dos filmes.</p>
+          <h1>{t("loginWelcome")}</h1>
+          <p>{t("loginDescription")}</p>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-heading">
-            <span className="auth-kicker">Acesse sua conta</span>
-            <h2>Entrar</h2>
+            <span className="auth-kicker">{t("accountAccess")}</span>
+            <h2>{t("login")}</h2>
           </div>
 
           <label className="auth-field">
-            <span>E-mail</span>
-            <input autoComplete="email" name="email" placeholder="voce@exemplo.com" required type="email" />
+            <span>{t("email")}</span>
+            <input autoComplete="email" name="email" placeholder="you@example.com" required type="email" />
           </label>
           <label className="auth-field">
-            <span>Senha</span>
-            <input autoComplete="current-password" name="password" placeholder="Sua senha" required type="password" />
+            <span>{t("password")}</span>
+            <input autoComplete="current-password" name="password" placeholder={t("yourPassword")} required type="password" />
           </label>
 
           <button className="auth-submit" disabled={isSubmitting} type="submit">
-            {isSubmitting ? "Entrando..." : "Entrar"}
+            {isSubmitting ? t("signingIn") : t("login")}
           </button>
           {feedback && <p aria-live="polite" className="auth-feedback" role="alert">{feedback}</p>}
-          <p className="auth-switch">Ainda não tem uma conta? <Link to="/cadastro">Cadastre-se</Link></p>
+          <p className="auth-switch">{t("noAccount")} <Link to="/cadastro">{t("register")}</Link></p>
         </form>
       </div>
     </section>

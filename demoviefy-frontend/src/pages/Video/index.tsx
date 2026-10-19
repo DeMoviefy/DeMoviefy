@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { useVideoDetailStore } from "src/pages/Video/stores/useVideoDetailStore";
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
@@ -7,6 +8,7 @@ import { useCatalogStore } from "src/core/stores/useAICatalogStore";
 import { VideoWorkbench } from "src/pages/Video/components/VideoWorkbench";
 
 export default function Video() {
+    const { t } = useTranslation();
     const { id } = useParams<{ id: string }>();
     const parsedId = id ? Number(id) : NaN;
     const isValidId = !Number.isNaN(parsedId);
@@ -27,8 +29,8 @@ export default function Video() {
     const error = useVideoDetailStore((state) => state.error);
     const { videoConfig, setVideoConfig, handleReprocess } = useVideoConfig(video);
 
-    if (!isValidId) return <p>ID de vídeo inválido.</p>;
-    if (loading && !video) return <p>Carregando vídeo...</p>;
+    if (!isValidId) return <p>{t("invalidVideoId")}</p>;
+    if (loading && !video) return <p>{t("loadingVideo")}</p>;
     if (error) return <p>{error}</p>;
 
     return (

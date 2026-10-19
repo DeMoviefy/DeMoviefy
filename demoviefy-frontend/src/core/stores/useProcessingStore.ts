@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { toast } from "sonner";
+import i18n from "src/i18n";
 import { createPoller } from "src/core/utils/createPoller";
 import { VideoService } from "src/core/services/videoService";
 import { UserService, type AuthenticatedUser, type SessionStatus } from "src/core/services/userService";
@@ -104,11 +105,11 @@ export const useProcessingStore = create<ProcessingState>((set, get) => ({
                 if (wasInitialized) {
 
                     if (stats.processed > previousStats.processed) {
-                        toast.success("Processamento concluído");
+                        toast.success(i18n.t("processingCompleteToast"));
                     }
 
                     else if (stats.errors > previousStats.errors) {
-                        toast.error("Erro no processamento");
+                        toast.error(i18n.t("processingFailedToast"));
                     }
                 }
 
@@ -125,7 +126,7 @@ export const useProcessingStore = create<ProcessingState>((set, get) => ({
             } catch (error) {
                 console.error(error);
 
-                toast.error(getApiErrorMessage(error, "Erro ao buscar vídeos."));
+                toast.error(getApiErrorMessage(error, i18n.t("fetchVideosError")));
 
             } finally {
                 set({ loading: false });

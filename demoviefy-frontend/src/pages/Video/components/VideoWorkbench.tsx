@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useVideoPlayer } from "src/pages/Video/hooks/useVideoPlayer";
 import { useAnalysisStore } from "src/pages/Video/stores/useAnalysisStore";
@@ -33,6 +34,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
     onConfigChange,
     onReprocess,
 }: VideoWorkbenchProps) {
+    const { t } = useTranslation();
     const processingVideo = useProcessingStore((state) =>
         state.videos.find((item) => item.id === video?.id)
     );
@@ -57,7 +59,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
     const availableLanguages = transcription?.available_languages ?? [];
     const hasTranscription = Boolean(transcription?.available);
     const transcriptionVariants = transcription?.variants ?? [
-        { id: "default", label: "Transcrição principal", language: null },
+        { id: "default", label: t("primaryTranscription"), language: null },
     ];
     const originalSegments = transcription?.transcription.segments ?? [];
     const transcriptionContent = transcription?.transcription.content ?? "";
@@ -104,7 +106,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                 <div className="flex min-w-0 flex-col gap-6">
                 <div className="min-w-0">
                         <h3 className="mb-6 text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-                            Detalhes da análise
+                            {t("detailsAnalysis")}
                         </h3>
                         <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
                             <div className="bg-neutral-50 px-3 py-5 dark:bg-neutral-900">

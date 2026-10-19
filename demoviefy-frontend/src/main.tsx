@@ -4,6 +4,7 @@ import  App  from "src/app/App"
 
 import "src/index.css";
 import { StrictMode } from "react";
+import "src/i18n";
 
 
 function StartupScreen({ title, message }: { title: string; message: string }) {

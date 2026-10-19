@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { VideoRecord } from "src/core/types/videoTypes";
 
 interface VideoPreviewPanelProps {
@@ -16,29 +17,30 @@ function getAnnotatedPreviewState(
 ) {
     if (isReprocessing) {
         return {
-            title: "Vídeo sendo processado",
-            message: "O vídeo está sendo processado com uma nova configuração. O preview anotado estará disponível quando terminar.",
+            title: "previewProcessing",
+            message: "previewProcessingMessage",
         };
     }
     if (annotatedPlaybackError && hasSelectedAnalysis) {
         return {
-            title: "Não foi possível reproduzir o vídeo anotado",
-            message: "O preview anotado foi gerado, mas falhou ao abrir no navegador. Reprocesse o vídeo para regenerar um MP4 compatível ou abra o arquivo salvo em uma nova guia.",
+            title: "previewPlaybackError",
+            message: "previewPlaybackErrorMessage",
         };
     }
     if (analysisState === "pending") {
         return {
-            title: "Vídeo anotado ainda não disponível",
-            message: "A IA ainda está processando o arquivo. Quando terminar, o preview anotado aparece aqui.",
+            title: "previewPending",
+            message: "previewPendingMessage",
         };
     }
     return {
-        title: "Vídeo anotado indisponível",
-        message: "Não há uma análise disponível para este vídeo.",
+        title: "previewUnavailable",
+        message: "previewUnavailableMessage",
     };
 }
 
 export function VideoPreviewPanel({ video, analysisState, annotatedVideoSrc, hasSelectedAnalysis }: VideoPreviewPanelProps) {
+    const { t } = useTranslation();
     const [annotatedPlaybackError, setAnnotatedPlaybackError] = useState(false);
 
     useEffect(() => {
@@ -65,12 +67,12 @@ export function VideoPreviewPanel({ video, analysisState, annotatedVideoSrc, has
                     src={annotatedVideoSrc}
                     onError={() => setAnnotatedPlaybackError(true)}
                 >
-                    Seu navegador não suporta reproduzir este vídeo.
+                    {t("videoUnsupported")}
                 </video>
             ) : (
                 <div className="flex aspect-video flex-col items-center justify-center bg-neutral-50 px-8 text-center dark:bg-neutral-800">
-                    <strong className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{previewState.title}</strong>
-                    <p className="mt-2 max-w-lg text-sm leading-6 text-neutral-500 dark:text-neutral-400">{previewState.message}</p>
+                    <strong className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{t(previewState.title)}</strong>
+                    <p className="mt-2 max-w-lg text-sm leading-6 text-neutral-500 dark:text-neutral-400">{t(previewState.message)}</p>
                 </div>
             )}
         </article>

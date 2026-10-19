@@ -1,6 +1,7 @@
 // src/pages/Dashboard/components/VideoConfigPanel.tsx
 
 import { useState } from "react"
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom"
 import { useCatalogStore } from "src/core/stores/useAICatalogStore"
 import { FaTrashAlt } from "react-icons/fa"
@@ -24,7 +25,7 @@ export function VideoConfigPanel({
     isBusy,
     onReprocess,
 }: VideoConfigPanelProps) {
-
+    const { t } = useTranslation();
 
     const [isOpen, setIsOpen] = useState(false)
     const { tasks, models } = useCatalogStore()
@@ -39,14 +40,14 @@ export function VideoConfigPanel({
                 <div>
                     <div className="flex items-center gap-3">
                         <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
-                            Reprocessar vídeo
+                            {t("reprocessVideo")}
                         </h3>
                         <button
                             type="button"
                             onClick={() => setIsOpen((open) => !open)}
                             aria-expanded={isOpen}
                             aria-controls="video-reprocess-config"
-                            aria-label={isOpen ? "Recolher configurações" : "Expandir configurações"}
+                            aria-label={isOpen ? t("collapseConfiguration") : t("expandConfiguration")}
                             className={`flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-all hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-100 ${isOpen ? "rotate-180" : ""}`}
                         >
                             <svg
@@ -66,7 +67,7 @@ export function VideoConfigPanel({
                     </div>
 
                     <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-                        Execute uma nova análise do vídeo.
+                        {t("reprocessDescription")}
                     </p>
                 </div>
             </div>
@@ -97,8 +98,8 @@ export function VideoConfigPanel({
                             disabled={isBusy}
                         >
                             {isBusy
-                                ? "Processando..."
-                                : "Reprocessar vídeo"}
+                                ? t("processingNow")
+                                : t("reprocessVideo")}
                         </button>
                     </div>
                 </div>
@@ -110,6 +111,7 @@ export function VideoConfigPanel({
 }
 
 export function DeleteVideoButton({ video }: { video: VideoRecord }) {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const onDeleteVideo = useAnalysisStore((state) => state.onDeleteVideo)
 
@@ -124,8 +126,8 @@ export function DeleteVideoButton({ video }: { video: VideoRecord }) {
     return (
         <div className="flex justify-start border-t border-neutral-100 py-4 dark:border-neutral-800">
             <ConfirmationDialog
-                title="Excluir vídeo"
-                message="Tem certeza de que deseja excluir o vídeo? Esta ação é irreversível."
+                title={t("deleteVideo")}
+                message={t("deleteVideoConfirm")}
                 onConfirm={handleDeleteVideo}
             >
                 {(open) => (
@@ -135,7 +137,7 @@ export function DeleteVideoButton({ video }: { video: VideoRecord }) {
                         onClick={open}
                     >
                         <FaTrashAlt aria-hidden="true" className="size-3" />
-                        Excluir vídeo
+                        {t("deleteVideo")}
                     </button>
                 )}
             </ConfirmationDialog>
