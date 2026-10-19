@@ -60,7 +60,7 @@ export function VideoAnalysisConfig({
               htmlFor="video-analysis-task"
               className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
             >
-              Tarefa IA
+              Tipo de análise
             </label>
   
             <select
@@ -69,8 +69,6 @@ export function VideoAnalysisConfig({
               onChange={(e) => onTaskChange(e.target.value)}
               className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"
             >
-              <option value="">Selecione uma tarefa</option>
-  
               {tasks.map((task) => (
                 <option key={task.task_type} value={task.task_type}>
                   {task.task_label}
@@ -85,7 +83,7 @@ export function VideoAnalysisConfig({
                 htmlFor="video-analysis-model"
                 className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
               >
-                Modelo
+                Precisão da análise
               </label>
   
               <select
