@@ -40,6 +40,7 @@ from app.services.frame_ai_service import (
 )
 from app.services.job_queue_service import get_job_queue
 from app.services.transcription_service import (
+    NoAudioStreamError,
     get_transcription_progress,
     transcribe_video_with_timestamps,
     update_transcription_progress,
@@ -423,6 +424,11 @@ def generate_video_transcription_by_id(video_id: int):
         )
         saved = save_transcription(video_id, **transcription, variant=variant)
         update_transcription_progress(video_id, status="completed", progress=100)
+    except NoAudioStreamError as exc:
+        progress = get_transcription_progress(video_id).get("progress") or 0
+        update_transcription_progress(video_id, status="failed", progress=progress)
+        current_app.logger.info("transcription:rejected_no_audio video_id=%s", video_id)
+        return jsonify({"error": str(exc)}), 400
     except Exception as exc:
         progress = get_transcription_progress(video_id).get("progress") or 0
         update_transcription_progress(video_id, status="failed", progress=progress)

@@ -30,6 +30,33 @@ _progress_lock = threading.Lock()
 _whisper_progress_lock = threading.Lock()
 
 
+class NoAudioStreamError(RuntimeError):
+    """Raised when a video has no audio stream to transcribe."""
+
+
+def _has_audio_stream(video_path: str) -> bool | None:
+    try:
+        result = subprocess.run(
+            [
+                "ffprobe",
+                "-v", "error",
+                "-select_streams", "a:0",
+                "-show_entries", "stream=codec_type",
+                "-of", "default=noprint_wrappers=1:nokey=1",
+                video_path,
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return None
+
+    if result.returncode != 0:
+        return None
+    return bool(result.stdout.strip())
+
+
 def update_transcription_progress(video_id: int, *, status: str, progress: int = 0) -> None:
     TRANSCRIPTIONS_DIR.mkdir(parents=True, exist_ok=True)
     progress_path = TRANSCRIPTIONS_DIR / f"video_{video_id}.progress.json"
@@ -273,6 +300,11 @@ def transcribe_video_with_timestamps(
     proxy_url: str | None = None,
     progress_callback=None,
 ) -> dict[str, Any]:
+    if video_path and _has_audio_stream(video_path) is False:
+        raise NoAudioStreamError(
+            "Este vídeo não possui faixa de áudio. Adicione ou selecione um vídeo com áudio para gerar a transcrição."
+        )
+
     worker_python = resolve_transcription_python()
     worker_error: Exception | None = None
 
