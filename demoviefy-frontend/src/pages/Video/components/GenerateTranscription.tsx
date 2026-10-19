@@ -48,13 +48,13 @@ export function GenerateTranscription({
             </p>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    Modelo de transcrição
+                    Precisão da transcrição
                     <select value={selectedModel} onChange={(event) => onModelChange(event.target.value)} className={SELECT_CLASS} disabled={isBusy}>
                         {MODEL_OPTIONS.map((model) => <option key={model.value} value={model.value}>{model.label}</option>)}
                     </select>
                 </label>
                 <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    Idioma da transcrição
+                    Idioma do vídeo
                     <select value={selectedLanguage || "auto"} onChange={(event) => onLanguageChange(event.target.value)} className={SELECT_CLASS} disabled={isBusy}>
                         {languageOptions.map((language) => (
                             <option key={language} value={language}>{LANGUAGE_LABELS[language] ?? language.toUpperCase()}</option>
