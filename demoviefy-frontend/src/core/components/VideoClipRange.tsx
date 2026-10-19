@@ -100,10 +100,10 @@ function ClipTimeInput({
                     }}
                     placeholder={formatTime(0, format)}
                     aria-label={label}
-                    className="h-5 min-w-0 bg-transparent font-mono text-sm leading-5 tabular-nums text-neutral-900 outline-none dark:text-neutral-100"
+                    className="h-5 min-w-0 bg-transparent text-sm leading-5 text-neutral-900 outline-none dark:text-neutral-100"
                     style={{ width: `${Math.max(2, draft.length + 0.5)}ch` }}
                 />
-                <span className="relative -top-0.5 ml-1 text-sm font-normal leading-5 text-neutral-500 dark:text-neutral-400" aria-hidden="true">
+                <span className="ml-1 text-sm font-normal leading-5 text-neutral-500 dark:text-neutral-400" aria-hidden="true">
                     {unit}
                 </span>
             </div>
