@@ -186,14 +186,14 @@ def generate_multilingual_srt(
     video_id: str,
     segments: list[dict],
     languages: list[str] = ["pt", "en"],
-    proxy_url: str | None = None,
+    source_lang: str | None = None,
 ) -> list[str]:
     """Gera arquivos SRT para múltiplos idiomas com base nos segmentos da transcrição."""
     generated_files = []
     for lang in languages:
         try:
             srt_content = translate_segments_to_srt(
-                segments=segments, target_lang=lang, proxy_url=proxy_url
+                segments=segments, target_lang=lang, source_lang=source_lang
             )
             # Define o caminho do arquivo: uploads/transcriptions/video_{id}_{lang}.srt
             file_path = TRANSCRIPTIONS_DIR / f"video_{video_id}_{lang}.srt"
