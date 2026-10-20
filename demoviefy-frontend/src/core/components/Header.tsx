@@ -91,7 +91,7 @@ export default function Header() {
   return (
     <header className="app-navbar top-0 z-50 border-b border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-950/50">
       <div className="mx-auto flex h-20 w-full items-center justify-between px-8">
-        <NavLink to="/dashboard">
+        <NavLink to="/">
           <img
             src={theme === "dark" ? demoviefyLight : demoviefyDark}
             alt="DeMoviefy"
