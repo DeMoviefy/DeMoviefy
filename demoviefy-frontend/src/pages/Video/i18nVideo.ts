@@ -7,7 +7,7 @@ export const i18nVideo = {
     deleteAnalysis: "Excluir análise",
     deleteAnalysisSelectedConfirm: "Tem certeza de que deseja excluir a análise selecionada?",
     deleteAnalysisConfirm: "Tem certeza de que deseja excluir a análise deste vídeo?",
-    noTranscriptionAvailable: "Nenhuma transcrição disponível",
+    noTranscriptionAvailable: "Sem transcrição disponível",
     transcriptionVersion: "Versão da transcrição",
     deleteTranscription: "Excluir transcrição",
     deleteTranscriptionConfirm: "Tem certeza que deseja excluir esta transcrição? Essa ação não pode ser desfeita.",
