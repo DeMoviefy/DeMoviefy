@@ -93,6 +93,7 @@ Abra uma nova janela do terminal na raiz do projeto, acesse a pasta do frontend,
 ```sh
 cd demoviefy-frontend
 npm install
+npm install react-google-recaptcha 
 npm run dev
 ```
 
