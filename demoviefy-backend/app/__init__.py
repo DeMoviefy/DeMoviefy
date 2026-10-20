@@ -75,6 +75,9 @@ def create_app(test_config: dict | None = None):
     app.config["TRANSCRIPTION_PYTHON"] = os.environ.get("DEMOVIEFY_TRANSCRIPTION_PYTHON")
     app.config["BACKEND_APP_VERSION"] = BACKEND_APP_VERSION
     app.config["API_CONTRACT_VERSION"] = API_CONTRACT_VERSION
+    app.config["RECAPTCHA_ENABLED"] = os.environ.get(
+        "DEMOVIEFY_RECAPTCHA_ENABLED", "true"
+    ).strip().lower() not in {"0", "false", "no", "off"}
 
     if test_config:
         app.config.update(test_config)

@@ -67,6 +67,8 @@ temp/
 demoviefy-fronend/node_modules/
 demoviefy-frontend/dist/
 demoviefy-frontend/.vite/
+demoviefy-frontend/.env.local
+demoviefy-frontend/.env.*.local
 
 */node_modules/
 */dist/

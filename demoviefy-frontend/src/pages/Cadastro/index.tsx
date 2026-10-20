@@ -7,6 +7,8 @@ import { useTranslation } from "react-i18next";
 
 import { UserService } from "src/core/services/userService";
 
+const recaptchaEnabled = import.meta.env.VITE_RECAPTCHA_ENABLED !== "false";
+
 export default function Cadastro() {
   const { t } = useTranslation();
 
@@ -25,7 +27,7 @@ export default function Cadastro() {
 
     setFeedback("");
 
-    if (!recaptchaToken) {
+    if (recaptchaEnabled && !recaptchaToken) {
       setFeedback(t("recaptchaRequired"));
       return;
     }
@@ -40,7 +42,7 @@ export default function Cadastro() {
         senha_confirmada: String(
           formData.get("confirm-password")
         ),
-        recaptcha_token: recaptchaToken,
+        recaptcha_token: recaptchaEnabled ? recaptchaToken! : "",
       });
 
       setFeedback(t("accountCreated"));
@@ -99,17 +101,19 @@ export default function Cadastro() {
           </label>
         </div>
 
-        <div className="mt-5 flex justify-center">
-          <ReCAPTCHA
-            ref={recaptchaRef}
-            sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-            onChange={(token) => setRecaptchaToken(token)}
-            onExpired={() => setRecaptchaToken(null)}
-            onErrored={() => setRecaptchaToken(null)}
-          />
-        </div>
+        {recaptchaEnabled && (
+          <div className="mt-5 flex justify-center">
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+              onChange={(token) => setRecaptchaToken(token)}
+              onExpired={() => setRecaptchaToken(null)}
+              onErrored={() => setRecaptchaToken(null)}
+            />
+          </div>
+        )}
 
-        <button disabled={isSubmitting || !recaptchaToken} type="submit" className="mt-7 w-full cursor-pointer rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-800 dark:hover:bg-blue-700">
+        <button disabled={isSubmitting || (recaptchaEnabled && !recaptchaToken)} type="submit" className="mt-7 w-full cursor-pointer rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-800 dark:hover:bg-blue-700">
           {isSubmitting ? t("creatingAccount") : t("createAccount")}
         </button>
         {feedback && <p aria-live="polite" className="mt-4 text-sm leading-6 text-neutral-600 dark:text-neutral-300" role="status">{feedback}</p>}

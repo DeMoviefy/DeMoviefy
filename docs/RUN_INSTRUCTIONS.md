@@ -79,6 +79,11 @@ Frontend padrao:
 - `DEMOVIEFY_SESSION_LIFETIME_MINUTES`: duração configurável do cookie de sessão em minutos (padrão: `30`; deve ser um inteiro positivo)
 - `DEMOVIEFY_SESSION_COOKIE_SECURE`: use `true` em HTTPS para exigir envio do cookie apenas por conexões seguras (padrão: `false` para desenvolvimento local)
 - `DEMOVIEFY_ADMIN_USER_ID`: ID de um usuário existente com acesso administrativo a todos os vídeos; quando definido, vídeos legados sem proprietário são atribuídos a essa conta. Crie a conta pela tela de cadastro, consulte o ID em `/users/me` após entrar e configure a variável antes de reiniciar o backend.
+- `DEMOVIEFY_RECAPTCHA_ENABLED`: mantém a validação do reCAPTCHA no cadastro (padrão: `true`). Para uma apresentação local sem internet, defina `false` no ambiente do backend e `VITE_RECAPTCHA_ENABLED=false` no ambiente do frontend. O backend continua validando os dados da conta; use essa opção apenas em uma instância local de demonstração. Em produção, mantenha o padrão `true`.
+
+### Apresentação local sem internet
+
+Antes de iniciar o backend, defina `DEMOVIEFY_RECAPTCHA_ENABLED=false` no ambiente dele. Crie `demoviefy-frontend/.env.local` com `VITE_RECAPTCHA_ENABLED=false` e reinicie o frontend, pois o Vite lê essas variáveis ao iniciar. A tela de cadastro não carregará o widget e o backend não fará a chamada ao Google. Essa opção não substitui a conexão necessária para outros recursos que dependam de serviços externos.
 
 Os endpoints `/videos` aceitam uma sessão privada de convidado ou uma sessão autenticada. Convidados só acessam seus próprios vídeos temporários; usuários comuns só acessam os vídeos da própria conta; apenas o usuário configurado em `DEMOVIEFY_ADMIN_USER_ID` pode listar e acessar todos. Em bancos existentes, configure o ID de uma conta existente como administrador para atribuir a ela vídeos legados sem proprietário; enquanto isso, esses vídeos permanecem invisíveis para usuários comuns.
 

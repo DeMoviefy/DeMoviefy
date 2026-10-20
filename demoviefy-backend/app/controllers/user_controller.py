@@ -132,23 +132,24 @@ def register_user():
     if not isinstance(data, dict):
         return jsonify({"error": "Envie os dados do cadastro em JSON."}), 400
 
-    # 1. Recebe e valida o token do reCAPTCHA.
-    token = data.get("recaptcha_token")
-    if not isinstance(token, str) or not token.strip():
-        return jsonify({"error": "Token do reCAPTCHA obrigatório."}), 400
+    # O bypass só pode ser ativado explicitamente para apresentações locais.
+    if current_app.config.get("RECAPTCHA_ENABLED", True):
+        token = data.get("recaptcha_token")
+        if not isinstance(token, str) or not token.strip():
+            return jsonify({"error": "Token do reCAPTCHA obrigatório."}), 400
 
-    try:
-        valid, error_message = verify_recaptcha(token)
-    except RuntimeError:
-        current_app.logger.error(
-            "RECAPTCHA_SECRET_KEY não configurada."
-        )
-        return jsonify({
-            "error": "Serviço de verificação indisponível."
-        }), 503
+        try:
+            valid, error_message = verify_recaptcha(token)
+        except RuntimeError:
+            current_app.logger.error(
+                "RECAPTCHA_SECRET_KEY não configurada."
+            )
+            return jsonify({
+                "error": "Serviço de verificação indisponível."
+            }), 503
 
-    if not valid:
-        return jsonify({"error": error_message}), 403
+        if not valid:
+            return jsonify({"error": error_message}), 403
     
     nome = data.get("nome")
     email = data.get("email")
