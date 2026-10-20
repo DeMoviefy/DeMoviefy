@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { FaMoon, FaSignOutAlt, FaSun, FaUser } from "react-icons/fa";
+import { FaCog, FaMoon, FaSignOutAlt, FaSun, FaUser } from "react-icons/fa";
 import { LuGlobe } from "react-icons/lu";
 import { useThemeStore } from "src/core/stores/useThemeStore";
 import { UserService } from "src/core/services/userService";
@@ -17,6 +17,7 @@ export default function Header() {
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const profileMenuRef = useRef<HTMLDetailsElement>(null);
+  const settingsMenuRef = useRef<HTMLDetailsElement>(null);
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
   const isGuest = useProcessingStore((state) => state.isGuest);
@@ -37,7 +38,7 @@ export default function Header() {
         guest_video_limit: 3,
       });
       await useProcessingStore.getState().refresh();
-      navigate("/", { replace: true });
+      navigate("/dashboard", { replace: true });
       toast.success(t("signedOutToast"));
     } catch (error: unknown) {
       console.error("Não foi possível encerrar a sessão.", error);
@@ -64,30 +65,28 @@ export default function Header() {
   }, [isGuest, setSessionStatus]);
 
   useEffect(() => {
-    if (isGuest !== false) {
-      return;
-    }
-
-    function closeProfileMenu(event: MouseEvent) {
-      const menu = profileMenuRef.current;
-      if (menu?.open && event.target instanceof Node && !menu.contains(event.target)) {
-        menu.open = false;
+    function closeMenus(event: MouseEvent) {
+      for (const menu of [settingsMenuRef.current, profileMenuRef.current]) {
+        if (menu?.open && event.target instanceof Node && !menu.contains(event.target)) {
+          menu.open = false;
+        }
       }
     }
 
-    function closeProfileMenuOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape" && profileMenuRef.current?.open) {
-        profileMenuRef.current.open = false;
+    function closeMenusOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        if (settingsMenuRef.current?.open) settingsMenuRef.current.open = false;
+        if (profileMenuRef.current?.open) profileMenuRef.current.open = false;
       }
     }
 
-    document.addEventListener("pointerdown", closeProfileMenu);
-    document.addEventListener("keydown", closeProfileMenuOnEscape);
+    document.addEventListener("pointerdown", closeMenus);
+    document.addEventListener("keydown", closeMenusOnEscape);
     return () => {
-      document.removeEventListener("pointerdown", closeProfileMenu);
-      document.removeEventListener("keydown", closeProfileMenuOnEscape);
+      document.removeEventListener("pointerdown", closeMenus);
+      document.removeEventListener("keydown", closeMenusOnEscape);
     };
-  }, [isGuest]);
+  }, []);
 
   return (
     <header className="top-0 z-50 border-b border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-950/50">
@@ -101,15 +100,6 @@ export default function Header() {
         </NavLink>
 
         <nav className="flex items-center gap-4">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            aria-label={theme === "light" ? t("darkTheme") : t("lightTheme")}
-            title={theme === "light" ? t("darkTheme") : t("lightTheme")}
-            className="inline-flex size-9 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
-          >
-            {theme === "dark" ? <FaMoon aria-hidden="true" /> : <FaSun aria-hidden="true" />}
-          </button>
           {isGuest !== false && (
             <>
               <NavLink
@@ -126,6 +116,42 @@ export default function Header() {
               </NavLink>
             </>
           )}
+          <details ref={settingsMenuRef} className="group relative">
+            <summary
+              aria-label={t("settings")}
+              title={t("settings")}
+              className="flex size-10 cursor-pointer list-none items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100 dark:focus-visible:ring-offset-neutral-900 [&::-webkit-details-marker]:hidden"
+            >
+              <FaCog aria-hidden="true" />
+            </summary>
+            <div className="absolute right-0 top-full z-50 mt-2 min-w-56 rounded-md border border-neutral-200 bg-white p-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-left text-sm text-neutral-700 transition-colors hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
+              >
+                {theme === "dark" ? (
+                  <FaMoon aria-hidden="true" className="shrink-0 text-neutral-500 dark:text-neutral-400" />
+                ) : (
+                  <FaSun aria-hidden="true" className="shrink-0 text-neutral-500 dark:text-neutral-400" />
+                )}
+                {theme === "dark" ? t("darkMode") : t("lightMode")}
+              </button>
+              <div className="flex items-center gap-2 border-t border-neutral-200 px-3 py-2 dark:border-neutral-700">
+                <LuGlobe aria-hidden="true" className="shrink-0 text-neutral-500 dark:text-neutral-400" />
+                <label className="sr-only" htmlFor="language-select">{t("language")}</label>
+                <select
+                  id="language-select"
+                  value={i18n.language === "en" ? "en" : "pt-BR"}
+                  onChange={(event) => void i18n.changeLanguage(event.target.value)}
+                  className="min-w-0 flex-1 cursor-pointer border-0 bg-transparent text-sm text-neutral-700 outline-none dark:text-neutral-200"
+                >
+                  <option value="pt-BR">{t("portuguese")}</option>
+                  <option value="en">{t("english")}</option>
+                </select>
+              </div>
+            </div>
+          </details>
           {isGuest === false && (
             <details ref={profileMenuRef} className="group relative ml-2">
               <summary
@@ -139,19 +165,6 @@ export default function Header() {
                 <div className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-neutral-800 dark:text-neutral-100">
                   <FaUser aria-hidden="true" className="shrink-0 text-neutral-500 dark:text-neutral-400" />
                   <span className="truncate">{currentUser?.nome ?? "DeMoviefy"}</span>
-                </div>
-                <div className="flex items-center gap-2 border-b border-neutral-200 px-3 py-2 dark:border-neutral-700">
-                  <LuGlobe aria-hidden="true" className="shrink-0 text-neutral-500 dark:text-neutral-400" />
-                  <label className="sr-only" htmlFor="language-select">{t("language")}</label>
-                  <select
-                    id="language-select"
-                    value={i18n.language === "en" ? "en" : "pt-BR"}
-                    onChange={(event) => void i18n.changeLanguage(event.target.value)}
-                    className="min-w-0 flex-1 rounded-md border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200"
-                  >
-                    <option value="pt-BR">{t("portuguese")}</option>
-                    <option value="en">{t("english")}</option>
-                  </select>
                 </div>
                 <button
                   type="button"

@@ -29,6 +29,7 @@ export default function Login() {
         guest_video_count: 0,
         guest_video_limit: 3,
       });
+      toast.success(t("welcomeToast", { name: response.user.nome }));
       navigate("/dashboard", { replace: true });
     } catch (error: unknown) {
       const message = axios.isAxiosError<{ error?: string }>(error)
