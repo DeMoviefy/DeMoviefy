@@ -65,7 +65,7 @@ npm run dev
 Frontend padrao:
 
 - `http://localhost:5173`
-- A API usa por padrão o mesmo hostname do frontend na porta `5000`, para que o cookie `SameSite=Lax` funcione durante o login local. Se definir `VITE_API_URL`, use o mesmo hostname usado para abrir o frontend (`localhost` ou `127.0.0.1`).
+- A API usa por padrão o mesmo protocolo e hostname do frontend na porta `5000`, para que as chamadas autenticadas enviem o cookie de sessão também em HTTPS. Se definir `VITE_API_URL`, use o mesmo hostname usado para abrir o frontend (`localhost` ou `127.0.0.1`) e o protocolo correspondente; nomes diferentes, como `localhost` e `127.0.0.1`, podem impedir o envio do cookie `SameSite=Lax`.
 
 ## Variaveis uteis
 
@@ -75,7 +75,7 @@ Frontend padrao:
 - `FRAME_AI_CONFIDENCE`: confianca minima da detecção
 - `FRAME_AI_MAX_FRAMES`: limite de frames processados
 - `DEMOVIEFY_FRONTEND_ORIGINS`: origens do frontend permitidas para chamadas com sessão, separadas por vírgula (padrão: `http://localhost:5173,http://127.0.0.1:5173`)
-- `DEMOVIEFY_SECRET_KEY`: segredo persistente usado para assinar sessões Flask
+- `DEMOVIEFY_SECRET_KEY`: segredo compartilhado e persistente usado para assinar sessões Flask. Se omitido, o backend cria e reutiliza um segredo local em `demoviefy-backend/instance`; configure esta variável com o mesmo valor em todas as instâncias/contêineres do backend.
 - `DEMOVIEFY_SESSION_LIFETIME_MINUTES`: duração configurável do cookie de sessão em minutos (padrão: `30`; deve ser um inteiro positivo)
 - `DEMOVIEFY_SESSION_COOKIE_SECURE`: use `true` em HTTPS para exigir envio do cookie apenas por conexões seguras (padrão: `false` para desenvolvimento local)
 - `DEMOVIEFY_ADMIN_USER_ID`: ID de um usuário existente com acesso administrativo a todos os vídeos; quando definido, vídeos legados sem proprietário são atribuídos a essa conta. Crie a conta pela tela de cadastro, consulte o ID em `/users/me` após entrar e configure a variável antes de reiniciar o backend.

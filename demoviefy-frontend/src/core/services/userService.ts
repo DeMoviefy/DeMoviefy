@@ -36,11 +36,6 @@ export type SessionStatus = {
   guest_video_limit: number;
 };
 
-export type RestoredUserFromCOOKIE = {
-  message: string;
-  user: AuthenticatedUser;
-};
-
 export class UserService {
   static async register(input: RegisterUserInput): Promise<RegisteredUser> {
     const { data } = await api.post<RegisteredUser>("/users", input);
@@ -57,10 +52,6 @@ export class UserService {
 
   static async getSessionStatus(): Promise<SessionStatus> {
     const { data } = await api.get<SessionStatus>("/users/session");
-    return data;
-  }
-  static async getUserFromCookie(): Promise<RestoredUserFromCOOKIE> {
-    const {data} = await api.post<RestoredUserFromCOOKIE>("/users/getfromcookie");
     return data;
   }
 }

@@ -247,6 +247,81 @@ class DeMoviefyTestPlan(unittest.TestCase):
             "alterado",
         )
 
+    def test_authenticated_session_cookie_allows_video_reprocessing_and_transcription_edits(self):
+        upload_response = self.upload()
+        self.assertEqual(upload_response.status_code, 200)
+        video_id = upload_response.get_json()["video"]["id"]
+
+        session_response = self.client.get("/users/session")
+        with (
+            patch("app.controllers.video_controller.whisper_available", return_value=True),
+            patch(
+                "app.controllers.video_controller.transcribe_video_with_timestamps",
+                return_value={
+                    "content": "Transcrição gerada",
+                    "source": "whisper",
+                    "language": "pt",
+                    "segments": [{"id": 0, "start": 0, "end": 1, "text": "Transcrição gerada"}],
+                    "model_name": "base",
+                    "status": "ready",
+                    "error": None,
+                },
+            ),
+        ):
+            transcription_generation_response = self.client.post(
+                f"/videos/{video_id}/transcription/generate",
+                json={"language": "pt", "model_name": "base"},
+            )
+        reprocess_response = self.client.post(
+            f"/videos/{video_id}/reprocess",
+            json=dict(AI_CONFIG),
+        )
+        transcription_response = self.client.put(
+            f"/videos/{video_id}/transcription",
+            json={
+                "content": "Transcrição atualizada",
+                "segments": [{"id": 0, "start": 0, "end": 1, "text": "Transcrição atualizada"}],
+            },
+        )
+        with patch("app.controllers.video_controller.delete_video_artifacts"):
+            delete_response = self.client.delete(f"/videos/{video_id}")
+
+        self.assertEqual(session_response.status_code, 200)
+        self.assertFalse(session_response.get_json()["is_guest"])
+        self.assertEqual(transcription_generation_response.status_code, 200)
+        self.assertEqual(reprocess_response.status_code, 200)
+        self.assertEqual(transcription_response.status_code, 200)
+        self.assertEqual(delete_response.status_code, 200)
+        self.assertFalse(self.client.get("/users/session").get_json()["is_guest"])
+        self.assertEqual(
+            self.queued_jobs,
+            [(video_id, f"job-{video_id}"), (video_id, f"job-{video_id}")],
+        )
+
+    def test_video_cors_preflight_does_not_require_the_owner_session_cookie(self):
+        video_id = self.create_video()
+
+        response = self.app.test_client().open(
+            f"/videos/{video_id}/reprocess",
+            method="OPTIONS",
+            headers={
+                "Origin": "http://localhost:5173",
+                "Access-Control-Request-Method": "POST",
+                "Access-Control-Request-Headers": "content-type",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.headers.get("Access-Control-Allow-Origin"),
+            "http://localhost:5173",
+        )
+        self.assertIn(
+            "POST",
+            response.headers.get("Access-Control-Allow-Methods", ""),
+        )
+        self.assertEqual(response.headers.get("Access-Control-Allow-Credentials"), "true")
+
     def test_ct08_accepts_multiple_uploads_and_queues_each_request(self):
         # This covers application-level queue initiation. Use a separate load
         # test against Nginx + Flask for true concurrent traffic validation.

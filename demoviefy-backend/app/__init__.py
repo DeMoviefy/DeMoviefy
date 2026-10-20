@@ -1,6 +1,8 @@
 import os
 import secrets
 from datetime import timedelta
+from pathlib import Path
+from time import sleep
 
 from flask import Flask, current_app
 from flask_cors import CORS
@@ -24,7 +26,9 @@ db = SQLAlchemy()
 def create_app(test_config: dict | None = None):
     """Create the Flask application, optionally with isolated test settings."""
     app = Flask(__name__)
-    app.secret_key = os.environ.get("DEMOVIEFY_SECRET_KEY") or secrets.token_urlsafe(32)
+    app.secret_key = os.environ.get("DEMOVIEFY_SECRET_KEY") or _load_session_secret_key(
+        app.instance_path
+    )
     ai_settings = load_frame_ai_settings()
     admin_user_id = os.environ.get("DEMOVIEFY_ADMIN_USER_ID")
     try:
@@ -117,6 +121,40 @@ def create_app(test_config: dict | None = None):
         return jsonify({"error": "Arquivo não encontrado"}), 404
 
     return app
+
+
+def _load_session_secret_key(instance_path: str) -> str:
+    """Reuse a local signing key across app workers when no key is configured."""
+    secret_path = Path(instance_path) / "demoviefy-session-secret"
+    secret_path.parent.mkdir(parents=True, exist_ok=True)
+
+    for _ in range(100):
+        try:
+            descriptor = os.open(
+                secret_path,
+                os.O_CREAT | os.O_EXCL | os.O_WRONLY,
+                0o600,
+            )
+        except FileExistsError:
+            try:
+                secret = secret_path.read_text(encoding="utf-8").strip()
+            except FileNotFoundError:
+                continue
+            if secret:
+                return secret
+            sleep(0.01)
+            continue
+
+        secret = secrets.token_urlsafe(32)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as secret_file:
+            secret_file.write(secret)
+            secret_file.flush()
+            os.fsync(secret_file.fileno())
+        return secret
+
+    raise RuntimeError(
+        f"Could not initialize the Flask session secret at {secret_path}."
+    )
 
 
 def _positive_int_environment_setting(name: str, *, default: int) -> int:

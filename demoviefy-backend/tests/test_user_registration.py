@@ -2,12 +2,13 @@ from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from http.cookies import SimpleCookie
 import os
+from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
 from werkzeug.security import check_password_hash
 
-from app import create_app, db
+from app import _load_session_secret_key, create_app, db
 from app.models.user import User
 from app.models.video import Video
 from app.repositories.video_repository import create_video
@@ -27,6 +28,13 @@ class UserRegistrationTests(unittest.TestCase):
             db.session.remove()
             db.drop_all()
             db.engine.dispose()
+
+    def test_session_secret_is_reused_across_app_workers(self):
+        with TemporaryDirectory() as temporary_directory:
+            first_secret = _load_session_secret_key(temporary_directory)
+            second_secret = _load_session_secret_key(temporary_directory)
+
+        self.assertEqual(first_secret, second_secret)
 
     def test_registers_user_with_hashed_password(self):
         response = self.client.post("/users", json={
