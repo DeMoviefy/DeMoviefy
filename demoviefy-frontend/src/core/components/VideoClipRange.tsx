@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 type VideoClipRangeProps = {
     boxed?: boolean;
@@ -108,6 +109,7 @@ function ClipTimeInput({
 }
 
 export function VideoClipRange({ boxed = true, className = "", durationSeconds, durationLimitReached, start, end, onStartChange, onEndChange }: VideoClipRangeProps) {
+    const { t } = useTranslation();
     const [activeHandle, setActiveHandle] = useState<"start" | "end">("end");
     const maxDuration = durationSeconds !== null && Number.isFinite(durationSeconds)
         ? Math.min(MAX_CLIP_DURATION_SECONDS, Math.max(0, Math.floor(durationSeconds)))
@@ -127,16 +129,16 @@ export function VideoClipRange({ boxed = true, className = "", durationSeconds, 
         <div className={`${boxed ? "rounded-xl border border-neutral-200 bg-neutral-100 p-4 pt-5 dark:border-neutral-700 dark:bg-neutral-900/60 sm:p-5" : ""} ${className}`}>
             <div className="flex items-start gap-3">
                 <div>
-                    <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">Trecho do vídeo</h3>
+                    <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">{t("videoSegment")}</h3>
                     <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-                        Defina o intervalo da análise.
+                        {t("clipRangeDescription")}
                     </p>
                 </div>
             </div>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
                 <ClipTimeInput
-                    label="Início"
+                    label={t("clipStart")}
                     value={boundedStart}
                     format={timeFormat}
                     min={0}
@@ -144,7 +146,7 @@ export function VideoClipRange({ boxed = true, className = "", durationSeconds, 
                     onCommit={(value) => onStartChange(String(value))}
                 />
                 <ClipTimeInput
-                    label="Fim"
+                    label={t("clipEnd")}
                     value={effectiveEnd}
                     format={timeFormat}
                     min={boundedStart}
@@ -154,7 +156,7 @@ export function VideoClipRange({ boxed = true, className = "", durationSeconds, 
             </div>
 
             <div className="mt-5">
-                <div className="relative h-8" role="group" aria-label="Selecionar trecho do vídeo">
+                <div className="relative h-8" role="group" aria-label={t("selectVideoSegment")}>
                     <div className="absolute inset-x-2 top-1/2 h-2 -translate-y-1/2 rounded-full bg-neutral-200 dark:bg-neutral-700">
                         <div
                             className="absolute inset-y-0 rounded-full bg-blue-600 dark:bg-blue-400"
@@ -171,7 +173,7 @@ export function VideoClipRange({ boxed = true, className = "", durationSeconds, 
                         onPointerDown={() => setActiveHandle("start")}
                         onFocus={() => setActiveHandle("start")}
                         onChange={(event) => onStartChange(String(Math.min(Number(event.target.value), effectiveEnd)))}
-                        aria-label="Início do trecho do vídeo"
+                        aria-label={t("videoSegmentStart")}
                         aria-valuetext={formatTime(boundedStart, timeFormat)}
                         className={`${RANGE_CLASS} clip-range-start ${activeHandle === "start" ? "z-20" : ""}`}
                     />
@@ -185,7 +187,7 @@ export function VideoClipRange({ boxed = true, className = "", durationSeconds, 
                         onPointerDown={() => setActiveHandle("end")}
                         onFocus={() => setActiveHandle("end")}
                         onChange={(event) => onEndChange(String(Math.max(Number(event.target.value), boundedStart)))}
-                        aria-label="Fim do trecho do vídeo"
+                        aria-label={t("videoSegmentEnd")}
                         aria-valuetext={formatTime(effectiveEnd, timeFormat)}
                         className={`${RANGE_CLASS} clip-range-end ${activeHandle === "end" ? "z-20" : ""}`}
                     />
@@ -193,12 +195,12 @@ export function VideoClipRange({ boxed = true, className = "", durationSeconds, 
             </div>
             {durationLimitReached && (
                 <p className="mt-2 text-xs text-amber-700 dark:text-amber-300">
-                    Vídeos com mais de 3 horas serão limitados às primeiras 3 horas.
+                    {t("videoDurationLimit")}
                 </p>
             )}
             {durationSeconds === null && (
                 <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">
-                    A duração não foi detectada; o controle deslizante ficará disponível quando o vídeo puder ser lido.
+                    {t("videoDurationUnknown")}
                 </p>
             )}
         </div>

@@ -86,6 +86,15 @@ export function ProcessingQueuePanel() {
           <div className="flex flex-col gap-4">
             {processingVideos.map((video) => {
               const frameProgress = getAnalyzingFrameProgress(video.processing.processing_message);
+              const stageLabels: Record<string, string> = {
+                queued: t("queued"), preparing: t("preparingVideo"), analyzing: t("analyzingVideo"),
+                analysis_complete: t("analysisComplete"), transcribing: t("transcribingVideo"),
+                transcription_skipped: t("transcriptionSkipped"), completed: t("processingCompleted"),
+                cancelled: t("statusCancelled"), error: t("processingError"),
+              };
+              const statusMessage = frameProgress
+                ? t("analyzingFrames", frameProgress)
+                : stageLabels[video.processing.processing_stage] || video.processing.processing_message;
               return (
               <div
                 key={video.id}
@@ -120,9 +129,7 @@ export function ProcessingQueuePanel() {
 
                   <div className="mt-2 flex items-center justify-between gap-4 text-xs text-neutral-500 dark:text-neutral-400">
                     <span className="min-w-0 truncate">
-                      {frameProgress
-                        ? t("analyzingFrames", frameProgress)
-                        : video.processing.processing_message}
+                      {statusMessage}
                     </span>
 
                     <div className="flex shrink-0 items-center gap-3 whitespace-nowrap tabular-nums">

@@ -44,7 +44,7 @@ export default function Video() {
 
     if (!isValidId) return <p>{t("invalidVideoId")}</p>;
     if (loading && !video) return <p>{t("loadingVideo")}</p>;
-    if (error) return <p>{error}</p>;
+    if (error) return <p>{t(error)}</p>;
 
     return (
         <VideoWorkbench

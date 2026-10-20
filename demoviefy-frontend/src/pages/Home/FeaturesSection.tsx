@@ -18,7 +18,7 @@ export default function FeaturesSection() {
           <div className="mt-10 max-w-xl overflow-hidden rounded-lg">
             <img
               src="src/assets/DeMoviefy-Demo.png"
-              alt="Interface do DeMoviefy"
+              alt={t("videoInterfaceAlt")}
               className="w-full"
             />
           </div>
@@ -57,7 +57,7 @@ export default function FeaturesSection() {
 
           <div>
             <h3 className="text-xl font-semibold tracking-tight">
-              <span className="text-blue-600 dark:text-blue-400">Timestamps</span>
+              <span className="text-blue-600 dark:text-blue-400">{t("timestamps")}</span>
             </h3>
 
             <p className="mt-3 max-w-xl text-base leading-7 text-neutral-400">

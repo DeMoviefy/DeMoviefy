@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import i18n from "src/i18n";
 
 type ErrorBoundaryProps = {
   children: ReactNode;
@@ -18,7 +19,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return {
       hasError: true,
-      errorMessage: error.message || "Erro inesperado na interface.",
+      errorMessage: error.message || i18n.t("uiError"),
     };
   }
 
@@ -35,15 +36,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       return (
         <div className="app-shell">
           <section className="surface crash-panel">
-            <span className="eyebrow">Interface</span>
-            <h1>O painel encontrou um erro.</h1>
-            <p>
-              A interface foi protegida para não ficar em branco. Voce pode recarregar a pagina e tentar novamente.
-            </p>
+            <span className="eyebrow">{i18n.t("interface")}</span>
+            <h1>{i18n.t("uiError")}</h1>
+            <p>{i18n.t("uiErrorDescription")}</p>
             <code>{this.state.errorMessage}</code>
             <div className="action-row action-row-start">
               <button type="button" className="primary-button" onClick={this.handleReload}>
-                Recarregar pagina
+                {i18n.t("reloadPage")}
               </button>
             </div>
           </section>

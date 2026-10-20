@@ -59,7 +59,7 @@ export default function UseCases() {
                     <div className="overflow-hidden rounded-lg">
                         <img
                             src="src/assets/DeMoviefy-Demo.png"
-                            alt="Novos recursos do DeMoviefy"
+                            alt={t("futureFeaturesAlt")}
                             className="w-full"
                         />
                     </div>

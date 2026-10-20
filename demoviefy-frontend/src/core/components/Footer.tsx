@@ -1,7 +1,9 @@
 import { type JSX } from "react";
 import { FaGithub } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 export default function Footer(): JSX.Element {
+    const { t } = useTranslation();
     const year = new Date().getFullYear();
 
     return (
@@ -14,7 +16,7 @@ export default function Footer(): JSX.Element {
                 <a
                     href="https://github.com/DeMoviefy/DeMoviefy"
                     rel="noopener noreferrer"
-                    aria-label="GitHub do DeMoviefy"
+                    aria-label={t("githubRepository")}
                     className="shrink-0 text-neutral-500 transition hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
                 >
                     <FaGithub className="h-8 w-8" />

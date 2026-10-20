@@ -3,6 +3,7 @@
 // Remover a mensagem de verificando compatibilidade de gerar texto na tela, somente quando houver mismatch
 
 import { useCallback, useState } from "react"
+import { useTranslation } from "react-i18next";
 import { CompatibilityService } from "src/core/services/compatibilityService";
 import type { BackendVersionResponse } from "src/core/types/compatibility"
 
@@ -11,14 +12,15 @@ type CompatibilityState =
   | { status: "compatible" | "mismatch" | "unavailable"; message: string; backendInfo: BackendVersionResponse | null }
 
 export function useCompatibility() {
+  const { t } = useTranslation();
   const [compatibility, setCompatibility] = useState<CompatibilityState>({
     status: "checking",
-    message: "Verificando compatibilidade entre frontend e backend.",
+    message: t("checkingCompatibilityMessage"),
     backendInfo: null,
   })
 
   const checkBackendCompatibility = useCallback(async () => {
-    setCompatibility({ status: "checking", message: "Verificando compatibilidade...", backendInfo: null })
+    setCompatibility({ status: "checking", message: t("checkingCompatibilityMessage"), backendInfo: null })
 
     const { isCompatible, backendInfo, reason } = await CompatibilityService.checkCompatibility()
 
@@ -26,14 +28,14 @@ export function useCompatibility() {
       status: reason,
       backendInfo,
       message: reason === "compatible"
-        ? `Contrato ${backendInfo?.api_contract_version} validado com sucesso.`
+        ? t("contractValidated", { version: backendInfo?.api_contract_version })
         : reason === "mismatch"
-          ? "Frontend e backend estão em versões de contrato diferentes."
-          : "Não foi possível validar a versão do backend.",
+          ? t("contractMismatch")
+          : t("backendVersionUnavailable"),
     })
 
     return isCompatible
-  }, [])
+  }, [t])
 
   return { compatibility, checkBackendCompatibility }
 }

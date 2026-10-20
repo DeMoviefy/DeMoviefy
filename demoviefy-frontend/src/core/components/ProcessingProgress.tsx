@@ -25,17 +25,14 @@ export const ProcessingProgress = memo(function ProcessingProgress({
   const stageLabels: Record<string, string> = {
     queued: t("queued"), preparing: t("preparingVideo"), analyzing: t("analyzingVideo"),
     analysis_complete: t("analysisComplete"), transcribing: t("transcribingVideo"),
-    transcription_skipped: t("transcriptionSkipped"), completed: t("completed"), error: t("processingError"),
+    transcription_skipped: t("transcriptionSkipped"), completed: t("processingCompleted"),
+    cancelled: t("statusCancelled"), error: t("processingError"),
   };
   const safeProgress = Math.max(0, Math.min(progress, 100));
   const frameProgress = getAnalyzingFrameProgress(message);
-  const statusMessage = stage === "preparing"
-    ? t("preparingVideo")
-    : stage === "completed"
-      ? t("processingCompleted")
-      : frameProgress
-        ? t("analyzingFrames", frameProgress)
-        : message || stageLabels[stage] || stage;
+  const statusMessage = frameProgress
+    ? t("analyzingFrames", frameProgress)
+    : stageLabels[stage] || message || stage;
 
   return (
     <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-5 dark:border-neutral-700 dark:bg-neutral-800">

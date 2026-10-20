@@ -30,7 +30,7 @@ export const useVideoDetailStore = create<VideoDetailState>((set) => ({
 
     } catch (error) {
       console.error(error);
-      set({ video: null, loading: false, error: "Não foi possível carregar este vídeo." });
+      set({ video: null, loading: false, error: "videoLoadError" });
     }
   },
 

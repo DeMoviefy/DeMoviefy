@@ -28,8 +28,8 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
             type="button"
             aria-expanded={isOpen}
             aria-controls="dashboard-video-library-content"
-            aria-label={isOpen ? "Recolher biblioteca de vídeos" : "Expandir biblioteca de vídeos"}
-            title={isOpen ? "Recolher biblioteca" : "Expandir biblioteca"}
+            aria-label={isOpen ? t("collapseVideoLibrary") : t("expandVideoLibrary")}
+            title={isOpen ? t("collapseLibrary") : t("expandLibrary")}
             onClick={onToggle}
             className={`inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100 ${isOpen ? "" : "-ml-2"}`}
           >

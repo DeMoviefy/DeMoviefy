@@ -5,13 +5,14 @@ import  App  from "src/app/App"
 import "src/index.css";
 import { StrictMode } from "react";
 import "src/i18n";
+import i18n from "src/i18n";
 
 
 function StartupScreen({ title, message }: { title: string; message: string }) {
   return (
     <div className="app-shell">
       <section className="surface crash-panel">
-        <span className="eyebrow">Inicialização</span>
+        <span className="eyebrow">{i18n.t("startup")}</span>
         <h1>{title}</h1>
         <p>{message}</p>
       </section>
@@ -23,16 +24,13 @@ function FatalStartupScreen({ errorMessage }: { errorMessage: string }) {
   return (
     <div className="app-shell">
       <section className="surface crash-panel">
-        <span className="eyebrow">Inicialização</span>
-        <h1>O frontend não conseguiu carregar.</h1>
-        <p>
-          Em vez de deixar a pagina em branco, o bootstrap exibiu esta tela. Reinicie o frontend e o backend e,
-          se o problema continuar, use a mensagem abaixo para depurarmos.
-        </p>
+        <span className="eyebrow">{i18n.t("startup")}</span>
+        <h1>{i18n.t("frontendLoadError")}</h1>
+        <p>{i18n.t("frontendLoadErrorDescription")}</p>
         <code>{errorMessage}</code>
         <div className="action-row action-row-start">
           <button type="button" className="primary-button" onClick={() => window.location.reload()}>
-            Recarregar pagina
+            {i18n.t("reloadPage")}
           </button>
         </div>
       </section>
@@ -49,7 +47,7 @@ if (!rootElement) {
 const root = createRoot(rootElement);
 
 function renderFatal(rootInstance: Root, error: unknown) {
-  const errorMessage = error instanceof Error ? error.message : "Erro desconhecido ao iniciar a interface.";
+  const errorMessage = error instanceof Error ? error.message : i18n.t("unknownStartupError");
   console.error("DeMoviefy startup error:", error);
   rootInstance.render(<FatalStartupScreen errorMessage={errorMessage} />);
 }
@@ -64,8 +62,8 @@ window.addEventListener("unhandledrejection", (event) => {
 
 root.render(
   <StartupScreen
-    title="Carregando o painel"
-    message="Estamos preparando a interface e validando os módulos principais."
+    title={i18n.t("loadingDashboard")}
+    message={i18n.t("preparingInterface")}
   />,
 );
 
