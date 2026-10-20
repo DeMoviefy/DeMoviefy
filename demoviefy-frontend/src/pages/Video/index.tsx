@@ -14,6 +14,19 @@ export default function Video() {
     const isValidId = !Number.isNaN(parsedId);
 
     useEffect(() => {
+        const viewport = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
+        if (!viewport) return;
+
+        const previousContent = viewport.content;
+        // Render the workbench at desktop width on phones; browsers scale it to
+        // fit initially while retaining pinch-to-zoom for close work.
+        viewport.content = "width=1280, user-scalable=yes";
+        return () => {
+            viewport.content = previousContent;
+        };
+    }, []);
+
+    useEffect(() => {
         if (isValidId) {
             void useVideoDetailStore.getState().fetchVideoById(parsedId);
             void useProcessingStore.getState().refresh();
