@@ -48,7 +48,7 @@ export default function VideoDashboard() {
     }, [videoCount, videosInitialized]);
 
     return (
-        <div className="relative flex min-h-[calc(100vh-6rem)] w-full flex-col pt-4">
+        <div className="relative flex min-h-[calc(100vh-6rem)] w-full flex-col pt-8">
             <div className="flex min-h-0 flex-1">
                 <DashboardSidebar
                     isOpen={isLibraryOpen}

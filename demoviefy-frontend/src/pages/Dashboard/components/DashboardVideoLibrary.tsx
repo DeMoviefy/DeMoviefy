@@ -5,7 +5,7 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 import { StatusBadge } from "src/core/components/StatusBadge";
 import type { VideoRecord } from "src/core/types/videoTypes";
-import { formatVideoModelName } from "src/core/utils/videoHelpers";
+import { formatVideoModelName, getVideoModelSizeTranslationKey } from "src/core/utils/videoHelpers";
 
 type DashboardVideoLibraryProps = {
   videos: VideoRecord[];
@@ -14,9 +14,9 @@ type DashboardVideoLibraryProps = {
 const DEFAULT_VIDEOS_PER_PAGE = 4;
 const WIDE_SCREEN_VIDEOS_PER_PAGE = 6;
 
-function formatDate(createdAt: string | null, language: string) {
+function formatDate(createdAt: string | null, language: string, noDateLabel: string) {
   if (!createdAt) {
-    return "Sem data";
+    return noDateLabel;
   }
 
   return new Intl.DateTimeFormat(language, {
@@ -143,18 +143,12 @@ export const DashboardVideoLibrary = memo(
 
                       <StatusBadge status={video.status} />
                     </div>
-                    <div className="mt-2 flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
-                      <span>#{video.id}</span>
-                      <span aria-hidden="true">·</span>
-                      <span className="truncate">
-                        {formatDate(video.created_at, i18n.resolvedLanguage ?? i18n.language)}
-                      </span>
-                    </div>
-
                     <div className="mt-2 pt-2">
                       <div className="flex justify-between gap-3 text-xs">
                         <span className="truncate font-medium text-neutral-700 dark:text-neutral-300">
-                          {formatVideoModelName(video.ai_config.model_name)}
+                          {t("analysisTitle")}: {getVideoModelSizeTranslationKey(video.ai_config.model_name)
+                            ? t(getVideoModelSizeTranslationKey(video.ai_config.model_name)!)
+                            : formatVideoModelName(video.ai_config.model_name)}
                         </span>
 
                         <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
@@ -164,6 +158,12 @@ export const DashboardVideoLibrary = memo(
                         </span>
                       </div>
 
+                      <div className="mt-3 flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
+                        <span><b>{t("dateLabel")}</b></span>
+                        <span className="truncate">
+                          {formatDate(video.created_at, i18n.resolvedLanguage ?? i18n.language, t("noDate"))}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </Link>

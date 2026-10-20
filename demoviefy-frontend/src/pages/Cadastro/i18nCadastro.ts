@@ -1,8 +1,7 @@
 export const i18nCadastro = {
   ptBR: {
-    signupTitle: "Seu próximo filme começa aqui.",
-    signupDescription: "Crie sua conta para organizar e descobrir histórias para assistir.",
-    newAccount: "Nova conta",
+    signupTitle: "Crie sua conta DeMoviefy.",
+    signupDescription: "Salve seus vídeos, análises e transcrições em um só lugar.",
     name: "Nome",
     yourName: "Seu nome",
     confirmPassword: "Confirme sua senha",
@@ -10,11 +9,11 @@ export const i18nCadastro = {
     minPassword: "No mínimo 8 caracteres",
     hasAccount: "Já tem uma conta?",
     accountCreated: "Conta criada com sucesso. Você já pode entrar.",
+    signupError: "Não foi possível criar sua conta. Tente novamente.",
   },
   en: {
-    signupTitle: "Your next movie starts here.",
-    signupDescription: "Create an account to organize and discover stories to watch.",
-    newAccount: "New account",
+    signupTitle: "Create your DeMoviefy account.",
+    signupDescription: "Keep your videos, analyses, and transcripts together.",
     name: "Name",
     yourName: "Your name",
     confirmPassword: "Confirm your password",
@@ -22,5 +21,6 @@ export const i18nCadastro = {
     minPassword: "At least 8 characters",
     hasAccount: "Already have an account?",
     accountCreated: "Account created. You can now sign in.",
+    signupError: "Could not create your account. Please try again.",
   },
 } as const;

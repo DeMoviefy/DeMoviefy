@@ -74,6 +74,9 @@ export const i18nDashboard = {
     noUploads: "Nenhum vídeo enviado ainda",
     withTranscription: "Com transcrição",
     withoutTranscription: "Sem transcrição",
+    analysisAccuracy: "Precisão da análise",
+    dateLabel: "Data:",
+    noDate: "Sem data",
     loadingVideo: "Carregando vídeo...",
   },
   en: {
@@ -151,6 +154,9 @@ export const i18nDashboard = {
     noUploads: "No videos uploaded yet",
     withTranscription: "With transcription",
     withoutTranscription: "Without transcription",
+    analysisAccuracy: "Analysis accuracy",
+    dateLabel: "Date:",
+    noDate: "No date",
     loadingVideo: "Loading video...",
   },
 } as const;
