@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useVideoPlayer } from "src/pages/Video/hooks/useVideoPlayer";
@@ -71,6 +71,38 @@ export const VideoWorkbench = memo(function VideoWorkbench({
 
     const { annotatedVideoSrc } = useVideoPlayer(currentVideo, selectedAnalysisVariantId);
 
+    const resultsContainerRef = useRef<HTMLDivElement>(null);
+    const transcriptionContainerRef = useRef<HTMLDivElement>(null);
+    const detailsPanelRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const updateResultsHeight = () => {
+            const resultsScroll = resultsContainerRef.current?.querySelector<HTMLElement>("[data-analysis-results-scroll]");
+            const detailsPanel = detailsPanelRef.current;
+            if (!resultsScroll || !detailsPanel) return;
+
+            if (!window.matchMedia("(min-width: 1280px)").matches) {
+                resultsScroll.style.height = "";
+                return;
+            }
+
+            const availableHeight = detailsPanel.getBoundingClientRect().bottom
+                - resultsScroll.getBoundingClientRect().top;
+            resultsScroll.style.height = `${Math.max(0, availableHeight)}px`;
+        };
+
+        const observer = new ResizeObserver(updateResultsHeight);
+        [resultsContainerRef.current, transcriptionContainerRef.current, detailsPanelRef.current]
+            .forEach((element) => element && observer.observe(element));
+        window.addEventListener("resize", updateResultsHeight);
+        updateResultsHeight();
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener("resize", updateResultsHeight);
+        };
+    }, [analysisState, summary, transcription]);
+
     if (!currentVideo) return <WorkbenchEmptyState />;
 
     return (
@@ -87,18 +119,18 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                         transcriptionTrack={playerTranscriptionTrack}
                     />
 
-                    <div className="mt-6 min-w-0">
+                    <div ref={resultsContainerRef} className="mt-6 min-w-0">
                         <AnalysisResults state={analysisState} summary={summary} />
                     </div>
                 </div>
 
                 <div className="flex min-w-0 flex-col gap-6">
-                    <TranscriptionWorkbench
-                        isBusy={isBusy}
-                    />
+                    <div ref={transcriptionContainerRef}>
+                        <TranscriptionWorkbench isBusy={isBusy} />
+                    </div>
 
                     <div className="min-w-0">
-                        <div className="overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800/70">
+                        <div ref={detailsPanelRef} className="overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800/70">
                             <div>
                                 <h3 className="bg-neutral-100 px-4 pb-4 text-base font-semibold tracking-tight text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100 sm:px-5 sm:pt-5">
                                     {t("detailsAnalysis")}

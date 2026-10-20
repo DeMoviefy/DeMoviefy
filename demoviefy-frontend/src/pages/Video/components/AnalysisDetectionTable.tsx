@@ -29,7 +29,7 @@ export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
                     {heading}
                 </h3>
             )}
-            <div className="h-168 overflow-auto bg-white dark:bg-neutral-800">
+            <div data-analysis-results-scroll className="overflow-auto bg-white dark:bg-neutral-800">
                 <table className="w-full min-w-96 border-separate border-spacing-0 text-left text-sm">
                     <thead className="sticky top-0 z-10 bg-neutral-100 text-xs font-semibold tracking-wide text-neutral-600 dark:bg-neutral-900 dark:text-neutral-400">
                         <tr>
