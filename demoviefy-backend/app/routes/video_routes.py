@@ -4,7 +4,7 @@ from flask import Blueprint, current_app, g, jsonify, request, session
 from app import db
 from app.models.user import User
 from app.models.video import Video
-from app.repositories.video_repository import count_guest_videos
+from app.services.guest_video_quota import guest_uploads_used
 
 from app.controllers.video_controller import (
     cancel_video_processing_by_id,
@@ -63,7 +63,7 @@ def require_video_access():
             return jsonify({"error": "Vídeo não encontrado."}), 404
 
     if request.method == "POST" and request.path == "/videos" and user is None:
-        if count_guest_videos(g.video_guest_token) >= GUEST_VIDEO_LIMIT:
+        if guest_uploads_used(g.video_guest_token) >= GUEST_VIDEO_LIMIT:
             return jsonify({
                 "error": "Você atingiu o limite de 3 vídeos como convidado. Entre ou crie uma conta para continuar.",
                 "code": "guest_video_limit_reached",

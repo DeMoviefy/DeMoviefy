@@ -9,7 +9,10 @@ from app.repositories.user_repository import get_user_by_email, create_user
 from app import db
 from app.models.user import User
 from app.models.video import Video
-from app.repositories.video_repository import count_guest_videos
+from app.services.guest_video_quota import (
+    GUEST_UPLOADS_USED_KEY,
+    guest_uploads_used,
+)
 
 GUEST_VIDEO_LIMIT = 3
 
@@ -61,6 +64,7 @@ def login_user():
         return jsonify({"error": "E-mail ou senha incorretos."}), 401
 
     guest_token = session.get("guest_token")
+    uploads_used = guest_uploads_used(guest_token)
     if guest_token:
         Video.query.filter_by(guest_token=guest_token).update(
             {"user_id": user.id, "guest_token": None},
@@ -71,6 +75,7 @@ def login_user():
     session.clear()
     session.permanent = True
     session["user_id"] = user.id
+    session[GUEST_UPLOADS_USED_KEY] = uploads_used
 
     return jsonify({
         "message": "Login realizado com sucesso.",
@@ -83,7 +88,10 @@ def login_user():
 
 
 def logout_user():
+    uploads_used = guest_uploads_used(session.get("guest_token"))
     session.clear()
+    session.permanent = True
+    session[GUEST_UPLOADS_USED_KEY] = uploads_used
 
     return jsonify({"message": "Logout realizado com sucesso."}), 200
 
@@ -122,7 +130,7 @@ def get_session_status():
     return jsonify({
         "is_guest": True,
         "user": None,
-        "guest_video_count": count_guest_videos(guest_token),
+        "guest_video_count": guest_uploads_used(guest_token),
         "guest_video_limit": GUEST_VIDEO_LIMIT,
     })
 

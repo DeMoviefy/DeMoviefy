@@ -67,7 +67,7 @@ export const i18nDashboard = {
     upload: "Enviar vídeo",
     cancelUpload: "Cancelar envio",
     guestLimit: "Você usou os {{limit}} vídeos de convidado.",
-    signInToContinue: "Entre ou crie uma conta e depois entre para continuar. Os vídeos desta sessão serão transferidos para a biblioteca da conta.",
+    signInToContinue: "Entre ou crie uma conta para continuar. Os vídeos desta sessão serão transferidos para a biblioteca da conta.",
     library: "Biblioteca de vídeos",
     searchVideo: "Busque pelo nome do vídeo...",
     noVideoFound: "Nenhum vídeo encontrado",
