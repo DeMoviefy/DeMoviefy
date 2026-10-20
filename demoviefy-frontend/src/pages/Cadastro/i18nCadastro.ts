@@ -10,6 +10,7 @@ export const i18nCadastro = {
     hasAccount: "Já tem uma conta?",
     accountCreated: "Conta criada com sucesso. Você já pode entrar.",
     signupError: "Não foi possível criar sua conta. Tente novamente.",
+    recaptchaRequired: "Confirme o reCAPTCHA antes de cadastrar.",
   },
   en: {
     signupTitle: "Create your DeMoviefy account.",
@@ -22,5 +23,6 @@ export const i18nCadastro = {
     hasAccount: "Already have an account?",
     accountCreated: "Account created. You can now sign in.",
     signupError: "Could not create your account. Please try again.",
+    recaptchaRequired: "Complete the reCAPTCHA before signing up.",
   },
 } as const;

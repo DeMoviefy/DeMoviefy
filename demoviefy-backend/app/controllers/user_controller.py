@@ -1,7 +1,9 @@
 import secrets
 
+import os
+import requests
 from sqlalchemy.exc import IntegrityError
-from flask import jsonify, request, session
+from flask import jsonify, request, session, current_app
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.repositories.user_repository import get_user_by_email, create_user
 from app import db
@@ -11,6 +13,37 @@ from app.repositories.video_repository import count_guest_videos
 
 GUEST_VIDEO_LIMIT = 3
 
+
+def verify_recaptcha(token: str) -> tuple[bool, str | None]:
+    secret_key = os.environ.get("RECAPTCHA_SECRET_KEY")
+
+    if not secret_key:
+        raise RuntimeError(
+            "RECAPTCHA_SECRET_KEY não configurada."
+        )
+
+    try:
+        response = requests.post(
+            "https://www.google.com/recaptcha/api/siteverify",
+            data={
+                "secret": secret_key,
+                "response": token,
+            },
+            timeout=5,
+        )
+        response.raise_for_status()
+        result = response.json()
+
+    except (requests.RequestException, ValueError):
+        return False, (
+            "Não foi possível verificar o reCAPTCHA. "
+            "Tente novamente."
+        )
+
+    if not result.get("success"):
+        return False, "Verificação reCAPTCHA inválida."
+
+    return True, None
 
 def login_user():
     data = request.get_json(silent=True)
@@ -99,6 +132,24 @@ def register_user():
     if not isinstance(data, dict):
         return jsonify({"error": "Envie os dados do cadastro em JSON."}), 400
 
+    # 1. Recebe e valida o token do reCAPTCHA.
+    token = data.get("recaptcha_token")
+    if not isinstance(token, str) or not token.strip():
+        return jsonify({"error": "Token do reCAPTCHA obrigatório."}), 400
+
+    try:
+        valid, error_message = verify_recaptcha(token)
+    except RuntimeError:
+        current_app.logger.error(
+            "RECAPTCHA_SECRET_KEY não configurada."
+        )
+        return jsonify({
+            "error": "Serviço de verificação indisponível."
+        }), 503
+
+    if not valid:
+        return jsonify({"error": error_message}), 403
+    
     nome = data.get("nome")
     email = data.get("email")
     senha = data.get("senha")

@@ -5,6 +5,7 @@ export type RegisterUserInput = {
   email: string;
   senha: string;
   senha_confirmada: string;
+  recaptcha_token: string;
 };
 
 export type RegisteredUser = {

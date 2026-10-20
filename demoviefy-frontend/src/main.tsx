@@ -73,10 +73,9 @@ try {
   root.render(
     <StrictMode>
         <ErrorBoundary>
-        <App />
+          <App />
         </ErrorBoundary>
     </StrictMode>,
-
   );
 } catch (error) {
   renderFatal(root, error);
