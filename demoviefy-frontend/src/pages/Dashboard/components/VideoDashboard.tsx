@@ -63,7 +63,7 @@ export default function VideoDashboard() {
                         errors={stats.errors}
                     />
 
-                    <div className="grid gap-8 xl:grid-cols-2">
+                    <div className="grid items-start gap-8 xl:grid-cols-2">
                         <NewVideoPanel />
                         <ProcessingQueuePanel />
                     </div>
