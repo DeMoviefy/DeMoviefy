@@ -1,5 +1,6 @@
 // src/pages/Dashboard/Video/useVideoConfig.ts
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
 import { VideoService } from "src/core/services/videoService";
 import { toast } from "sonner";
@@ -8,6 +9,7 @@ import { getApiErrorMessage, chooseFirstModel } from "src/core/utils/videoHelper
 import { useCatalogStore } from "src/core/stores/useAICatalogStore";
 
 export function useVideoConfig(video: VideoRecord | null) {
+    const { t } = useTranslation();
 
 
     const [videoConfig, setVideoConfig] = useState<AiConfigPayload>({
@@ -52,12 +54,12 @@ export function useVideoConfig(video: VideoRecord | null) {
             await VideoService.reprocessVideo(video.id, videoConfig);
             await useProcessingStore.getState().refresh();
             
-            toast("Reprocessamento iniciado.");
+            toast.success(t("reprocessStarted"));
         } catch (error) {
             console.error(error);
-            toast.error(getApiErrorMessage(error, "Não foi possível iniciar o reprocessamento."));
+            toast.error(getApiErrorMessage(error, t("reprocessError")));
         }
-    }, [videoConfig]);
+    }, [videoConfig, t]);
 
     return {
         videoConfig,

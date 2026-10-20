@@ -1,5 +1,6 @@
 // src/pages/Dashboard/components/WorkbenchHeader.tsx
 
+import { useTranslation } from "react-i18next";
 import { StatusBadge } from "src/core/components/StatusBadge"
 import { ProcessingProgress } from "src/core/components/ProcessingProgress"
 import { formatVideoModelName } from "src/core/utils/videoHelpers"
@@ -10,11 +11,12 @@ type WorkbenchHeaderProps = {
 }
 
 export function WorkbenchHeader({ video }: WorkbenchHeaderProps) {
+  const { t } = useTranslation();
   return (
     <>
       <div className="min-w-0">
         <span className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
-          Análise do vídeo
+          {t("analysisVideo")}
         </span>
   
         <h2

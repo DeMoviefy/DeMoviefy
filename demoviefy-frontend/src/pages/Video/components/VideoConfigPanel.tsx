@@ -1,5 +1,6 @@
 // src/pages/Dashboard/components/VideoConfigPanel.tsx
 
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom"
 import { useCatalogStore } from "src/core/stores/useAICatalogStore"
 import { FaTrashAlt } from "react-icons/fa"
@@ -27,7 +28,7 @@ export function VideoConfigPanel({
     isBusy,
     onReprocess,
 }: VideoConfigPanelProps) {
-
+    const { t } = useTranslation();
 
     const { tasks, models } = useCatalogStore()
 
@@ -39,10 +40,10 @@ export function VideoConfigPanel({
         <section className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 pt-5 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
             <div>
                 <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
-                    Reprocessar vídeo
+                    {t("reprocessVideo")}
                 </h3>
                 <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-                    Execute uma nova análise do vídeo.
+                    {t("reprocessDescription")}
                 </p>
             </div>
 
@@ -56,7 +57,9 @@ export function VideoConfigPanel({
                             onClick={onReprocess}
                             disabled={isBusy}
                         >
-                            {isBusy ? "Processando..." : "Reprocessar vídeo"}
+                            {isBusy
+                                ? t("processingNow")
+                                : t("reprocessVideo")}
                         </button>
                     )}
                     taskType={config.task_type}
@@ -65,12 +68,14 @@ export function VideoConfigPanel({
                     clipEnd={config.clip_end_sec}
                     videoSource={videoSource}
                     knownDurationSeconds={durationSeconds}
+                    frameStride={config.frame_stride}
                     tasks={tasks}
                     models={models}
                     onTaskChange={(value) => update("task_type", value)}
                     onModelChange={(value) => update("model_path", value)}
                     onClipStartChange={(value) => update("clip_start_sec", value)}
                     onClipEndChange={(value) => update("clip_end_sec", value || null)}
+                    onFrameStrideChange={(value) => update("frame_stride", value)}
                 />
             </div>
         </section>
@@ -79,6 +84,7 @@ export function VideoConfigPanel({
 }
 
 export function DeleteVideoButton({ video }: { video: VideoRecord }) {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const onDeleteVideo = useAnalysisStore((state) => state.onDeleteVideo)
 
@@ -93,8 +99,8 @@ export function DeleteVideoButton({ video }: { video: VideoRecord }) {
     return (
         <div className="flex justify-start border-t border-neutral-100 py-4 dark:border-neutral-800">
             <ConfirmationDialog
-                title="Excluir vídeo"
-                message="Tem certeza de que deseja excluir o vídeo? Esta ação é irreversível."
+                title={t("deleteVideo")}
+                message={t("deleteVideoConfirm")}
                 onConfirm={handleDeleteVideo}
             >
                 {(open) => (
@@ -104,7 +110,7 @@ export function DeleteVideoButton({ video }: { video: VideoRecord }) {
                         onClick={open}
                     >
                         <FaTrashAlt aria-hidden="true" className="size-3" />
-                        Excluir vídeo
+                        {t("deleteVideo")}
                     </button>
                 )}
             </ConfirmationDialog>

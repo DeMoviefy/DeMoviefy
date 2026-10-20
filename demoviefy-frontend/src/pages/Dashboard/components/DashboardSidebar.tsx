@@ -1,4 +1,5 @@
 import { FaBars } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
 
 import { DashboardVideoLibrary } from "src/pages/Dashboard/components/DashboardVideoLibrary";
@@ -9,6 +10,7 @@ type DashboardSidebarProps = {
 };
 
 export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
+  const { t } = useTranslation();
   const videos = useProcessingStore((state) => state.videos);
 
   return (
@@ -19,7 +21,7 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
         <div className={`flex min-h-9 items-center pb-2 ${isOpen ? "justify-between pr-8" : "justify-start"}`}>
           {isOpen && (
             <h2 className="truncate text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-              Biblioteca de vídeos
+              {t("library")}
             </h2>
           )}
           <button

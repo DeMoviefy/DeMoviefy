@@ -1,15 +1,17 @@
+import { useTranslation } from "react-i18next";
+
 export default function UseCases() {
+  const { t } = useTranslation();
 
     return (
         <section className="w-full pb-20 pt-4 lg:pb-20 lg:pt-8">
             <div className="text-center">
                 <h2 className="mx-auto max-w-200 text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">
-                    Feito para aproveitar melhor seus vídeos.
+                    {t("useCasesTitle")}
                 </h2>
 
                 <p className="mx-auto mt-6 w-full text-lg leading-8 text-neutral-400 lg:text-xl">
-                    O DeMoviefy reúne ferramentas para transformar diferentes partes do
-                    conteúdo audiovisual em informações úteis.
+                    {t("useCasesDescription")}
                 </p>
             </div>
 
@@ -19,18 +21,17 @@ export default function UseCases() {
                     <div className="overflow-hidden rounded-lg">
                         <img
                             src="src/assets/DeMoviefy-Demo.png"
-                            alt="Análise de conteúdo no DeMoviefy"
+                            alt={t("analysis")}
                             className="w-full"
                         />
                     </div>
 
                     <h3 className="mt-5 text-xl font-semibold tracking-tight">
-                        Análise
+                        {t("analysis")}
                     </h3>
 
                     <p className="mt-3 text-base leading-7 text-neutral-400">
-                        Extraia informações do conteúdo e organize os resultados de forma
-                        estruturada.
+                        {t("featureDescriptionAnalysis")}
                     </p>
                 </div>
 
@@ -38,18 +39,17 @@ export default function UseCases() {
                     <div className="overflow-hidden rounded-lg">
                         <img
                             src="src/assets/DeMoviefy-Demo.png"
-                            alt="Transcrição de vídeo no DeMoviefy"
+                            alt={t("transcription")}
                             className="w-full"
                         />
                     </div>
 
                     <h3 className="mt-5 text-xl font-semibold tracking-tight">
-                        Transcrição
+                        {t("transcription")}
                     </h3>
 
                     <p className="mt-3 text-base leading-7 text-neutral-400">
-                        Transforme o áudio dos seus vídeos em texto e encontre informações
-                        importantes com mais facilidade.
+                        {t("transcriptionCardDescription")}
                     </p>
                 </div>
 
@@ -65,12 +65,11 @@ export default function UseCases() {
                     </div>
 
                     <h3 className="mt-5 text-xl font-semibold tracking-tight">
-                        Mais por vir
+                        {t("moreComing")}
                     </h3>
 
                     <p className="mt-3 text-base leading-7 text-neutral-400">
-                        Novos recursos serão adicionados para ampliar as possibilidades de
-                        análise dos seus vídeos.
+                        {t("moreFeaturesDescription")}
                     </p>
                 </div>
             </div>

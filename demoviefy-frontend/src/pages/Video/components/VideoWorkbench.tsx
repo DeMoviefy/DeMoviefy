@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useVideoPlayer } from "src/pages/Video/hooks/useVideoPlayer";
 import { useAnalysisStore } from "src/pages/Video/stores/useAnalysisStore";
@@ -33,6 +34,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
     onConfigChange,
     onReprocess,
 }: VideoWorkbenchProps) {
+    const { t } = useTranslation();
     const processingVideo = useProcessingStore((state) =>
         state.videos.find((item) => item.id === video?.id)
     );
@@ -53,14 +55,14 @@ export const VideoWorkbench = memo(function VideoWorkbench({
     const analysisVariants = analysis?.available_variants ?? [];
     const hasTranscription = Boolean(transcription?.available);
     const transcriptionVariants = transcription?.variants ?? [
-        { id: "default", label: "Transcrição principal", language: null },
+        { id: "default", label: t("primaryTranscription"), language: null },
     ];
     const loadedTranscriptionVariant = transcription?.selected_variant ?? "default";
     const selectedTranscriptionVariant = transcriptionVariants.find((variant) => variant.id === selectedVariant);
     const playerTranscriptionTrack = hasTranscription && selectedVariant === loadedTranscriptionVariant
         ? {
             segments: transcription?.transcription.segments ?? [],
-            label: selectedTranscriptionVariant?.label ?? "Transcrição",
+            label: selectedTranscriptionVariant?.label ?? t("transcription"),
             language: selectedTranscriptionVariant?.language ?? transcription?.transcription.language ?? "pt",
         }
         : null;
@@ -91,8 +93,6 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                 </div>
 
                 <div className="flex min-w-0 flex-col gap-6">
-
-
                     <TranscriptionWorkbench
                         isBusy={isBusy}
                     />
@@ -101,7 +101,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                         <div className="overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800/70">
                             <div>
                                 <h3 className="bg-neutral-100 px-4 pb-4 text-base font-semibold tracking-tight text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100 sm:px-5 sm:pt-5">
-                                    Detalhes da análise
+                                    {t("detailsAnalysis")}
                                 </h3>
                                 <div className="px-4 pb-4 sm:px-5">
                                     <div className="-mx-4 border-b border-neutral-200 px-4 py-4 transition-colors hover:bg-blue-50/40 dark:border-neutral-700 dark:hover:bg-neutral-700/50 sm:-mx-5 sm:px-5">

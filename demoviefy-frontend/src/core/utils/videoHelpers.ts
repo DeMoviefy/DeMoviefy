@@ -25,6 +25,12 @@ export function getApiErrorMessage(error: unknown, fallback: string) {
 
 // Prefere o modelo equilibrado da tarefa e usa o primeiro disponível como fallback.
 
+export function getAnalyzingFrameProgress(message: string | null): { current: number; total: number } | null {
+    const match = message?.match(/^\s*(?:Analisando|Analyzing)\s+frames\s+(\d+)\s*\/\s*(\d+)\.?\s*$/i);
+    if (!match) return null;
+    return { current: Number(match[1]), total: Number(match[2]) };
+}
+
 export function chooseFirstModel(models: AIModelOption[], taskType: string): string {
     const taskModels = models.filter((model) => model.task_type === taskType);
     const balancedModel = taskModels.find((model) => getVideoModelSize(model.name) === "m");

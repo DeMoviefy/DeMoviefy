@@ -1,16 +1,19 @@
 // src/pages/Dashboard/components/ProcessingQueuePanel.tsx
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FaRegClock } from "react-icons/fa";
 
 import { toast } from "sonner";
 
 import { StatusBadge } from "src/core/components/StatusBadge";
 import { formatVideoModelName, getApiErrorMessage } from "src/core/utils/videoHelpers";
+import { getAnalyzingFrameProgress } from "src/core/utils/videoHelpers";
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
 import { VideoUploadService } from "src/pages/Dashboard/services/videoUploadService";
 
 export function ProcessingQueuePanel() {
+  const { t } = useTranslation();
   const videos = useProcessingStore((state) => state.videos);
 
   const [cancellingVideoId, setCancellingVideoId] = useState<number | null>(
@@ -26,14 +29,14 @@ export function ProcessingQueuePanel() {
     try {
       await VideoUploadService.cancelProcessing(videoId);
 
-      toast.success("Processamento cancelado. O vídeo foi mantido.");
+      toast.success(t("cancelSuccess"));
 
       await useProcessingStore.getState().refresh();
     } catch (error) {
       toast.error(
         getApiErrorMessage(
           error,
-          "Não foi possível cancelar o processamento."
+            t("cancelError")
         )
       );
     } finally {
@@ -46,23 +49,23 @@ export function ProcessingQueuePanel() {
       <div>
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-            Fila de processamento
+            {t("processingQueue")}
           </h2>
         </div>
 
         <p className="mt-1.5 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-          Acompanhe os vídeos que estão sendo processados.
+          {t("queueDescription")}
         </p>
       </div>
 
       {processingVideos.length === 0 ? (
         <div className="flex min-h-48 flex-col items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 px-6 py-8 text-center dark:border-transparent dark:bg-neutral-800">
           <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-            Nenhum vídeo na fila
+            {t("noVideosQueued")}
           </p>
 
           <p className="mt-2 max-w-full text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-            Os vídeos em processamento aparecerão aqui.
+            {t("queuedDescription")}
           </p>
           <FaRegClock
             aria-hidden="true"
@@ -73,11 +76,13 @@ export function ProcessingQueuePanel() {
         <div
           className="max-h-96 overflow-y-auto pr-2 lg:max-h-128 xl:max-h-160"
           role="region"
-          aria-label="Vídeos em processamento"
+          aria-label={t("processing")}
           tabIndex={0}
         >
           <div className="flex flex-col gap-4">
-            {processingVideos.map((video) => (
+            {processingVideos.map((video) => {
+              const frameProgress = getAnalyzingFrameProgress(video.processing.processing_message);
+              return (
               <div
                 key={video.id}
                 className="flex min-h-48 flex-col justify-between rounded-lg border border-neutral-200 bg-neutral-50 p-5 dark:border-neutral-700 dark:bg-neutral-800"
@@ -92,7 +97,7 @@ export function ProcessingQueuePanel() {
                     </div>
 
                     <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs font-medium text-neutral-600 dark:text-neutral-300">
-                      <span>Análise: {formatVideoModelName(video.ai_config.model_name)}</span>
+                      <span>{t("analysis")}: {formatVideoModelName(video.ai_config.model_name)}</span>
                     </div>
                   </div>
 
@@ -111,7 +116,9 @@ export function ProcessingQueuePanel() {
 
                   <div className="mt-2 flex items-center justify-between gap-4 text-xs text-neutral-500 dark:text-neutral-400">
                     <span className="min-w-0 truncate">
-                      {video.processing.processing_message}
+                      {frameProgress
+                        ? t("analyzingFrames", frameProgress)
+                        : video.processing.processing_message}
                     </span>
 
                     <div className="flex shrink-0 items-center gap-3 whitespace-nowrap tabular-nums">
@@ -133,12 +140,13 @@ export function ProcessingQueuePanel() {
                     onClick={() => void cancelProcessing(video.id)}
                   >
                     {cancellingVideoId === video.id
-                      ? "Cancelando..."
-                      : "Cancelar processamento"}
+                      ? t("cancelling")
+                      : t("cancelProcessing")}
                   </button>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

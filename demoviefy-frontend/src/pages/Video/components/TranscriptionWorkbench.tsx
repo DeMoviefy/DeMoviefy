@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import type { VideoTranscriptionResponse } from "src/core/types/videoTypes";
+import { useTranslation } from "react-i18next";
 import { GenerateTranscription } from "src/pages/Video/components/GenerateTranscription";
 import { TranscriptionTextEditor } from "src/pages/Video/components/TranscriptionTextEditor";
 import { TranslateTranscription } from "src/pages/Video/components/TranslateTranscription";
@@ -13,6 +14,7 @@ type TranscriptionWorkbenchProps = {
 };
 
 export function TranscriptionWorkbench({ isBusy }: TranscriptionWorkbenchProps) {
+    const { t } = useTranslation();
     const videoId = useVideoDetailStore((state) => state.video?.id);
     const {
         transcription,
@@ -39,7 +41,7 @@ export function TranscriptionWorkbench({ isBusy }: TranscriptionWorkbenchProps) 
     }, [videoId, setModel]);
 
     const variants: TranscriptionVariant[] = transcription?.variants ?? [
-        { id: "default", label: "Transcrição principal", language: null },
+        { id: "default", label: t("primaryTranscription"), language: null },
     ];
     const availableLanguages = transcription?.available_languages ?? [];
     const originalSegments = transcription?.transcription.segments ?? [];
@@ -54,9 +56,9 @@ export function TranscriptionWorkbench({ isBusy }: TranscriptionWorkbenchProps) 
         <section className="flex min-w-0 flex-col gap-6">
             <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
                 <div className="mb-5 text-left">
-                    <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">Editor de transcrição</h3>
+                    <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">{t("editorTranscription")}</h3>
                     <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-                        Edite a transcrição no formato SRT ou gere e traduza versões.
+                        {t("editorDescription")}
                     </p>
                 </div>
 
@@ -76,7 +78,7 @@ export function TranscriptionWorkbench({ isBusy }: TranscriptionWorkbenchProps) 
             <section className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 pt-5 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
                 <div className="mb-5 text-left">
                     <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
-                        Opções de transcrição
+                        {t("transcriptionOptions")}
                     </h3>
                 </div>
 

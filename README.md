@@ -105,12 +105,38 @@ O fluxo correto é:
    depois clique em **Salvar transcrição**.
 
 A tradução nunca é executada automaticamente durante a geração da transcrição.
-Quando você clicar em **Traduzir**, os segmentos são enviados ao provedor em
-lotes de até 50 textos, reduzindo as requisições e a chance de atingir o limite
-temporário do Google Translate. A tradução usa o `deep-translator` com
-`GoogleTranslator`; se o provedor bloquear novas chamadas, aguarde e tente
-novamente mais tarde. O erro é mostrado na interface e a versão original nunca
-é sobrescrita.
+A tradução usa **Argos Translate localmente**, com suporte a português (`pt`),
+inglês (`en`) e espanhol (`es`). O setup instala os modelos `en → pt`, `pt → en`,
+`en → es` e `es → en`. Português e espanhol podem usar inglês como intermediário,
+com possível perda de qualidade.
+
+Execute **Setup Environment** no launcher para preparar os modelos. Para atualizar
+somente a tradução, execute na raiz do projeto (PowerShell):
+
+```powershell
+.venv/Scripts/python.exe -m pip install argostranslate==1.11.0
+.venv/Scripts/python.exe demoviefy-backend/scripts/install_translation_models.py
+```
+
+O download inicial precisa de internet e respeita o proxy configurado no launcher.
+O script reutiliza modelos existentes e valida as seis direções de tradução.
+Depois do setup, reinicie o backend. A tradução roda na CPU por padrão, sem
+chamadas ao Google, chave de API ou limites externos de requisições.
+Os modelos ficam em `uploads/argos/packages`; `ARGOS_PACKAGES_DIR` permite mudar
+esse caminho (use o mesmo valor no setup e no backend).
+
+Cada segmento concluído é salvo em `uploads/translation_cache.sqlite3`.
+`TRANSLATION_CACHE_PATH` permite mudar o caminho. O cache inclui idiomas, texto,
+versão do Argos e versões dos modelos. Resultados antigos do Google são
+preservados em sua tabela original e não são reutilizados pelo Argos.
+O cache contém texto e tradução e não é removido ao excluir um vídeo.
+As variáveis antigas `TRANSLATION_REQUEST_INTERVAL` e `TRANSLATION_MAX_RETRIES`
+não são mais utilizadas, pois a inferência é local.
+
+A origem deve ter um idioma definido; não há detecção automática no tradutor.
+Modelos ausentes e idiomas não suportados geram mensagens específicas. A versão
+original e os timestamps são preservados. A tradução continua síncrona e vídeos
+longos podem atingir o timeout HTTP; uma nova tentativa aproveita o cache.
 
 > **Importante**: Manter `torch==2.11.0` e `torchvision==0.26.0` para compatibilidade.
 

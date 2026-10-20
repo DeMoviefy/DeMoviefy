@@ -152,7 +152,13 @@ def _get_model(model_path: str):
     Raises:
         RuntimeError: If model fails to load
     """
-    from ultralytics import YOLO  # Imported lazily to avoid hard failure at app import time.
+    try:
+        from ultralytics import YOLO  # Imported lazily to avoid hard failure at app import time.
+    except ImportError as exc:
+        raise ProcessingDependencyError(
+            "A análise de vídeo exige Ultralytics e PyTorch. No launcher, execute "
+            "Setup Environment com \"Instalar Pacotes de IA\" selecionado e reinicie o backend."
+        ) from exc
 
     # Ensure compatibility aliases exist before loading
     _ensure_ultralytics_compat()
@@ -448,6 +454,10 @@ class ProcessingCancelled(Exception):
     """Raised when a caller requests cooperative cancellation."""
 
 
+class ProcessingDependencyError(RuntimeError):
+    """Raised when a required video-analysis package is unavailable."""
+
+
 def analyze_video_frames(
     *,
     video_path: str,
@@ -513,8 +523,11 @@ def analyze_video_frames(
     """
     try:
         import cv2
-    except Exception as exc:  # pragma: no cover
-        raise RuntimeError("opencv-python is required for frame analysis.") from exc
+    except ImportError as exc:  # pragma: no cover
+        raise ProcessingDependencyError(
+            "A análise de vídeo exige OpenCV. No launcher, execute Setup Environment "
+            "com \"Instalar Pacotes de IA\" selecionado e reinicie o backend."
+        ) from exc
 
     try:
         model = _get_model(model_path)

@@ -1,0 +1,31 @@
+.signin-page {
+  --auth-ink: #202b2a;
+  --auth-muted: #687673;
+  --auth-accent: #bb563b;
+  --auth-accent-dark: #98412c;
+  --auth-line: #e8dfd9;
+  background: radial-gradient(ellipse at 10% 10%, #f5dfd1 0, transparent 35%),
+    radial-gradient(ellipse at 88% 90%, #dceae4 0, transparent 34%);
+}
+
+.signin-page .auth-panel {
+  grid-template-columns: 0.9fr 1.1fr;
+}
+
+.signin-page .auth-intro {
+  background: #653b31;
+}
+
+.signin-page .auth-intro .auth-kicker {
+  color: #f2b7a1;
+}
+
+.signin-page .auth-field input:focus {
+  box-shadow: 0 0 0 3px rgba(187, 86, 59, 0.14);
+}
+
+@media (max-width: 680px) {
+  .signin-page .auth-panel {
+    grid-template-columns: 1fr;
+  }
+}

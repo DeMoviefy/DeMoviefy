@@ -1,4 +1,5 @@
 import { memo, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
@@ -13,12 +14,12 @@ type DashboardVideoLibraryProps = {
 const DEFAULT_VIDEOS_PER_PAGE = 4;
 const WIDE_SCREEN_VIDEOS_PER_PAGE = 6;
 
-function formatDate(createdAt: string | null) {
+function formatDate(createdAt: string | null, language: string) {
   if (!createdAt) {
     return "Sem data";
   }
 
-  return new Intl.DateTimeFormat("pt-BR", {
+  return new Intl.DateTimeFormat(language, {
     dateStyle: "short",
     timeStyle: "short",
   }).format(new Date(createdAt));
@@ -29,6 +30,7 @@ export const DashboardVideoLibrary = memo(
   function DashboardVideoLibrary({
     videos,
   }: DashboardVideoLibraryProps) {
+    const { t, i18n } = useTranslation();
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [videosPerPage, setVideosPerPage] = useState(DEFAULT_VIDEOS_PER_PAGE);
@@ -101,9 +103,9 @@ export const DashboardVideoLibrary = memo(
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Busque pelo nome do vídeo..."
-            aria-label="Buscar vídeo"
-            className="w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-400 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder:text-neutral-500 "
+            placeholder={t("searchVideo")}
+            aria-label={t("searchVideo")}
+            className="w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-blue-400 dark:focus:bg-neutral-800 dark:focus:ring-blue-900"
           />
         </div>
 
@@ -112,14 +114,14 @@ export const DashboardVideoLibrary = memo(
             <div className="py-4">
               <strong className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                 {search
-                  ? "Nenhum vídeo encontrado"
-                  : "Nenhum vídeo enviado ainda"}
+                  ? t("noVideoFound")
+                  : t("noUploads")}
               </strong>
 
               <p className="mt-2 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
                 {search
-                  ? "Tente buscar por outro nome de arquivo."
-                  : "Assim que o upload for concluído o vídeo aparecerá aqui."}
+                  ? t("emptySearchDescription")
+                  : t("emptyLibraryDescription")}
               </p>
             </div>
           ) : (
@@ -141,8 +143,13 @@ export const DashboardVideoLibrary = memo(
 
                       <StatusBadge status={video.status} />
                     </div>
-
-
+                    <div className="mt-2 flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
+                      <span>#{video.id}</span>
+                      <span aria-hidden="true">·</span>
+                      <span className="truncate">
+                        {formatDate(video.created_at, i18n.resolvedLanguage ?? i18n.language)}
+                      </span>
+                    </div>
 
                     <div className="mt-2 pt-2">
                       <div className="flex justify-between gap-3 text-xs">
@@ -152,18 +159,10 @@ export const DashboardVideoLibrary = memo(
 
                         <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
                           {video.transcription_ready
-                            ? "Com transcrição"
-                            : "Sem transcrição"}
+                            ? t("withTranscription")
+                            : t("withoutTranscription")}
                         </span>
                       </div>
-
-                        <div className="mt-3 flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
-                        <span><b>Data:</b></span>
-
-                        <span className="truncate">
-                            {formatDate(video.created_at)}
-                        </span>
-                        </div>
 
                     </div>
                   </div>
@@ -175,27 +174,27 @@ export const DashboardVideoLibrary = memo(
 
         {totalPages > 1 && (
           <nav
-            aria-label="Paginação da biblioteca"
+            aria-label={t("libraryPagination")}
             className="flex items-center justify-between gap-2 border-t border-neutral-100 pt-4 dark:border-neutral-800"
           >
             <button
               type="button"
               disabled={page === 1}
               onClick={() => setPage((current) => current - 1)}
-              aria-label="Página anterior"
+              aria-label={t("previousPage")}
               className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 disabled:pointer-events-none disabled:opacity-40 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
             >
               <FaChevronLeft aria-hidden="true" className="size-3" />
             </button>
 
-            <div className="flex shrink-0 items-center gap-1" aria-label="Selecionar página">
+            <div className="flex shrink-0 items-center gap-1" aria-label={t("choosePage")}>
               {visiblePages.map((pageNumber) => (
                 <button
                   key={pageNumber}
                   type="button"
                   onClick={() => setPage(pageNumber)}
                   aria-current={pageNumber === page ? "page" : undefined}
-                  aria-label={`Página ${pageNumber}`}
+                  aria-label={t("pageNumber", { number: pageNumber })}
                   className={`h-7 min-w-7 cursor-pointer rounded-md px-2 text-xs font-medium transition-colors ${
                     pageNumber === page
                       ? "bg-blue-600 text-white dark:bg-blue-800 dark:hover:bg-blue-700"
@@ -211,7 +210,7 @@ export const DashboardVideoLibrary = memo(
               type="button"
               disabled={page === totalPages}
               onClick={() => setPage((current) => current + 1)}
-              aria-label="Próxima página"
+              aria-label={t("nextPage")}
               className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 disabled:pointer-events-none disabled:opacity-40 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
             >
               <FaChevronRight aria-hidden="true" className="size-3" />

@@ -3,6 +3,15 @@ import type { ReactNode } from "react";
 import { MAX_CLIP_DURATION_SECONDS, VideoClipRange } from "src/core/components/VideoClipRange";
 import { toApiUrl } from "src/core/services/api";
 import { formatVideoModelName, getVideoModelSizeOrder } from "src/core/utils/videoHelpers";
+import { useTranslation } from "react-i18next";
+
+export const TASK_TRANSLATION_KEYS = {
+  object_detection: "task_object_detection",
+  image_classification: "task_image_classification",
+  instance_segmentation: "task_instance_segmentation",
+  oriented_bounding_boxes: "task_oriented_bounding_boxes",
+  pose_estimation: "task_pose_estimation",
+} as const;
 
 type VideoAnalysisConfigProps = {
     configCard?: boolean
@@ -13,6 +22,7 @@ type VideoAnalysisConfigProps = {
     clipEnd: string | number | null
     videoSource: File | string | null
     knownDurationSeconds?: number | null
+    frameStride: string | number
   
     tasks: {
       task_type: string
@@ -29,6 +39,7 @@ type VideoAnalysisConfigProps = {
     onModelChange: (value: string) => void
     onClipStartChange: (value: string) => void
     onClipEndChange: (value: string) => void
+    onFrameStrideChange: (value: string) => void
   }
   
 export function VideoAnalysisConfig({
@@ -40,17 +51,20 @@ export function VideoAnalysisConfig({
   clipEnd,
   videoSource,
   knownDurationSeconds = null,
+  frameStride,
   tasks,
   models,
   onTaskChange,
   onModelChange,
   onClipStartChange,
   onClipEndChange,
+  onFrameStrideChange,
 }: VideoAnalysisConfigProps) {
   const [durationSeconds, setDurationSeconds] = useState<number | null>(null);
   const [durationLimitReached, setDurationLimitReached] = useState(false);
   const clipConfigRef = useRef({ clipStart, clipEnd, onClipStartChange, onClipEndChange });
   clipConfigRef.current = { clipStart, clipEnd, onClipStartChange, onClipEndChange };
+  const { t } = useTranslation();
   const filteredModels = models
     .filter((model) => model.task_type === taskType)
     .sort((a, b) => getVideoModelSizeOrder(a.name) - getVideoModelSizeOrder(b.name))
@@ -114,22 +128,37 @@ export function VideoAnalysisConfig({
         <div className="flex items-start gap-3">
           <div>
             <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
-              Configuração
+              {t("configuration")}
             </h3>
   
             <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-              Defina como o vídeo será processado.
+              {t("configDescription")}
             </p>
           </div>
         </div>
   
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <div>
+            <label htmlFor="video-analysis-frame-stride" className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+              Stride de frames
+            </label>
+            <select
+              id="video-analysis-frame-stride"
+              value={frameStride}
+              onChange={(e) => onFrameStrideChange(e.target.value)}
+              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"
+            >
+              {[1, 8, 24, 30, 60].map((stride) => (
+                <option key={stride} value={stride}>{stride === 1 ? "1 frame (todos os frames)" : `${stride} frames`}</option>
+              ))}
+            </select>
+          </div>
+          <div>
             <label
               htmlFor="video-analysis-task"
               className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
             >
-              Tipo de análise
+              {t("aiTask")}
             </label>
   
             <select
@@ -138,9 +167,13 @@ export function VideoAnalysisConfig({
               onChange={(e) => onTaskChange(e.target.value)}
               className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"
             >
+              <option value="">{t("selectTask")}</option>
+  
               {tasks.map((task) => (
                 <option key={task.task_type} value={task.task_type}>
-                  {task.task_label}
+                  {task.task_type in TASK_TRANSLATION_KEYS
+                    ? t(TASK_TRANSLATION_KEYS[task.task_type as keyof typeof TASK_TRANSLATION_KEYS])
+                    : task.task_label}
                 </option>
               ))}
             </select>
@@ -152,7 +185,7 @@ export function VideoAnalysisConfig({
                 htmlFor="video-analysis-model"
                 className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
               >
-                Precisão da análise
+                {t("model")}
               </label>
   
               <select
@@ -161,6 +194,8 @@ export function VideoAnalysisConfig({
                 onChange={(e) => onModelChange(e.target.value)}
                 className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"
               >
+                <option value="">{t("selectModel")}</option>
+  
                 {filteredModels.map((model) => (
                   <option key={model.relative_path} value={model.relative_path}>
                     {formatVideoModelName(model.name)}
@@ -188,3 +223,4 @@ export function VideoAnalysisConfig({
     </div>
   )
 }
+

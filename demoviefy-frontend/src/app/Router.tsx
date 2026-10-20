@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import Home from "src/pages/Home";
 import Dashboard from "src/pages/Dashboard";
 import Video from "src/pages/Video";
@@ -7,24 +8,20 @@ import Login from "src/pages/Login";
 import Cadastro from "src/pages/Cadastro";
 
 // Define os títulos das páginas com base nas rotas
-const titlesMap: Record<string, string> = {
-    "/": "DeMoviefy",
-    "/dashboard": "DeMoviefy - Painel",
-};
-
 // Aplica o título na página caso ela esteja declarada acima. Caso não, o valor padrão ("DeMoviefy") será vinculado.
 function TitleManager() {
     const { pathname } = useLocation()
+    const { t, i18n } = useTranslation();
 
     useEffect(() => {
 
         // Workaround para o map acima, pois video/{id} nunca é uma rota fixa.
         if (pathname.startsWith("/video/")) {
-            document.title = "DeMoviefy - Análise";
+            document.title = `DeMoviefy - ${t("analysisTitle")}`;
             return;
         }
-        document.title =  titlesMap[pathname] ?? "DeMoviefy";
-    }, [pathname]);
+        document.title = pathname === "/dashboard" ? `DeMoviefy - ${t("dashboardTitle")}` : "DeMoviefy";
+    }, [pathname, t, i18n.language]);
 
     return null;
 }
