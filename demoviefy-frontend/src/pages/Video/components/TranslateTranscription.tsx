@@ -36,7 +36,8 @@ export function TranslateTranscription({
         ?? (sourceVariant === selectedVariant ? sourceLanguage : "");
 
     return (
-        <div className="mt-6">
+        <section>
+            <div className="rounded-xl border border-neutral-200 bg-neutral-100 p-4 pt-5 dark:border-neutral-700 dark:bg-neutral-900/60 sm:p-5">
             <h4 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">Traduzir transcrição</h4>
             <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
                 A tradução será salva como uma nova versão.
@@ -73,6 +74,7 @@ export function TranslateTranscription({
                     {isTranslating ? "Traduzindo..." : "Traduzir"}
                 </button>
             </div>
-        </div>
+            </div>
+        </section>
     );
 }

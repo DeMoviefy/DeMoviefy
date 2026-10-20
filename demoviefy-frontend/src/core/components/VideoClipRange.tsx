@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 type VideoClipRangeProps = {
+    boxed?: boolean;
     durationSeconds: number | null;
     durationLimitReached: boolean;
     start: string | number;
@@ -16,8 +17,7 @@ const RANGE_CLASS = "pointer-events-none absolute left-2 right-2 top-0 z-10 h-8 
 
 function getTimeFormat(durationSeconds: number | null): "seconds" | "minutes" | "hours" {
     if (durationSeconds !== null && durationSeconds >= 3600) return "hours";
-    if (durationSeconds === null || durationSeconds >= 60) return "minutes";
-    return "seconds";
+    return "minutes";
 }
 
 function formatTime(seconds: number, format: "seconds" | "minutes" | "hours"): string {
@@ -56,7 +56,6 @@ function ClipTimeInput({
     label,
     value,
     format,
-    unit,
     min,
     max,
     onCommit,
@@ -64,7 +63,6 @@ function ClipTimeInput({
     label: string;
     value: number;
     format: "seconds" | "minutes" | "hours";
-    unit: string;
     min: number;
     max: number;
     onCommit: (value: number) => void;
@@ -103,15 +101,12 @@ function ClipTimeInput({
                     className="h-5 min-w-0 bg-transparent text-sm leading-5 text-neutral-900 outline-none dark:text-neutral-100"
                     style={{ width: `${Math.max(2, draft.length + 0.5)}ch` }}
                 />
-                <span className="ml-1 text-sm font-normal leading-5 text-neutral-500 dark:text-neutral-400" aria-hidden="true">
-                    {unit}
-                </span>
             </div>
         </label>
     );
 }
 
-export function VideoClipRange({ durationSeconds, durationLimitReached, start, end, onStartChange, onEndChange }: VideoClipRangeProps) {
+export function VideoClipRange({ boxed = true, durationSeconds, durationLimitReached, start, end, onStartChange, onEndChange }: VideoClipRangeProps) {
     const [activeHandle, setActiveHandle] = useState<"start" | "end">("end");
     const maxDuration = durationSeconds !== null && Number.isFinite(durationSeconds)
         ? Math.min(MAX_CLIP_DURATION_SECONDS, Math.max(0, Math.floor(durationSeconds)))
@@ -123,13 +118,12 @@ export function VideoClipRange({ durationSeconds, durationLimitReached, start, e
     const effectiveEnd = maxDuration === null ? Math.max(startSeconds, endSeconds) : Math.min(maxDuration, Math.max(startSeconds, endSeconds));
     const boundedStart = Math.min(startSeconds, effectiveEnd);
     const timeFormat = getTimeFormat(maxDuration);
-    const timeFormatLabel = timeFormat === "hours" ? "h:m:s" : timeFormat === "minutes" ? "m:s" : "s";
     const sliderAvailable = maxDuration !== null && maxDuration > 0;
     const startPosition = maxDuration ? (boundedStart / maxDuration) * 100 : 0;
     const endPosition = maxDuration ? (effectiveEnd / maxDuration) * 100 : 100;
 
     return (
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 pt-5 dark:border-neutral-700 dark:bg-neutral-900/60 sm:p-5">
+        <div className={boxed ? "rounded-xl border border-neutral-200 bg-neutral-100 p-4 pt-5 dark:border-neutral-700 dark:bg-neutral-900/60 sm:p-5" : ""}>
             <div className="flex items-start gap-3">
                 <div>
                     <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">Trecho do vídeo</h3>
@@ -144,7 +138,6 @@ export function VideoClipRange({ durationSeconds, durationLimitReached, start, e
                     label="Início"
                     value={boundedStart}
                     format={timeFormat}
-                    unit={timeFormatLabel}
                     min={0}
                     max={effectiveEnd}
                     onCommit={(value) => onStartChange(String(value))}
@@ -153,7 +146,6 @@ export function VideoClipRange({ durationSeconds, durationLimitReached, start, e
                     label="Fim"
                     value={effectiveEnd}
                     format={timeFormat}
-                    unit={timeFormatLabel}
                     min={boundedStart}
                     max={maxDuration ?? Number.MAX_SAFE_INTEGER}
                     onCommit={(value) => onEndChange(String(value))}

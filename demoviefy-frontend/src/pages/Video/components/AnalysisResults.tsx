@@ -11,7 +11,7 @@ type AnalysisResultsProps = {
 export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
     if (state === "loading" || state === "pending") {
         return (
-            <section className="flex flex-col gap-3">
+            <section className="flex flex-col gap-3 rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800">
                 <h3 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
                     Resultados da Análise
                 </h3>
@@ -24,7 +24,7 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
 
     if (!summary) {
         return (
-            <section className="flex flex-col gap-3">
+            <section className="flex flex-col gap-3 rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800">
                 <h3 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
                     Resultados da Análise
                 </h3>
@@ -38,8 +38,8 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
     return (
         <>
             {summary.content_rating && (
-                <div className="p-5 mb-6 border rounded-2xl border-(--border) bg-(--surface)">
-                    <h3 className="mb-4 text-xs font-bold tracking-widest uppercase text-(--muted)">
+                <div className="mb-6 rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
+                    <h3 className="mb-4 text-base font-semibold text-neutral-900 dark:text-neutral-100">
                         Classificação Sugerida
                     </h3>
 
@@ -49,19 +49,14 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
                     />
 
                     {summary.content_rating.danger_level > 1 && (
-                        <p className="mt-3 text-sm text-(--muted)">
-
-                            <strong>Motivo:</strong> Presença de {summary.content_rating.trigger_objects.join(', ')}.
+                        <p className="mt-3 text-sm leading-6 text-neutral-600 dark:text-neutral-300">
+                            <strong className="font-semibold text-neutral-800 dark:text-neutral-100">Motivo:</strong>{" "}
+                            Presença de {summary.content_rating.trigger_objects.join(", ")}.
                         </p>
                     )}
                 </div>
             )}
-            <section className="flex flex-col gap-4">
-                <h3 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-                    Resultados da Análise
-                </h3>
-                <AnalysisDetectionTable summary={summary} />
-            </section>
+            <AnalysisDetectionTable summary={summary} heading="Resultados da Análise" />
         </>
     );
 }

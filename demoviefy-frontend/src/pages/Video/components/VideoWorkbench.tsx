@@ -87,21 +87,6 @@ export const VideoWorkbench = memo(function VideoWorkbench({
 
                     <div className="mt-6 min-w-0">
                         <AnalysisResults state={analysisState} summary={summary} />
-
-                        <div className="mt-6">
-                            <VideoConfigPanel
-                                config={config}
-                                videoSource={currentVideo.video_url}
-                                durationSeconds={analysis?.video_id === currentVideo.id ? summary?.video_duration_sec ?? null : null}
-                                onConfigChange={onConfigChange}
-                                isBusy={isBusy || isProcessing}
-                                onReprocess={onReprocess}
-                            />
-                        </div>
-
-                        <div className="mt-8">
-                            <DeleteVideoButton video={currentVideo} />
-                        </div>
                     </div>
                 </div>
 
@@ -112,15 +97,17 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                         isBusy={isBusy}
                     />
 
-                                        <div className="min-w-0">
-                        <h3 className="mb-6 text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-                            Detalhes da análise
-                        </h3>
-                        <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
-                            <div className="bg-neutral-50 px-3 py-5 dark:bg-neutral-900">
-                                <AnalysisMetrics summary={summary} modelName={currentVideo.ai_config.model_name} />
+                    <div className="min-w-0">
+                        <div className="overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800/70">
+                            <div>
+                                <h3 className="bg-neutral-100 px-4 pb-4 pt-5 text-base font-semibold tracking-tight text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100 sm:px-5 sm:pb-5 sm:pt-5">
+                                    Detalhes da análise
+                                </h3>
+                                <div className="px-4 py-5 sm:px-5">
+                                    <AnalysisMetrics summary={summary} modelName={currentVideo.ai_config.model_name} />
+                                </div>
                             </div>
-                            <div className="px-3 py-5">
+                            <div className="px-4 py-5 sm:px-5">
                                 <AnalysisVersion
                                     message={analysisMessage}
                                     variants={analysisVariants}
@@ -146,6 +133,17 @@ export const VideoWorkbench = memo(function VideoWorkbench({
 
                 </div>
             </div>
+
+            <VideoConfigPanel
+                config={config}
+                videoSource={currentVideo.video_url}
+                durationSeconds={analysis?.video_id === currentVideo.id ? summary?.video_duration_sec ?? null : null}
+                onConfigChange={onConfigChange}
+                isBusy={isBusy || isProcessing}
+                onReprocess={onReprocess}
+            />
+
+            <DeleteVideoButton video={currentVideo} />
         </section>
     );
 });

@@ -52,33 +52,35 @@ export function TranscriptionWorkbench({ isBusy }: TranscriptionWorkbenchProps) 
 
     return (
         <section className="flex min-w-0 flex-col gap-6">
-            <div>
-                <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">Editor de transcrição</h3>
-                <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-                    Edite a transcrição no formato SRT ou gere e traduza versões.
-                </p>
+            <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
+                <div className="mb-5 text-left">
+                    <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">Editor de transcrição</h3>
+                    <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+                        Edite a transcrição no formato SRT ou gere e traduza versões.
+                    </p>
+                </div>
+
+                <TranscriptionTextEditor
+                    draft={transcriptionDraft}
+                    message={transcriptionMessage}
+                    segments={segments}
+                    hasChanges={hasChanges}
+                    isBusy={isWorking}
+                    selectedVariant={selectedVariant}
+                    onDraftChange={setTranscriptionDraft}
+                    onSegmentsChange={setTranscriptionSegments}
+                    onSave={onSaveTranscription}
+                />
             </div>
 
-            <TranscriptionTextEditor
-                draft={transcriptionDraft}
-                message={transcriptionMessage}
-                segments={segments}
-                hasChanges={hasChanges}
-                isBusy={isWorking}
-                selectedVariant={selectedVariant}
-                onDraftChange={setTranscriptionDraft}
-                onSegmentsChange={setTranscriptionSegments}
-                onSave={onSaveTranscription}
-            />
-
-            <section>
-                <div className="py-5 text-left">
+            <section className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 pt-5 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
+                <div className="mb-5 text-left">
                     <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
                         Opções de Transcrição
                     </h3>
                 </div>
 
-                <div className="mt-2 rounded-lg border border-neutral-200 bg-white px-3 py-5 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+                <div className="space-y-6">
                     <GenerateTranscription
                         selectedModel={selectedModel}
                         selectedLanguage={selectedLanguage}

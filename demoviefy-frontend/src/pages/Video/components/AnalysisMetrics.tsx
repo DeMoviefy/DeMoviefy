@@ -1,12 +1,26 @@
 // src/pages/Dashboard/components/AnalysisMetrics.tsx
 
 import { memo } from "react"
-import { formatSeconds, formatVideoModelName } from "src/core/utils/videoHelpers"
+import { formatVideoModelName } from "src/core/utils/videoHelpers"
 import type { VideoAnalysisResponse } from "src/core/types/videoTypes"
 
 type AnalysisMetricsProps = {
     summary: NonNullable<VideoAnalysisResponse["analysis"]> | null
     modelName: string
+}
+
+function formatClipTime(value: number | null, videoDuration: number | null): string {
+    if (value === null || !Number.isFinite(value)) return "-";
+    const totalSeconds = Math.max(0, Math.floor(value));
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    const pad = (part: number) => String(part).padStart(2, "0");
+
+    if (videoDuration !== null && videoDuration >= 3600) {
+        return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+    }
+    return `${pad(Math.floor(totalSeconds / 60))}:${pad(seconds)}`;
 }
 
 export const AnalysisMetrics = memo(function AnalysisMetrics({
@@ -38,10 +52,8 @@ export const AnalysisMetrics = memo(function AnalysisMetrics({
                             Trecho
                         </span>
                         <strong className="mt-1 block text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                            {formatSeconds(summary.clip_start_sec)} -{" "}
-                            {summary.clip_end_sec === null
-                                ? "fim"
-                                : formatSeconds(summary.clip_end_sec)}
+                            {formatClipTime(summary.clip_start_sec, summary.video_duration_sec)} -{" "}
+                            {formatClipTime(summary.clip_end_sec ?? summary.video_duration_sec, summary.video_duration_sec)}
                         </strong>
                     </div>
 

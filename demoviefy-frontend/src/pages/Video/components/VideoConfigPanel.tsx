@@ -1,6 +1,5 @@
 // src/pages/Dashboard/components/VideoConfigPanel.tsx
 
-import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useCatalogStore } from "src/core/stores/useAICatalogStore"
 import { FaTrashAlt } from "react-icons/fa"
@@ -30,7 +29,6 @@ export function VideoConfigPanel({
 }: VideoConfigPanelProps) {
 
 
-    const [isOpen, setIsOpen] = useState(false)
     const { tasks, models } = useCatalogStore()
 
     const update = (field: keyof AiConfigPayload, value: string | null) =>
@@ -38,78 +36,43 @@ export function VideoConfigPanel({
 
 
     return (
-        <section>
-            <div className="py-5 text-left">
-                <div>
-                    <div className="flex items-center gap-3">
-                        <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
-                            Reprocessar vídeo
-                        </h3>
-                        <button
-                            type="button"
-                            onClick={() => setIsOpen((open) => !open)}
-                            aria-expanded={isOpen}
-                            aria-controls="video-reprocess-config"
-                            aria-label={isOpen ? "Recolher configurações" : "Expandir configurações"}
-                            className={`flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-all hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-100 ${isOpen ? "rotate-180" : ""}`}
-                        >
-                            <svg
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                className="size-4"
-                            >
-                                <path
-                                    d="m5 7.5 5 5 5-5"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-                        Execute uma nova análise do vídeo.
-                    </p>
-                </div>
+        <section className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 pt-5 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
+            <div>
+                <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
+                    Reprocessar vídeo
+                </h3>
+                <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+                    Execute uma nova análise do vídeo.
+                </p>
             </div>
 
-            {isOpen && (
-                <div id="video-reprocess-config" className="mt-2 rounded-lg border border-neutral-200 bg-white px-3 py-5 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
-                    <VideoAnalysisConfig
-                        taskType={config.task_type}
-                        modelPath={config.model_path}
-                        clipStart={config.clip_start_sec}
-                        clipEnd={config.clip_end_sec}
-                        videoSource={videoSource}
-                        knownDurationSeconds={durationSeconds}
-                        tasks={tasks}
-                        models={models}
-                        onTaskChange={(value) => update("task_type", value)}
-                        onModelChange={(value) => update("model_path", value)}
-                        onClipStartChange={(value) => update("clip_start_sec", value)}
-                        onClipEndChange={(value) => update("clip_end_sec", value || null)}
-                    />
-
-                    <div className="mt-8 flex flex-wrap items-center justify-end gap-3">
+            <div className="mt-5 space-y-5">
+                <VideoAnalysisConfig
+                    configCard
+                    footer={(
                         <button
                             type="button"
                             className="cursor-pointer rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-800 dark:hover:bg-blue-700"
-                            onClick={() => {
-                                setIsOpen(false);
-                                onReprocess();
-                            }}
+                            onClick={onReprocess}
                             disabled={isBusy}
                         >
-                            {isBusy
-                                ? "Processando..."
-                                : "Reprocessar vídeo"}
+                            {isBusy ? "Processando..." : "Reprocessar vídeo"}
                         </button>
-                    </div>
-                </div>
-            )}
-
+                    )}
+                    taskType={config.task_type}
+                    modelPath={config.model_path}
+                    clipStart={config.clip_start_sec}
+                    clipEnd={config.clip_end_sec}
+                    videoSource={videoSource}
+                    knownDurationSeconds={durationSeconds}
+                    tasks={tasks}
+                    models={models}
+                    onTaskChange={(value) => update("task_type", value)}
+                    onModelChange={(value) => update("model_path", value)}
+                    onClipStartChange={(value) => update("clip_start_sec", value)}
+                    onClipEndChange={(value) => update("clip_end_sec", value || null)}
+                />
+            </div>
         </section>
 
     )

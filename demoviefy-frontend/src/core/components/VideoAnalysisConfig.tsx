@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { MAX_CLIP_DURATION_SECONDS, VideoClipRange } from "src/core/components/VideoClipRange";
 import { toApiUrl } from "src/core/services/api";
 import { formatVideoModelName, getVideoModelSizeOrder } from "src/core/utils/videoHelpers";
 
 type VideoAnalysisConfigProps = {
+    configCard?: boolean
+    footer?: ReactNode
     taskType: string
     modelPath: string
     clipStart: string | number
@@ -29,6 +32,8 @@ type VideoAnalysisConfigProps = {
   }
   
 export function VideoAnalysisConfig({
+  configCard = false,
+  footer,
   taskType,
   modelPath,
   clipStart,
@@ -98,8 +103,14 @@ export function VideoAnalysisConfig({
   }, [videoSource, knownDurationSeconds]);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="pt-2">
+    <div className={configCard
+      ? "grid grid-cols-1 gap-6 lg:grid-cols-2"
+      : "flex flex-col gap-6"}
+    >
+      <div className={configCard
+        ? "rounded-xl border border-neutral-200 bg-neutral-100 p-4 pt-5 dark:border-neutral-700 dark:bg-neutral-900/60 sm:p-5"
+        : "pt-2"}
+      >
         <div className="flex items-start gap-3">
           <div>
             <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
@@ -162,14 +173,18 @@ export function VideoAnalysisConfig({
       </div>
 
   
-      <VideoClipRange
-        durationSeconds={durationSeconds}
-        durationLimitReached={durationLimitReached}
-        start={clipStart}
-        end={clipEnd}
-        onStartChange={onClipStartChange}
-        onEndChange={onClipEndChange}
-      />
+      <div>
+        <VideoClipRange
+          boxed
+          durationSeconds={durationSeconds}
+          durationLimitReached={durationLimitReached}
+          start={clipStart}
+          end={clipEnd}
+          onStartChange={onClipStartChange}
+          onEndChange={onClipEndChange}
+        />
+      </div>
+      {footer && <div className={configCard ? "flex justify-end lg:col-span-2" : "flex justify-end"}>{footer}</div>}
     </div>
   )
 }
