@@ -5,6 +5,10 @@ import imagem2EngDark from "src/pages/Home/assets/Imagem2/Imagem2-ENG-Dark.png";
 import imagem2EngLight from "src/pages/Home/assets/Imagem2/Imagem2-ENG-Light.png";
 import imagem2PorDark from "src/pages/Home/assets/Imagem2/Imagem2-POR-Dark.png";
 import imagem2PorLight from "src/pages/Home/assets/Imagem2/Imagem2-POR-Light.png";
+import imagem3EngDark from "src/pages/Home/assets/Imagem3/Imagem3-ENG-Dark.png";
+import imagem3EngLight from "src/pages/Home/assets/Imagem3/Imagem3-ENG-Light.png";
+import imagem3PorDark from "src/pages/Home/assets/Imagem3/Imagem3-POR-Dark.png";
+import imagem3PorLight from "src/pages/Home/assets/Imagem3/Imagem3-POR-Light.png";
 import imagem4EngDark from "src/pages/Home/assets/Imagem4/Imagem4-ENG-Dark.png";
 import imagem4EngLight from "src/pages/Home/assets/Imagem4/Imagem4-ENG-Light.png";
 import imagem4PorDark from "src/pages/Home/assets/Imagem4/Imagem4-POR-Dark.png";
@@ -17,6 +21,9 @@ export default function UseCases() {
   const analysisScreenshot = isPortuguese
     ? theme === "dark" ? imagem2PorDark : imagem2PorLight
     : theme === "dark" ? imagem2EngDark : imagem2EngLight;
+  const transcriptionScreenshot = isPortuguese
+    ? theme === "dark" ? imagem3PorDark : imagem3PorLight
+    : theme === "dark" ? imagem3EngDark : imagem3EngLight;
   const ratingScreenshot = isPortuguese
     ? theme === "dark" ? imagem4PorDark : imagem4PorLight
     : theme === "dark" ? imagem4EngDark : imagem4EngLight;
@@ -54,9 +61,9 @@ export default function UseCases() {
                 </div>
 
                 <div>
-                    <div className="overflow-hidden rounded-lg">
+                    <div className="overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-700">
                         <img
-                            src="src/assets/DeMoviefy-Demo.png"
+                            src={transcriptionScreenshot}
                             alt={t("transcription")}
                             className="w-full"
                         />
