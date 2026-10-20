@@ -50,6 +50,8 @@ Na janela, clique em `Setup Environment` na primeira execução e depois em
 `Start All`. Consulte o [Guia do Launcher](docs/LAUNCHER.md) para conhecer todas
 as opções, incluindo iniciar cada serviço separadamente.
 
+Para um início completo com todas as funcionalidades é recomendado ao configurar o ambiente virtual selecionar `Instalar Pacotes de IA`, além de instalar o FFmpeg em `install FFmpeg`.
+
 ### Execução Manual
 
 **Passo 1 - Setup Python:**
