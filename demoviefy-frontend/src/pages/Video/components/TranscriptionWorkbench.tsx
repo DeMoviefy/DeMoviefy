@@ -76,7 +76,7 @@ export function TranscriptionWorkbench({ isBusy }: TranscriptionWorkbenchProps) 
             <section className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 pt-5 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
                 <div className="mb-5 text-left">
                     <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
-                        Opções de Transcrição
+                        Opções de transcrição
                     </h3>
                 </div>
 

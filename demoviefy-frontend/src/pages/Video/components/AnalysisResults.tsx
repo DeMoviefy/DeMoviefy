@@ -13,7 +13,7 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
         return (
             <section className="flex flex-col gap-3 rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800">
                 <h3 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-                    Resultados da Análise
+                    Resultados da análise
                 </h3>
                 <p className="text-sm leading-6 text-neutral-500 dark:text-neutral-400" aria-live="polite">
                     Processando análise. Os resultados aparecerão aqui quando terminar.
@@ -26,7 +26,7 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
         return (
             <section className="flex flex-col gap-3 rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800">
                 <h3 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-                    Resultados da Análise
+                    Resultados da análise
                 </h3>
                 <p className="text-sm leading-6 text-neutral-500 dark:text-neutral-400" aria-live="polite">
                     Não há uma análise disponível para este vídeo.
@@ -40,7 +40,7 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
             {summary.content_rating && (
                 <div className="mb-6 rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
                     <h3 className="mb-4 text-base font-semibold text-neutral-900 dark:text-neutral-100">
-                        Classificação Sugerida
+                        Classificação sugerida
                     </h3>
 
                     <RatingBadge

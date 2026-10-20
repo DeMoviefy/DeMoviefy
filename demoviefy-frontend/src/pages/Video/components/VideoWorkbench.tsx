@@ -100,11 +100,13 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                     <div className="min-w-0">
                         <div className="overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800/70">
                             <div>
-                                <h3 className="bg-neutral-100 px-4 pb-4 pt-5 text-base font-semibold tracking-tight text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100 sm:px-5 sm:pb-5 sm:pt-5">
+                                <h3 className="bg-neutral-100 px-4 pb-4 text-base font-semibold tracking-tight text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100 sm:px-5 sm:pt-5">
                                     Detalhes da análise
                                 </h3>
-                                <div className="px-4 py-5 sm:px-5">
-                                    <AnalysisMetrics summary={summary} modelName={currentVideo.ai_config.model_name} />
+                                <div className="px-4 pb-4 sm:px-5">
+                                    <div className="-mx-4 border-b border-neutral-200 px-4 py-4 transition-colors hover:bg-blue-50/40 dark:border-neutral-700 dark:hover:bg-neutral-700/50 sm:-mx-5 sm:px-5">
+                                        <AnalysisMetrics summary={summary} modelName={currentVideo.ai_config.model_name} />
+                                    </div>
                                 </div>
                             </div>
                             <div className="px-4 py-5 sm:px-5">
