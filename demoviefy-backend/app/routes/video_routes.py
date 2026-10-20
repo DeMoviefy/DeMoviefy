@@ -32,6 +32,9 @@ GUEST_VIDEO_LIMIT = 3
 
 @video_bp.before_request
 def require_video_access():
+    if request.method == "OPTIONS":
+        return
+
     session.permanent = True
     user_id = session.get("user_id")
     user = db.session.get(User, user_id) if user_id else None

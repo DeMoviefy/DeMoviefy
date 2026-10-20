@@ -11,46 +11,7 @@ from app.repositories.video_repository import count_guest_videos
 
 GUEST_VIDEO_LIMIT = 3
 
-from flask import current_app, jsonify, request, session
-from app.models.user import User
 
-
-def restore_session_from_cookie():
-    user_id = session.get("user_id")
-
-    if user_id is not None:
-        return False
-
-    cookie_name = current_app.config["SESSION_COOKIE_NAME"]
-    user_id = request.cookies.get(cookie_name)
-
-    if not user_id:
-        return None
-
-    try:
-        user_id = int(user_id)
-    except (ValueError, TypeError):
-        return None
-
-    user = User.query.get(user_id)
-
-    if user is None:
-        return None
-
-    session.clear()
-    session["user_id"] = user.id
-    ##adicionar a senha descriptografada
-    session.permanent = True
-
-    return jsonify({
-        "message": "Login realizado com sucesso.",
-        "user": {
-            "id": user.id,
-            "nome": user.nome,
-            "email": user.email
-        }
-    }), 200
-    
 def login_user():
     data = request.get_json(silent=True)
     if not isinstance(data, dict):
