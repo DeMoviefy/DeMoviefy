@@ -8,8 +8,9 @@ export const i18nCadastro = {
     repeatPassword: "Digite a senha novamente",
     minPassword: "No mínimo 8 caracteres",
     hasAccount: "Já tem uma conta?",
-    accountCreated: "Conta criada com sucesso. Você já pode entrar.",
+    accountCreated: "Conta criada com sucesso!",
     signupError: "Não foi possível criar sua conta. Tente novamente.",
+    signupLoginError: "Conta criada, mas não foi possível iniciar sua sessão. Tente entrar.",
     recaptchaRequired: "Confirme o reCAPTCHA antes de cadastrar.",
   },
   en: {
@@ -21,8 +22,9 @@ export const i18nCadastro = {
     repeatPassword: "Enter your password again",
     minPassword: "At least 8 characters",
     hasAccount: "Already have an account?",
-    accountCreated: "Account created. You can now sign in.",
+    accountCreated: "Account created successfully!",
     signupError: "Could not create your account. Please try again.",
+    signupLoginError: "Your account was created, but we couldn't sign you in. Please try signing in.",
     recaptchaRequired: "Complete the reCAPTCHA before signing up.",
   },
 } as const;

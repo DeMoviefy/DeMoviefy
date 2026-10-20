@@ -1,18 +1,20 @@
 
 import axios from "axios";
 import { useRef, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 import { UserService } from "src/core/services/userService";
+import { useProcessingStore } from "src/core/stores/useProcessingStore";
 
 const recaptchaEnabled = import.meta.env.VITE_RECAPTCHA_ENABLED !== "false";
 
 export default function Cadastro() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
-  const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [recaptchaToken, setRecaptchaToken] =
     useState<string | null>(null);
@@ -25,14 +27,13 @@ export default function Cadastro() {
     const form = event.currentTarget;
     const formData = new FormData(form);
 
-    setFeedback("");
-
     if (recaptchaEnabled && !recaptchaToken) {
-      setFeedback(t("recaptchaRequired"));
+      toast.error(t("recaptchaRequired"));
       return;
     }
 
     setIsSubmitting(true);
+    let accountCreated = false;
 
     try {
       await UserService.register({
@@ -44,18 +45,30 @@ export default function Cadastro() {
         ),
         recaptcha_token: recaptchaEnabled ? recaptchaToken! : "",
       });
+      accountCreated = true;
 
-      setFeedback(t("accountCreated"));
+      const response = await UserService.login({
+        email: String(formData.get("email")).trim(),
+        senha: String(formData.get("password")),
+      });
+      useProcessingStore.getState().setSessionStatus({
+        is_guest: false,
+        user: response.user,
+        guest_video_count: 0,
+        guest_video_limit: 3,
+      });
 
       form.reset();
       setRecaptchaToken(null);
       recaptchaRef.current?.reset();
+      toast.success(t("accountCreated"));
+      navigate("/dashboard", { replace: true });
 
     } catch (error: unknown) {
       const message = axios.isAxiosError<{ error?: string }>(error)
         ? error.response?.data?.error
         : undefined;
-      setFeedback(message ?? t("signupError"));
+      toast.error(message ?? t(accountCreated ? "signupLoginError" : "signupError"));
 
       // Permite resolver um novo CAPTCHA após uma falha.
       setRecaptchaToken(null);
@@ -116,7 +129,6 @@ export default function Cadastro() {
         <button disabled={isSubmitting || (recaptchaEnabled && !recaptchaToken)} type="submit" className="mt-7 w-full cursor-pointer rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-800 dark:hover:bg-blue-700">
           {isSubmitting ? t("creatingAccount") : t("createAccount")}
         </button>
-        {feedback && <p aria-live="polite" className="mt-4 text-sm leading-6 text-neutral-600 dark:text-neutral-300" role="status">{feedback}</p>}
         <p className="mt-6 text-center text-sm text-neutral-500 dark:text-neutral-400">
           {t("hasAccount")} <Link className="font-semibold text-blue-700 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300" to="/login">{t("login")}</Link>
         </p>

@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "sonner";
 
 import { UserService } from "src/core/services/userService";
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
@@ -9,7 +10,6 @@ import { useTranslation } from "react-i18next";
 export default function Login() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -17,7 +17,6 @@ export default function Login() {
     const form = event.currentTarget;
     const formData = new FormData(form);
 
-    setFeedback("");
     setIsSubmitting(true);
     try {
       const response = await UserService.login({
@@ -35,7 +34,7 @@ export default function Login() {
       const message = axios.isAxiosError<{ error?: string }>(error)
         ? error.response?.data?.error
         : undefined;
-      setFeedback(message ?? t("loginError"));
+      toast.error(message ?? t("loginError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -72,7 +71,6 @@ export default function Login() {
         <button disabled={isSubmitting} type="submit" className="mt-7 w-full cursor-pointer rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-800 dark:hover:bg-blue-700">
           {isSubmitting ? t("signingIn") : t("login")}
         </button>
-        {feedback && <p aria-live="polite" className="mt-4 text-sm leading-6 text-red-700 dark:text-red-300" role="alert">{feedback}</p>}
         <p className="mt-6 text-center text-sm text-neutral-500 dark:text-neutral-400">
           {t("noAccount")} <Link className="font-semibold text-blue-700 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300" to="/cadastro">{t("register")}</Link>
         </p>
