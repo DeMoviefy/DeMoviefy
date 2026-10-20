@@ -76,19 +76,24 @@ export const VideoWorkbench = memo(function VideoWorkbench({
     const detailsPanelRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        let animationFrame = 0;
         const updateResultsHeight = () => {
-            const resultsScroll = resultsContainerRef.current?.querySelector<HTMLElement>("[data-analysis-results-scroll]");
-            const detailsPanel = detailsPanelRef.current;
-            if (!resultsScroll || !detailsPanel) return;
+            cancelAnimationFrame(animationFrame);
+            animationFrame = requestAnimationFrame(() => {
+                const resultsScroll = resultsContainerRef.current?.querySelector<HTMLElement>("[data-analysis-results-scroll]");
+                const detailsPanel = detailsPanelRef.current;
+                if (!resultsScroll || !detailsPanel) return;
 
-            if (!window.matchMedia("(min-width: 1280px)").matches) {
-                resultsScroll.style.height = "";
-                return;
-            }
+                if (!window.matchMedia("(min-width: 1280px)").matches) {
+                    resultsScroll.style.height = "";
+                    return;
+                }
 
-            const availableHeight = detailsPanel.getBoundingClientRect().bottom
-                - resultsScroll.getBoundingClientRect().top;
-            resultsScroll.style.height = `${Math.max(0, availableHeight)}px`;
+                const availableHeight = detailsPanel.getBoundingClientRect().bottom
+                    - resultsScroll.getBoundingClientRect().top;
+                const nextHeight = `${Math.max(0, Math.round(availableHeight))}px`;
+                if (resultsScroll.style.height !== nextHeight) resultsScroll.style.height = nextHeight;
+            });
         };
 
         const observer = new ResizeObserver(updateResultsHeight);
@@ -98,6 +103,7 @@ export const VideoWorkbench = memo(function VideoWorkbench({
         updateResultsHeight();
 
         return () => {
+            cancelAnimationFrame(animationFrame);
             observer.disconnect();
             window.removeEventListener("resize", updateResultsHeight);
         };

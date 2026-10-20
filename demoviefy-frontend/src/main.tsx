@@ -53,6 +53,12 @@ function renderFatal(rootInstance: Root, error: unknown) {
 }
 
 window.addEventListener("error", (event) => {
+  // Browsers report ResizeObserver's deferred-layout warning as a window error.
+  // It is not a startup failure and must not replace the running application.
+  if (event.message === "ResizeObserver loop completed with undelivered notifications.") {
+    event.preventDefault();
+    return;
+  }
   renderFatal(root, event.error ?? new Error(event.message));
 });
 

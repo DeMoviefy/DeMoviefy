@@ -90,7 +90,7 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
           transcriptionMessage:
             data.available === false || data.transcription.status === "unavailable" || !hasTranscriptionContent
               ? data.transcription.error ?? "Não há uma transcrição disponível para este vídeo. Gere-a e depois confira-a neste editor."
-              : `Transcrição carregada de ${data.storage.transcription_relative_path}.`,
+              : i18n.t("transcriptionLoaded"),
         });
         return;
       }
