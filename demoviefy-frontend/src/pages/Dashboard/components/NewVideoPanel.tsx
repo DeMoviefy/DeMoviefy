@@ -38,6 +38,8 @@ export function NewVideoPanel() {
         setUploadClipStart,
         uploadClipEnd,
         setUploadClipEnd,
+        uploadFrameStride,
+        setUploadFrameStride,
         handleUpload,
     } = useUpload();
 
@@ -175,12 +177,14 @@ export function NewVideoPanel() {
                         modelPath={uploadModelPath}
                         clipStart={uploadClipStart}
                         clipEnd={uploadClipEnd}
+                        frameStride={uploadFrameStride}
                         tasks={tasks}
                         models={models}
                         onTaskChange={handleUploadTaskChange}
                         onModelChange={setUploadModelPath}
                         onClipStartChange={setUploadClipStart}
                         onClipEndChange={setUploadClipEnd}
+                        onFrameStrideChange={setUploadFrameStride}
                     />
 
                     <div className="mt-8 flex items-center justify-end gap-8">

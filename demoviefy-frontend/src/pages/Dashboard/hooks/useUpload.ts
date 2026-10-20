@@ -12,6 +12,7 @@ export function useUpload() {
   const [file, setFile] = useState<File | null>(null);
   const [uploadClipStart, setUploadClipStart] = useState("0");
   const [uploadClipEnd, setUploadClipEnd] = useState("");
+  const [uploadFrameStride, setUploadFrameStride] = useState("8");
 
   const setUploading = useUploadStore((state) => state.setUploading);
 
@@ -28,7 +29,7 @@ export function useUpload() {
         file,
         uploadTask,
         uploadModelPath,
-        8,
+        Number(uploadFrameStride),
         0.35,
         90000,
         parseInt(uploadClipStart) || 0,
@@ -49,10 +50,10 @@ export function useUpload() {
     } finally {
       setUploading(false);
     }
-  }, [file, uploadClipStart, uploadClipEnd, setUploading, t]);
+  }, [file, uploadClipStart, uploadClipEnd, uploadFrameStride, setUploading, t]);
 
   return {
-    file, setFile, uploadClipStart, setUploadClipStart,
+    file, setFile, uploadClipStart, setUploadClipStart, uploadFrameStride, setUploadFrameStride,
     uploadClipEnd, setUploadClipEnd, handleUpload
   };
 }
