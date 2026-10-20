@@ -5,16 +5,18 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 import { StatusBadge } from "src/core/components/StatusBadge";
 import type { VideoRecord } from "src/core/types/videoTypes";
+import { formatVideoModelName, getVideoModelSizeTranslationKey } from "src/core/utils/videoHelpers";
 
 type DashboardVideoLibraryProps = {
   videos: VideoRecord[];
 };
 
-const VIDEOS_PER_PAGE = 3;
+const DEFAULT_VIDEOS_PER_PAGE = 4;
+const WIDE_SCREEN_VIDEOS_PER_PAGE = 6;
 
-function formatDate(createdAt: string | null, language: string) {
+function formatDate(createdAt: string | null, language: string, noDateLabel: string) {
   if (!createdAt) {
-    return "Sem data";
+    return noDateLabel;
   }
 
   return new Intl.DateTimeFormat(language, {
@@ -31,6 +33,23 @@ export const DashboardVideoLibrary = memo(
     const { t, i18n } = useTranslation();
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
+    const [videosPerPage, setVideosPerPage] = useState(DEFAULT_VIDEOS_PER_PAGE);
+
+    useEffect(() => {
+      const wideScreen = window.matchMedia("(min-width: 1280px)");
+      const updatePageSize = () => {
+        setVideosPerPage(
+          wideScreen.matches
+            ? WIDE_SCREEN_VIDEOS_PER_PAGE
+            : DEFAULT_VIDEOS_PER_PAGE,
+        );
+      };
+
+      updatePageSize();
+      wideScreen.addEventListener("change", updatePageSize);
+
+      return () => wideScreen.removeEventListener("change", updatePageSize);
+    }, []);
 
     const filteredVideos = useMemo(() => {
       const normalizedSearch = search.trim().toLowerCase();
@@ -46,7 +65,7 @@ export const DashboardVideoLibrary = memo(
 
     const totalPages = Math.max(
       1,
-      Math.ceil(filteredVideos.length / VIDEOS_PER_PAGE),
+      Math.ceil(filteredVideos.length / videosPerPage),
     );
     const visiblePageCount = Math.min(totalPages, 5);
     const pageWindowStart = Math.min(
@@ -59,13 +78,13 @@ export const DashboardVideoLibrary = memo(
     );
 
     const visibleVideos = useMemo(() => {
-      const startIndex = (page - 1) * VIDEOS_PER_PAGE;
+      const startIndex = (page - 1) * videosPerPage;
 
       return filteredVideos.slice(
         startIndex,
-        startIndex + VIDEOS_PER_PAGE,
+        startIndex + videosPerPage,
       );
-    }, [filteredVideos, page]);
+    }, [filteredVideos, page, videosPerPage]);
 
     useEffect(() => {
       setPage(1);
@@ -86,7 +105,7 @@ export const DashboardVideoLibrary = memo(
             onChange={(event) => setSearch(event.target.value)}
             placeholder={t("searchVideo")}
             aria-label={t("searchVideo")}
-            className="w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-blue-400 dark:focus:bg-neutral-800 dark:focus:ring-blue-900"
+            className="w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-neutral-500 focus:bg-white focus:ring-1 focus:ring-neutral-200 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-neutral-600 dark:focus:bg-neutral-800 dark:focus:ring-neutral-700"
           />
         </div>
 
@@ -111,7 +130,7 @@ export const DashboardVideoLibrary = memo(
                 <Link
                   key={video.id}
                   to={`/video/${video.id}`}
-                  className="group block rounded-lg border border-transparent px-2 py-3 transition-colors hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-neutral-800"
+                  className="group block rounded-lg border border-transparent px-2 py-3 transition-colors  hover:bg-blue-50 dark:hover:bg-neutral-800"
                 >
                   <div className="min-w-0">
                     <div className="flex items-start justify-between gap-3">
@@ -124,21 +143,12 @@ export const DashboardVideoLibrary = memo(
 
                       <StatusBadge status={video.status} />
                     </div>
-
-                    <div className="mt-2 flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
-                      <span>#{video.id}</span>
-
-                      <span aria-hidden="true">·</span>
-
-                      <span className="truncate">
-                        {formatDate(video.created_at, i18n.resolvedLanguage ?? i18n.language)}
-                      </span>
-                    </div>
-
                     <div className="mt-2 pt-2">
                       <div className="flex justify-between gap-3 text-xs">
                         <span className="truncate font-medium text-neutral-700 dark:text-neutral-300">
-                          {video.ai_config.model_name}
+                          {t("analysisTitle")}: {getVideoModelSizeTranslationKey(video.ai_config.model_name)
+                            ? t(getVideoModelSizeTranslationKey(video.ai_config.model_name)!)
+                            : formatVideoModelName(video.ai_config.model_name)}
                         </span>
 
                         <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
@@ -148,6 +158,12 @@ export const DashboardVideoLibrary = memo(
                         </span>
                       </div>
 
+                      <div className="mt-3 flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
+                        <span><b>{t("dateLabel")}</b></span>
+                        <span className="truncate">
+                          {formatDate(video.created_at, i18n.resolvedLanguage ?? i18n.language, t("noDate"))}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </Link>

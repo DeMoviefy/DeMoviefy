@@ -17,6 +17,7 @@ interface TranscriptionState {
   selectedVariant: string;
   transcriptionSegments: VideoTranscriptionResponse["transcription"]["segments"];
   isGenerating: boolean;
+  transcriptionProgress: number | null;
   isTranslating: boolean;
 
   setTranscriptionDraft: (draft: string) => void;
@@ -24,7 +25,7 @@ interface TranscriptionState {
   setLanguage: (lang: string) => void;
   setModel: (model: string) => void;
   setSelectedVariant: (variant: string) => void;
-  translateTranscription: (targetLanguage: string) => Promise<void>;
+  translateTranscription: (targetLanguage: string, sourceVariant?: string) => Promise<void>;
 
   fetchTranscription: (video: VideoRecord, variant?: string) => Promise<void>;
   resetTranscription: () => void;
@@ -37,11 +38,12 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
   transcription: null,
   transcriptionDraft: "",
   transcriptionMessage: "",
-  selectedLanguage: "pt",
-  selectedModel: "base",
+  selectedLanguage: "auto",
+  selectedModel: "small",
   selectedVariant: "default",
   transcriptionSegments: [],
   isGenerating: false,
+  transcriptionProgress: null,
   isTranslating: false,
 
   setTranscriptionDraft: (transcriptionDraft) => set({ transcriptionDraft }),
@@ -53,14 +55,14 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
     set({ selectedVariant });
     if (video) void get().fetchTranscription(video, selectedVariant);
   },
-  translateTranscription: async (targetLanguage) => {
+  translateTranscription: async (targetLanguage, sourceVariant = get().selectedVariant) => {
     const video = useVideoDetailStore.getState().video;
     if (!video) return;
     try {
       set({ isTranslating: true });
-      await VideoService.translateTranscription(video.id, get().selectedVariant, targetLanguage);
+      await VideoService.translateTranscription(video.id, sourceVariant, targetLanguage);
       toast.success(i18n.t("translationCreated"));
-      await get().fetchTranscription(video, `${targetLanguage}-from-${get().selectedVariant}`);
+      await get().fetchTranscription(video, get().selectedVariant);
     } catch (error) {
       console.error(error);
       toast.error(getApiErrorMessage(error, i18n.t("translationError")));
@@ -163,11 +165,23 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
 
     const { fetchTranscription } = get();
     const toastId = "transcription-generation";
+    let progressInterval: ReturnType<typeof setInterval> | undefined;
+    let shouldPollProgress = true;
 
     try {
       toast(i18n.t("generatingTranscriptionNotice"), { id: toastId });
       const { selectedLanguage, selectedModel } = get();
-      set({ isGenerating: true });
+      set({ isGenerating: true, transcriptionProgress: 0 });
+      const refreshProgress = async () => {
+        try {
+          const { progress } = await VideoService.getTranscriptionProgress(selectedVideo.id);
+          if (shouldPollProgress && progress !== null) set({ transcriptionProgress: progress });
+        } catch {
+          // A chamada de geração segue sendo a fonte do resultado e dos erros.
+        }
+      };
+      void refreshProgress();
+      progressInterval = setInterval(() => void refreshProgress(), 750);
       await VideoService.generateTranscription(selectedVideo.id, {
         language: selectedLanguage,
         modelName: selectedModel,
@@ -179,7 +193,9 @@ export const useTranscriptionStore = create<TranscriptionState>((set, get) => ({
       console.error(error);
       toast.error(getApiErrorMessage(error, i18n.t("transcriptionGenerateError")), { id: toastId });
     } finally {
-      set({ isGenerating: false });
+      shouldPollProgress = false;
+      if (progressInterval) clearInterval(progressInterval);
+      set({ isGenerating: false, transcriptionProgress: null });
     }
   },
 }));

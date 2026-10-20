@@ -5,10 +5,10 @@ export default function Footer(): JSX.Element {
     const year = new Date().getFullYear();
 
     return (
-        <footer>
+        <footer className="border-t border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
             <div className="flex w-full items-center justify-between px-4 py-6 lg:px-8">
                 <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                    Copyright &copy; DeMoviefy {year}
+                    DeMoviefy {year}
                 </p>
 
                 <a

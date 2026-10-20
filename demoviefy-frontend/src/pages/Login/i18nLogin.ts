@@ -1,0 +1,26 @@
+export const i18nLogin = {
+  ptBR: {
+    signingIn: "Entrando...",
+    creatingAccount: "Criando conta...",
+    loginWelcome: "Bem-vindo de volta.",
+    loginDescription: "Acesse seus vídeos, análises e transcrições.",
+    email: "E-mail",
+    password: "Senha",
+    yourPassword: "Sua senha",
+    noAccount: "Ainda não tem uma conta?",
+    register: "Cadastre-se",
+    loginError: "Não foi possível entrar. Verifique sua conexão e tente novamente.",
+  },
+  en: {
+    signingIn: "Signing in...",
+    creatingAccount: "Creating account...",
+    loginWelcome: "Welcome back.",
+    loginDescription: "Access your videos, analyses, and transcripts.",
+    email: "Email",
+    password: "Password",
+    yourPassword: "Your password",
+    noAccount: "Don't have an account yet?",
+    register: "Sign up",
+    loginError: "Could not sign in. Check your connection and try again.",
+  },
+} as const;

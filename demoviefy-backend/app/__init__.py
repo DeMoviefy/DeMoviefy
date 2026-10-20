@@ -5,7 +5,7 @@ from datetime import timedelta
 from pathlib import Path
 from time import sleep
 
-from flask import Flask, current_app
+from flask import Flask, current_app, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 
@@ -114,7 +114,7 @@ def create_app(test_config: dict | None = None):
 
     @app.errorhandler(ValueError)
     def handle_value_error(e):
-        app.logger.warning("validation_failed error=%s", e)
+        app.logger.warning("validation_failed path=%s error=%s", request.path, e)
         return jsonify({"error": str(e)}), 400
 
     @app.errorhandler(FileNotFoundError)

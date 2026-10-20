@@ -1,100 +1,111 @@
+import { useEffect } from "react";
 import type { VideoTranscriptionResponse } from "src/core/types/videoTypes";
 import { useTranslation } from "react-i18next";
 import { GenerateTranscription } from "src/pages/Video/components/GenerateTranscription";
 import { TranscriptionTextEditor } from "src/pages/Video/components/TranscriptionTextEditor";
 import { TranslateTranscription } from "src/pages/Video/components/TranslateTranscription";
+import { useTranscriptionStore } from "src/pages/Video/stores/useTranscriptionStore";
+import { useVideoDetailStore } from "src/pages/Video/stores/useVideoDetailStore";
 
-type TranscriptionSegment = VideoTranscriptionResponse["transcription"]["segments"][number];
 type TranscriptionVariant = NonNullable<VideoTranscriptionResponse["variants"]>[number];
 
 type TranscriptionWorkbenchProps = {
-    transcriptionDraft: string;
-    transcriptionMessage: string;
-    segments: TranscriptionSegment[];
-    hasTranscription: boolean;
-    hasChanges: boolean;
     isBusy: boolean;
-    onDraftChange: (value: string) => void;
-    onSegmentsChange: (segments: TranscriptionSegment[]) => void;
-    onSave: () => void | Promise<void>;
-    onGenerate: () => void;
-    selectedLanguage: string;
-    onLanguageChange: (language: string) => void;
-    availableLanguages: string[];
-    selectedModel: string;
-    onModelChange: (model: string) => void;
-    isGenerating: boolean;
-    variants: TranscriptionVariant[];
-    selectedVariant: string;
-    isTranslating: boolean;
-    onTranslate: (targetLanguage: string) => void;
 };
 
-export function TranscriptionWorkbench({
-    transcriptionDraft,
-    transcriptionMessage,
-    segments,
-    hasTranscription,
-    hasChanges,
-    isBusy,
-    onDraftChange,
-    onSegmentsChange,
-    onSave,
-    onGenerate,
-    selectedLanguage,
-    onLanguageChange,
-    availableLanguages,
-    selectedModel,
-    onModelChange,
-    isGenerating,
-    variants,
-    selectedVariant,
-    isTranslating,
-    onTranslate,
-}: TranscriptionWorkbenchProps) {
+export function TranscriptionWorkbench({ isBusy }: TranscriptionWorkbenchProps) {
     const { t } = useTranslation();
+    const videoId = useVideoDetailStore((state) => state.video?.id);
+    const {
+        transcription,
+        transcriptionDraft,
+        transcriptionMessage,
+        transcriptionSegments: segments,
+        selectedLanguage,
+        selectedModel,
+        selectedVariant,
+        isGenerating,
+        transcriptionProgress,
+        isTranslating,
+        setTranscriptionDraft,
+        setTranscriptionSegments,
+        setLanguage,
+        setModel,
+        onSaveTranscription,
+        onGenerateTranscription,
+        translateTranscription,
+    } = useTranscriptionStore();
+
+    useEffect(() => {
+        setModel("small");
+    }, [videoId, setModel]);
+
+    const variants: TranscriptionVariant[] = transcription?.variants ?? [
+        { id: "default", label: t("primaryTranscription"), language: null },
+    ];
+    const availableLanguages = transcription?.available_languages ?? [];
+    const originalSegments = transcription?.transcription.segments ?? [];
+    const transcriptionContent = transcription?.transcription.content ?? "";
+    const hasTranscription = Boolean(transcription?.available);
+    const hasChanges = transcriptionDraft !== transcriptionContent
+        || JSON.stringify(segments) !== JSON.stringify(originalSegments);
     const sourceLanguage = variants.find((variant) => variant.id === selectedVariant)?.language ?? selectedLanguage;
     const isWorking = isBusy || isGenerating || isTranslating;
 
     return (
         <section className="flex min-w-0 flex-col gap-6">
-            <div>
-                <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">{t("editorTranscription")}</h3>
-                <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-                    {t("editorDescription")}
-                </p>
+            <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
+                <div className="mb-5 text-left">
+                    <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">{t("editorTranscription")}</h3>
+                    <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+                        {t("editorDescription")}
+                    </p>
+                </div>
+
+                <TranscriptionTextEditor
+                    draft={transcriptionDraft}
+                    message={transcriptionMessage}
+                    segments={segments}
+                    hasChanges={hasChanges}
+                    isBusy={isWorking}
+                    selectedVariant={selectedVariant}
+                    onDraftChange={setTranscriptionDraft}
+                    onSegmentsChange={setTranscriptionSegments}
+                    onSave={onSaveTranscription}
+                />
             </div>
 
-            <TranscriptionTextEditor
-                draft={transcriptionDraft}
-                message={transcriptionMessage}
-                segments={segments}
-                hasChanges={hasChanges}
-                isBusy={isWorking}
-                selectedVariant={selectedVariant}
-                onDraftChange={onDraftChange}
-                onSegmentsChange={onSegmentsChange}
-                onSave={onSave}
-            />
+            <section className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 pt-5 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
+                <div className="mb-5 text-left">
+                    <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
+                        {t("transcriptionOptions")}
+                    </h3>
+                </div>
 
-            <GenerateTranscription
-                selectedModel={selectedModel}
-                selectedLanguage={selectedLanguage}
-                availableLanguages={availableLanguages}
-                isBusy={isWorking}
-                isGenerating={isGenerating}
-                onModelChange={onModelChange}
-                onLanguageChange={onLanguageChange}
-                onGenerate={onGenerate}
-            />
+                <div className="space-y-6">
+                    <GenerateTranscription
+                        selectedModel={selectedModel}
+                        selectedLanguage={selectedLanguage}
+                        availableLanguages={availableLanguages}
+                        isBusy={isWorking}
+                        isGenerating={isGenerating}
+                        transcriptionProgress={transcriptionProgress}
+                        onModelChange={setModel}
+                        onLanguageChange={setLanguage}
+                        onGenerate={onGenerateTranscription}
+                    />
 
-            <TranslateTranscription
-                sourceLanguage={sourceLanguage}
-                hasTranscription={hasTranscription}
-                isBusy={isWorking}
-                isTranslating={isTranslating}
-                onTranslate={onTranslate}
-            />
+                    <TranslateTranscription
+                        sourceLanguage={sourceLanguage}
+                        hasTranscription={hasTranscription}
+                        variants={variants}
+                        selectedVariant={selectedVariant}
+                        isBusy={isWorking}
+                        isTranslating={isTranslating}
+                        onTranslate={(sourceVariant, language) => void translateTranscription(language, sourceVariant)}
+                    />
+                </div>
+            </section>
         </section>
     );
 }

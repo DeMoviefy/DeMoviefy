@@ -10,8 +10,11 @@ import json
 import os
 import subprocess
 import sys
+import threading
+import uuid
 from functools import lru_cache
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 from app.config.paths import TRANSCRIPTIONS_DIR, TRANSCRIPTION_ENV_DIR, TRANSCRIPTION_SCRIPT_PATH
@@ -22,6 +25,61 @@ from app.services.video_artifact_service import (
     save_transcription,
 )
 from app.services.translation_service import translate_segments_to_srt
+
+_progress_lock = threading.Lock()
+_whisper_progress_lock = threading.Lock()
+
+
+class NoAudioStreamError(RuntimeError):
+    """Raised when a video has no audio stream to transcribe."""
+
+
+def _has_audio_stream(video_path: str) -> bool | None:
+    try:
+        result = subprocess.run(
+            [
+                "ffprobe",
+                "-v", "error",
+                "-select_streams", "a:0",
+                "-show_entries", "stream=codec_type",
+                "-of", "default=noprint_wrappers=1:nokey=1",
+                video_path,
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return None
+
+    if result.returncode != 0:
+        return None
+    return bool(result.stdout.strip())
+
+
+def update_transcription_progress(video_id: int, *, status: str, progress: int = 0) -> None:
+    TRANSCRIPTIONS_DIR.mkdir(parents=True, exist_ok=True)
+    progress_path = TRANSCRIPTIONS_DIR / f"video_{video_id}.progress.json"
+    temporary_path = progress_path.with_name(f".{progress_path.name}.{uuid.uuid4().hex}.tmp")
+    payload = {"status": status, "progress": max(0, min(int(progress), 100))}
+    try:
+        with _progress_lock:
+            with open(temporary_path, "w", encoding="utf-8") as file:
+                json.dump(payload, file)
+                file.flush()
+                os.fsync(file.fileno())
+            os.replace(temporary_path, progress_path)
+    finally:
+        temporary_path.unlink(missing_ok=True)
+
+
+def get_transcription_progress(video_id: int) -> dict[str, Any]:
+    progress_path = TRANSCRIPTIONS_DIR / f"video_{video_id}.progress.json"
+    with _progress_lock:
+        if not progress_path.exists():
+            return {"status": "idle", "progress": None}
+        with open(progress_path, "r", encoding="utf-8") as file:
+            return json.load(file)
 
 
 def _local_whisper_available() -> bool:
@@ -78,6 +136,7 @@ def _transcribe_with_local_whisper(
     model_name: str,
     language: str | None,
     logger: Any | None,
+    progress_callback=None,
 ) -> dict[str, Any]:
     if logger:
         logger.info(
@@ -88,7 +147,28 @@ def _transcribe_with_local_whisper(
         )
 
     model = _load_whisper_model(model_name)
-    result = model.transcribe(video_path, verbose=False, language=language)
+    if progress_callback is None:
+        result = model.transcribe(video_path, verbose=False, language=language)
+    else:
+        import importlib
+
+        with _whisper_progress_lock:
+            whisper_transcribe = importlib.import_module("whisper.transcribe")
+            original_tqdm_module = whisper_transcribe.tqdm
+            original_tqdm = original_tqdm_module.tqdm
+
+            class ProgressTqdm(original_tqdm):
+                def update(self, n=1):
+                    result = super().update(n)
+                    if self.total:
+                        progress_callback(round(self.n * 100 / self.total))
+                    return result
+
+            whisper_transcribe.tqdm = SimpleNamespace(tqdm=ProgressTqdm)
+            try:
+                result = model.transcribe(video_path, verbose=False, language=language)
+            finally:
+                whisper_transcribe.tqdm = original_tqdm_module
     
     segments = [
         {
@@ -218,7 +298,13 @@ def transcribe_video_with_timestamps(
     language: str | None = None,
     logger: Any | None = None,
     proxy_url: str | None = None,
+    progress_callback=None,
 ) -> dict[str, Any]:
+    if video_path and _has_audio_stream(video_path) is False:
+        raise NoAudioStreamError(
+            "Este vídeo não possui faixa de áudio. Adicione ou selecione um vídeo com áudio para gerar a transcrição."
+        )
+
     worker_python = resolve_transcription_python()
     worker_error: Exception | None = None
 
@@ -243,6 +329,7 @@ def transcribe_video_with_timestamps(
             model_name=model_name,
             language=language,
             logger=logger,
+            progress_callback=progress_callback,
         )
         return payload
 
@@ -259,10 +346,12 @@ def transcribe_video_with_timestamps(
 
 __all__ = [
     "delete_transcription",
+    "get_transcription_progress",
     "has_transcription",
     "load_transcription",
     "resolve_transcription_python",
     "save_transcription",
     "transcribe_video_with_timestamps",
+    "update_transcription_progress",
     "whisper_available",
 ]

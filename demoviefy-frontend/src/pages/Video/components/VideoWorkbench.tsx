@@ -47,24 +47,25 @@ export const VideoWorkbench = memo(function VideoWorkbench({
         setSelectedAnalysisVariantId, onDeleteAnalysis,
     } = useAnalysisStore();
     const {
-        transcription, transcriptionDraft, transcriptionMessage, setTranscriptionDraft,
-        onSaveTranscription, onDeleteTranscription, onGenerateTranscription,
-        selectedLanguage, setLanguage, selectedModel, setModel, isGenerating,
-        selectedVariant, setSelectedVariant, transcriptionSegments, setTranscriptionSegments,
-        isTranslating, translateTranscription,
+        transcription, onDeleteTranscription, selectedVariant, setSelectedVariant,
+        isGenerating, isTranslating,
     } = useTranscriptionStore();
 
     const summary = analysis?.analysis ?? null;
     const analysisVariants = analysis?.available_variants ?? [];
-    const availableLanguages = transcription?.available_languages ?? [];
     const hasTranscription = Boolean(transcription?.available);
     const transcriptionVariants = transcription?.variants ?? [
         { id: "default", label: t("primaryTranscription"), language: null },
     ];
-    const originalSegments = transcription?.transcription.segments ?? [];
-    const transcriptionContent = transcription?.transcription.content ?? "";
-    const hasTranscriptionChanges = transcriptionDraft !== transcriptionContent
-        || JSON.stringify(transcriptionSegments) !== JSON.stringify(originalSegments);
+    const loadedTranscriptionVariant = transcription?.selected_variant ?? "default";
+    const selectedTranscriptionVariant = transcriptionVariants.find((variant) => variant.id === selectedVariant);
+    const playerTranscriptionTrack = hasTranscription && selectedVariant === loadedTranscriptionVariant
+        ? {
+            segments: transcription?.transcription.segments ?? [],
+            label: selectedTranscriptionVariant?.label ?? t("transcription"),
+            language: selectedTranscriptionVariant?.language ?? transcription?.transcription.language ?? "pt",
+        }
+        : null;
     const hasSelectedAnalysis = analysis !== null;
     const isProcessing = currentVideo?.status.startsWith("PROCESSANDO") ?? false;
 
@@ -83,36 +84,32 @@ export const VideoWorkbench = memo(function VideoWorkbench({
                         analysisState={analysisState}
                         hasSelectedAnalysis={hasSelectedAnalysis}
                         annotatedVideoSrc={annotatedVideoSrc}
+                        transcriptionTrack={playerTranscriptionTrack}
                     />
 
                     <div className="mt-6 min-w-0">
-                    <AnalysisResults state={analysisState} summary={summary} />
-
-                    <div className="mt-6">
-                            <VideoConfigPanel
-                                config={config}
-                                onConfigChange={onConfigChange}
-                                isBusy={isBusy || isProcessing}
-                                onReprocess={onReprocess}
-                            />
-                        </div>
-
-                        <div className="mt-8">
-                            <DeleteVideoButton video={currentVideo} />
-                        </div>
+                        <AnalysisResults state={analysisState} summary={summary} />
                     </div>
                 </div>
 
                 <div className="flex min-w-0 flex-col gap-6">
-                <div className="min-w-0">
-                        <h3 className="mb-6 text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-                            {t("detailsAnalysis")}
-                        </h3>
-                        <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
-                            <div className="bg-neutral-50 px-3 py-5 dark:bg-neutral-900">
-                                <AnalysisMetrics summary={summary} modelName={currentVideo.ai_config.model_name} />
+                    <TranscriptionWorkbench
+                        isBusy={isBusy}
+                    />
+
+                    <div className="min-w-0">
+                        <div className="overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800/70">
+                            <div>
+                                <h3 className="bg-neutral-100 px-4 pb-4 text-base font-semibold tracking-tight text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100 sm:px-5 sm:pt-5">
+                                    {t("detailsAnalysis")}
+                                </h3>
+                                <div className="px-4 pb-4 sm:px-5">
+                                    <div className="-mx-4 border-b border-neutral-200 px-4 py-4 transition-colors hover:bg-blue-50/40 dark:border-neutral-700 dark:hover:bg-neutral-700/50 sm:-mx-5 sm:px-5">
+                                        <AnalysisMetrics summary={summary} modelName={currentVideo.ai_config.model_name} />
+                                    </div>
+                                </div>
                             </div>
-                            <div className="px-3 py-5">
+                            <div className="px-4 py-5 sm:px-5">
                                 <AnalysisVersion
                                     message={analysisMessage}
                                     variants={analysisVariants}
@@ -136,32 +133,19 @@ export const VideoWorkbench = memo(function VideoWorkbench({
 
                     </div>
 
-                <TranscriptionWorkbench
-                            transcriptionDraft={transcriptionDraft}
-                            transcriptionMessage={transcriptionMessage}
-                            segments={transcriptionSegments}
-                            hasTranscription={hasTranscription}
-                            hasChanges={hasTranscriptionChanges}
-                            isBusy={isBusy}
-                            onDraftChange={setTranscriptionDraft}
-                            onSave={onSaveTranscription}
-                            onGenerate={onGenerateTranscription}
-                            selectedLanguage={selectedLanguage}
-                            onLanguageChange={setLanguage}
-                            availableLanguages={availableLanguages}
-                            selectedModel={selectedModel}
-                            onModelChange={setModel}
-                            isGenerating={isGenerating}
-                            variants={transcriptionVariants}
-                            selectedVariant={selectedVariant}
-                            onSegmentsChange={setTranscriptionSegments}
-                            isTranslating={isTranslating}
-                            onTranslate={(language) => void translateTranscription(language)}
-                        />
-
-
                 </div>
             </div>
+
+            <VideoConfigPanel
+                config={config}
+                videoSource={currentVideo.video_url}
+                durationSeconds={analysis?.video_id === currentVideo.id ? summary?.video_duration_sec ?? null : null}
+                onConfigChange={onConfigChange}
+                isBusy={isBusy || isProcessing}
+                onReprocess={onReprocess}
+            />
+
+            <DeleteVideoButton video={currentVideo} />
         </section>
     );
 });

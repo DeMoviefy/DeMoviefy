@@ -22,44 +22,41 @@ export function TranscriptionVersion({
     const { t } = useTranslation();
     return (
         <div className="mt-5">
-            {!hasTranscription && (
-                <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400" aria-live="polite">
-                    {t("noTranscriptionAvailable")}
-                </p>
-            )}
-            {hasTranscription && <div className="flex min-w-0 items-end gap-3">
-            <label className="block min-w-0 flex-1">
-                <span className="mb-1.5 block text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                    {t("transcriptionVersion")}
-                </span>
-                <select
-                    value={selectedVariant}
-                    onChange={(event) => onVariantChange(event.target.value)}
-                    className="max-w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:focus:border-blue-400 dark:focus:bg-neutral-800 dark:focus:ring-blue-900"
-                    disabled={disabled}
-                >
-                    {variants.map((variant) => (
-                        <option key={variant.id} value={variant.id}>{variant.label}</option>
-                    ))}
-                </select>
-            </label>
-            <ConfirmationDialog
-                title={t("deleteTranscription")}
-                message={t("deleteTranscriptionConfirm")}
-                onConfirm={onDelete}
-            >
-                {(open) => (
-                    <button
-                        type="button"
-                        className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:border-red-300 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-900 dark:bg-red-950 dark:text-red-300 dark:hover:border-red-800 dark:hover:bg-red-900"
-                        onClick={open}
+            <div className="flex min-w-0 items-end gap-3">
+                <label className="block min-w-0 flex-1">
+                    <span className="mb-1.5 block text-xs font-medium text-neutral-500 dark:text-neutral-400">
+                        {t("transcriptionVersion")}
+                    </span>
+                    <select
+                        value={hasTranscription ? selectedVariant : ""}
+                        onChange={(event) => onVariantChange(event.target.value)}
+                        className="max-w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700 outline-none transition focus:border-neutral-500 focus:bg-white focus:ring-1 focus:ring-neutral-200 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:focus:border-neutral-600 dark:focus:bg-neutral-800 dark:focus:ring-neutral-700"
                         disabled={disabled || !hasTranscription}
                     >
-                        {t("deleteTranscription")}
-                    </button>
-                )}
-            </ConfirmationDialog>
-            </div>}
+                        {hasTranscription
+                            ? variants.map((variant) => (
+                                <option key={variant.id} value={variant.id}>{variant.label}</option>
+                            ))
+                            : <option value="">{t("noTranscriptionAvailable")}</option>}
+                    </select>
+                </label>
+                <ConfirmationDialog
+                    title={t("deleteTranscription")}
+                    message={t("deleteTranscriptionConfirm")}
+                    onConfirm={onDelete}
+                >
+                    {(open) => (
+                        <button
+                            type="button"
+                            className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:border-red-300 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-900 dark:bg-red-950 dark:text-red-300 dark:hover:border-red-800 dark:hover:bg-red-900"
+                            onClick={open}
+                            disabled={disabled || !hasTranscription}
+                        >
+                            {t("deleteTranscription")}
+                        </button>
+                    )}
+                </ConfirmationDialog>
+            </div>
         </div>
     );
 }

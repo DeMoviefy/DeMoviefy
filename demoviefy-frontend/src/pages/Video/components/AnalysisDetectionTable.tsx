@@ -9,10 +9,12 @@ import type { VideoAnalysisResponse } from "src/core/types/videoTypes";
 
 type AnalysisDetectionTableProps = {
     summary: NonNullable<VideoAnalysisResponse["analysis"]>;
+    heading?: string;
 };
 
 export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
     summary,
+    heading,
 }: AnalysisDetectionTableProps) {
     const { t, i18n } = useTranslation();
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
@@ -21,12 +23,17 @@ export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
         return sortDirection === "desc" ? countB - countA : countA - countB;
     });
     return (
-        <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
-            <div className="h-48 overflow-auto">
-                <table className="h-full w-full min-w-96 border-separate border-spacing-0 text-left text-sm">
-                    <thead className="sticky top-0 z-10 bg-neutral-50 text-xs font-semibold tracking-wide text-neutral-500 dark:bg-neutral-900 dark:text-neutral-400">
+        <div className="mt-2 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800/70">
+            {heading && (
+                <h3 className="bg-neutral-100 px-4 pb-4 pt-5 text-base font-semibold tracking-tight text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100 sm:px-5 sm:pb-5 sm:pt-5">
+                    {heading}
+                </h3>
+            )}
+            <div className="h-[37.3rem] overflow-auto bg-white dark:bg-neutral-800">
+                <table className="w-full min-w-96 border-separate border-spacing-0 text-left text-sm">
+                    <thead className="sticky top-0 z-10 bg-neutral-100 text-xs font-semibold tracking-wide text-neutral-600 dark:bg-neutral-900 dark:text-neutral-400">
                         <tr>
-                            <th scope="col" className="px-3 py-3.5">
+                            <th scope="col" className="px-4 py-3.5 sm:px-5">
                                 {t("class")}
                             </th>
                             <th scope="col" className="px-5 py-3.5 text-right">
@@ -57,7 +64,7 @@ export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
                         </tr>
                     </thead>
 
-                    <tbody className="divide-y divide-neutral-100 text-neutral-700 dark:divide-neutral-700 dark:text-neutral-300">
+                    <tbody className="divide-y divide-neutral-200 text-neutral-700 dark:divide-neutral-700 dark:text-neutral-300">
                         {labels.length === 0 ? (
                             <tr>
                                 <td
@@ -72,14 +79,14 @@ export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
                                 <tr key={label} className="transition-colors hover:bg-blue-50/40 dark:hover:bg-neutral-700/50">
                                     <th
                                         scope="row"
-                                        className="px-3 py-3.5 font-medium text-neutral-900 dark:text-neutral-100"
+                                        className="border-b border-neutral-200 px-4 py-5 font-medium text-neutral-900 dark:border-neutral-700 dark:text-neutral-100 sm:px-5"
                                     >
                                         {getYoloClassLabel(label, i18n.resolvedLanguage ?? i18n.language)}
                                     </th>
-                                    <td className="px-5 py-3.5 text-right tabular-nums">
+                                    <td className="border-b border-neutral-200 px-5 py-5 text-right tabular-nums dark:border-neutral-700">
                                         {formatPercent(summary.avg_confidence_by_label[label])}
                                     </td>
-                                    <td className="px-5 py-3.5 text-right tabular-nums">
+                                    <td className="border-b border-neutral-200 px-5 py-5 text-right tabular-nums dark:border-neutral-700">
                                         {count}
                                     </td>
 

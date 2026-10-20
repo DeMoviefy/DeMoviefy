@@ -7,13 +7,18 @@ import { FaRegClock } from "react-icons/fa";
 import { toast } from "sonner";
 
 import { StatusBadge } from "src/core/components/StatusBadge";
-import { getAnalyzingFrameProgress, getApiErrorMessage } from "src/core/utils/videoHelpers";
+import { formatVideoModelName, getApiErrorMessage, getVideoModelSizeTranslationKey } from "src/core/utils/videoHelpers";
+import { getAnalyzingFrameProgress } from "src/core/utils/videoHelpers";
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
 import { VideoUploadService } from "src/pages/Dashboard/services/videoUploadService";
 
 export function ProcessingQueuePanel() {
   const { t } = useTranslation();
   const videos = useProcessingStore((state) => state.videos);
+  const formatModelName = (modelName: string) => {
+    const translationKey = getVideoModelSizeTranslationKey(modelName);
+    return translationKey ? t(translationKey) : formatVideoModelName(modelName);
+  };
 
   const [cancellingVideoId, setCancellingVideoId] = useState<number | null>(
     null
@@ -44,7 +49,7 @@ export function ProcessingQueuePanel() {
   }
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="flex flex-col gap-6 rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
       <div>
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
@@ -58,7 +63,7 @@ export function ProcessingQueuePanel() {
       </div>
 
       {processingVideos.length === 0 ? (
-        <div className="flex min-h-48 flex-col items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 px-6 py-8 text-center dark:border-neutral-700 dark:bg-neutral-800">
+        <div className="flex min-h-48 flex-col items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 px-6 py-8 text-center dark:border-transparent dark:bg-neutral-800">
           <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
             {t("noVideosQueued")}
           </p>
@@ -73,7 +78,7 @@ export function ProcessingQueuePanel() {
         </div>
       ) : (
         <div
-          className="max-h-96 overflow-y-auto pr-2"
+          className="max-h-96 overflow-y-auto pr-2 lg:max-h-128 xl:max-h-160"
           role="region"
           aria-label={t("processing")}
           tabIndex={0}
@@ -96,7 +101,7 @@ export function ProcessingQueuePanel() {
                     </div>
 
                     <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs font-medium text-neutral-600 dark:text-neutral-300">
-                      <span>{video.ai_config.model_name}</span>
+                      <span>{t("analysis")}: {formatModelName(video.ai_config.model_name)}</span>
                     </div>
                   </div>
 
@@ -113,18 +118,23 @@ export function ProcessingQueuePanel() {
                     />
                   </div>
 
-                  <div className="mt-2 flex items-start justify-between gap-4 text-xs text-neutral-500 dark:text-neutral-400">
+                  <div className="mt-2 flex items-center justify-between gap-4 text-xs text-neutral-500 dark:text-neutral-400">
                     <span className="min-w-0 truncate">
                       {frameProgress
                         ? t("analyzingFrames", frameProgress)
                         : video.processing.processing_message}
                     </span>
 
-                    <span className="shrink-0 font-semibold tabular-nums text-neutral-700 dark:text-neutral-300">
-                      {video.processing.processing_progress}%
-                      {video.processing.processing_eta_seconds !== null &&
-                        ` · ~${video.processing.processing_eta_seconds}s`}
-                    </span>
+                    <div className="flex shrink-0 items-center gap-3 whitespace-nowrap tabular-nums">
+                      <span className="font-semibold text-neutral-700 dark:text-neutral-300">
+                        {video.processing.processing_progress}%
+                      </span>
+                      {video.processing.processing_eta_seconds !== null && (
+                        <span className="text-neutral-500 dark:text-neutral-400">
+                          ~{video.processing.processing_eta_seconds}s
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <button

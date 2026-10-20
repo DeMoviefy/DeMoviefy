@@ -1,4 +1,7 @@
 import json
+import os
+import threading
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -50,6 +53,8 @@ PROCESSING_STATE_KEYS = {
     "processing_message",
 }
 
+_json_io_lock = threading.RLock()
+
 
 def _resolve_model_payload(payload: dict[str, Any], defaults: dict[str, Any]) -> dict[str, Any]:
     model_reference = payload.get("model_relative_path") or payload.get("model_path")
@@ -93,16 +98,26 @@ def _safe_float(value: Any, fallback: float) -> float:
 
 def _write_json(path, payload: dict[str, Any]) -> str:
     ensure_storage_dirs()
-    with open(path, "w", encoding="utf-8") as file:
-        json.dump(payload, file, ensure_ascii=True, indent=2)
+    path = Path(path)
+    temporary_path = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+    try:
+        with _json_io_lock:
+            with open(temporary_path, "w", encoding="utf-8") as file:
+                json.dump(payload, file, ensure_ascii=True, indent=2)
+                file.flush()
+                os.fsync(file.fileno())
+            os.replace(temporary_path, path)
+    finally:
+        temporary_path.unlink(missing_ok=True)
     return str(path)
 
 
 def _read_json(path):
-    if not path.exists():
-        return None
-    with open(path, "r", encoding="utf-8") as file:
-        return json.load(file)
+    with _json_io_lock:
+        if not path.exists():
+            return None
+        with open(path, "r", encoding="utf-8") as file:
+            return json.load(file)
 
 
 def _default_ai_config() -> dict[str, Any]:
@@ -220,21 +235,23 @@ def save_ai_config(
     clip_start_sec: float = 0.0,
     clip_end_sec: float | None = None,
 ) -> dict[str, Any]:
-    payload = normalize_metadata_payload(_read_json(metadata_file_path(video_id)))
-    payload.update({
-        "task_type": task_type,
-        "task_label": task_label,
-        "model_path": model_path,
-        "model_relative_path": to_repo_relative_path(model_path),
-        "model_name": model_name,
-        "frame_stride": frame_stride,
-        "confidence_threshold": confidence_threshold,
-        "max_frames": max_frames,
-        "clip_start_sec": clip_start_sec,
-        "clip_end_sec": clip_end_sec,
-    })
-    normalized = normalize_metadata_payload(payload)
-    _write_json(metadata_file_path(video_id), normalized)
+    with _json_io_lock:
+        path = metadata_file_path(video_id)
+        payload = normalize_metadata_payload(_read_json(path))
+        payload.update({
+            "task_type": task_type,
+            "task_label": task_label,
+            "model_path": model_path,
+            "model_relative_path": to_repo_relative_path(model_path),
+            "model_name": model_name,
+            "frame_stride": frame_stride,
+            "confidence_threshold": confidence_threshold,
+            "max_frames": max_frames,
+            "clip_start_sec": clip_start_sec,
+            "clip_end_sec": clip_end_sec,
+        })
+        normalized = normalize_metadata_payload(payload)
+        _write_json(path, normalized)
     return {key: normalized[key] for key in AI_CONFIG_KEYS}
 
 
@@ -251,15 +268,17 @@ def save_processing_state(
     eta_seconds: int | None = None,
     message: str | None = None,
 ) -> dict[str, Any]:
-    payload = normalize_metadata_payload(_read_json(metadata_file_path(video_id)))
-    payload.update({
-        "processing_progress": max(0, min(int(progress), 100)),
-        "processing_stage": stage,
-        "processing_eta_seconds": eta_seconds,
-        "processing_message": message,
-    })
-    _write_json(metadata_file_path(video_id), normalize_metadata_payload(payload))
-    return load_processing_state(video_id)
+    with _json_io_lock:
+        path = metadata_file_path(video_id)
+        payload = normalize_metadata_payload(_read_json(path))
+        payload.update({
+            "processing_progress": max(0, min(int(progress), 100)),
+            "processing_stage": stage,
+            "processing_eta_seconds": eta_seconds,
+            "processing_message": message,
+        })
+        _write_json(path, normalize_metadata_payload(payload))
+        return load_processing_state(video_id)
 
 
 def load_transcription(video_id: int, variant: str | None = None) -> dict[str, Any] | None:

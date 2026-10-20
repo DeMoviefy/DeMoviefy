@@ -2,11 +2,12 @@
 
 import type { AxiosError } from "axios";
 
-import type { 
-    AIModelOption, 
-    AITaskOption, 
+import type {
+    AIModelOption,
+    AITaskOption,
     VideoRecord,
-    VideoAnalysisVariant
+    VideoAnalysisVariant,
+    VideoTranscriptionResponse,
 } from "src/core/types/videoTypes";
 
 // Transforma em JSON
@@ -22,22 +23,66 @@ export function getApiErrorMessage(error: unknown, fallback: string) {
     return axiosError.response?.data?.error ?? axiosError.response?.data?.message ?? fallback;
 }
 
+// Prefere o modelo equilibrado da tarefa e usa o primeiro disponível como fallback.
+
 export function getAnalyzingFrameProgress(message: string | null): { current: number; total: number } | null {
     const match = message?.match(/^\s*(?:Analisando|Analyzing)\s+frames\s+(\d+)\s*\/\s*(\d+)\.?\s*$/i);
     if (!match) return null;
     return { current: Number(match[1]), total: Number(match[2]) };
 }
 
-// Retorna o caminho relativo do diretório para o primeiro modelo encontrado para uma determinada tarefa.
-
 export function chooseFirstModel(models: AIModelOption[], taskType: string): string {
-    return models.find((model) => model.task_type === taskType)?.relative_path ?? "";
+    const taskModels = models.filter((model) => model.task_type === taskType);
+    const balancedModel = taskModels.find((model) => getVideoModelSize(model.name) === "m");
+    return balancedModel?.relative_path ?? taskModels[0]?.relative_path ?? "";
 }
 
 // Define que a tarefa padrão para os modelos é a detecção de objetos.
 
 export function choosePreferredTask(tasks: AITaskOption[]): string {
     return tasks.find((task) => task.task_type === "object_detection")?.task_type ?? tasks[0]?.task_type ?? "object_detection";
+}
+
+const VIDEO_MODEL_SIZE_LABELS: Record<string, string> = {
+    n: "Muito rápida",
+    s: "Rápida",
+    m: "Equilibrada",
+    l: "Precisa",
+    x: "Muito precisa",
+};
+
+const VIDEO_MODEL_SIZE_ORDER: Record<string, number> = { n: 0, s: 1, m: 2, l: 3, x: 4 };
+
+export function getVideoModelSize(modelName: string): string | undefined {
+    const fileName = modelName.split(/[\\/]/).pop() ?? modelName;
+    const modelStem = fileName.replace(/\.pt$/i, "");
+    return (
+        modelStem.match(/yolo(?:v?\d+)?([nsmlx])(?:[-_.]|$)/i)?.[1]?.toLowerCase()
+        ?? modelStem.match(/(?:^|[-_.])([nsmlx])$/i)?.[1]?.toLowerCase()
+    );
+}
+
+export function getVideoModelSizeTranslationKey(modelName: string): string | undefined {
+    const size = getVideoModelSize(modelName);
+    if (!size) return undefined;
+
+    return {
+        n: "videoModelVeryFast",
+        s: "videoModelFast",
+        m: "videoModelBalanced",
+        l: "videoModelPrecise",
+        x: "videoModelVeryPrecise",
+    }[size as "n" | "s" | "m" | "l" | "x"];
+}
+
+export function getVideoModelSizeOrder(modelName: string): number {
+    const size = getVideoModelSize(modelName);
+    return size ? VIDEO_MODEL_SIZE_ORDER[size] : Number.MAX_SAFE_INTEGER;
+}
+
+export function formatVideoModelName(modelName: string): string {
+    const size = getVideoModelSize(modelName);
+    return size ? VIDEO_MODEL_SIZE_LABELS[size] : modelName;
 }
 
 // Cria uma assinatura única baseada no estado e configurações do vídeo para controlar o cache do useEffect.
@@ -76,6 +121,33 @@ export function formatTimecode(seconds: number): string {
     : `${minutes.toString().padStart(2, "0")}:${remaining.toString().padStart(2, "0")}`
 }
 
+function formatSubtitleTimestamp(seconds: number, separator: "," | "."): string {
+    const milliseconds = Math.max(0, Math.round(seconds * 1000));
+    const hours = Math.floor(milliseconds / 3_600_000);
+    const minutes = Math.floor((milliseconds % 3_600_000) / 60_000);
+    const remainingSeconds = Math.floor((milliseconds % 60_000) / 1000);
+    const remainder = milliseconds % 1000;
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}${separator}${String(remainder).padStart(3, "0")}`;
+}
+
+export function formatSrtTime(seconds: number): string {
+    return formatSubtitleTimestamp(seconds, ",");
+}
+
+export function formatVttTime(seconds: number): string {
+    return formatSubtitleTimestamp(seconds, ".");
+}
+
+export function createWebVtt(segments: VideoTranscriptionResponse["transcription"]["segments"]): string {
+    const cues = segments
+        .filter((segment) => segment.text.trim() && segment.end > segment.start)
+        .map((segment) => {
+            const text = segment.text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            return `${formatVttTime(segment.start)} --> ${formatVttTime(segment.end)}\n${text}`;
+        });
+    return `WEBVTT\n\n${cues.join("\n\n")}`;
+}
+
 export function formatPercent(value: number | undefined) {
   if (typeof value !== "number") {
     return "-";
@@ -92,5 +164,5 @@ export function formatSeconds(value: number | null | undefined) {
 
 export function formatVariantLabel(variant: VideoAnalysisVariant) {
   const createdAt = variant.created_at ? new Date(variant.created_at).toLocaleString() : "Sem data";
-  return `${variant.task_label} - ${variant.model_name} - ${createdAt}`;
+  return `${variant.task_label} - ${formatVideoModelName(variant.model_name)} - ${createdAt}`;
 }

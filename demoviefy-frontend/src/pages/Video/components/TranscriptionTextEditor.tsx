@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { VideoTranscriptionResponse } from "src/core/types/videoTypes";
+import { formatSrtTime } from "src/core/utils/videoHelpers";
 
 type TranscriptionSegment = VideoTranscriptionResponse["transcription"]["segments"][number];
 
@@ -15,15 +16,6 @@ type TranscriptionTextEditorProps = {
     onSegmentsChange: (segments: TranscriptionSegment[]) => void;
     onSave: () => void | Promise<void>;
 };
-
-function formatSrtTime(seconds: number): string {
-    const milliseconds = Math.max(0, Math.round(seconds * 1000));
-    const hours = Math.floor(milliseconds / 3_600_000);
-    const minutes = Math.floor((milliseconds % 3_600_000) / 60_000);
-    const remainingSeconds = Math.floor((milliseconds % 60_000) / 1000);
-    const remainder = milliseconds % 1000;
-    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")},${String(remainder).padStart(3, "0")}`;
-}
 
 function formatSrt(segments: TranscriptionSegment[], fallbackText: string): string {
     if (segments.length === 0) {
@@ -94,7 +86,7 @@ export function TranscriptionTextEditor({
     return (
         <div className="flex min-w-0 flex-col gap-3">
             <textarea
-                className="min-h-30 w-full resize-y rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm leading-7 text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 read-only:cursor-default dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-blue-400 dark:focus:bg-neutral-800 dark:focus:ring-blue-900"
+                className="min-h-30 w-full resize-y rounded-lg border border-neutral-200 bg-neutral-100 p-3 text-sm leading-7 text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-neutral-500 focus:bg-white focus:ring-1 focus:ring-neutral-200 read-only:cursor-default dark:border-neutral-700 dark:bg-neutral-900/60 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-neutral-600 dark:focus:bg-neutral-900/60 dark:focus:ring-neutral-700"
                 value={srtDraft}
                 onChange={(event) => handleChange(event.target.value)}
                 readOnly={isBusy}
@@ -105,7 +97,7 @@ export function TranscriptionTextEditor({
             <div className="flex justify-end">
                 <button
                     type="button"
-                    className="cursor-pointer rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed dark:bg-blue-800 dark:hover:bg-blue-700"
+                    className="cursor-pointer rounded-md bg-blue-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed dark:bg-blue-800 dark:hover:bg-blue-700"
                     onClick={() => void onSave()}
                     disabled={isBusy || !hasChanges}
                 >

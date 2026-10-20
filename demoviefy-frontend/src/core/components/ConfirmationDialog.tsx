@@ -37,7 +37,7 @@ export function ConfirmationDialog({
             <div className="mt-4 flex justify-between gap-3">
               <button
                 type="button"
-                className="cursor-pointer rounded-md bg-neutral-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 focus-visible:ring-offset-2"
+                className="cursor-pointer rounded-md bg-neutral-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-500 focus-visible:ring-offset-2"
                 onClick={() => setIsOpen(false)}
               >
                 {t("cancel")}

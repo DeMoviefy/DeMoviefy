@@ -14,7 +14,7 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
     const { t, i18n } = useTranslation();
     if (state === "loading" || state === "pending") {
         return (
-            <section className="flex flex-col gap-3">
+            <section className="flex flex-col gap-3 rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800">
                 <h3 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
                     {t("analysisResults")}
                 </h3>
@@ -27,13 +27,15 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
 
     if (!summary) {
         return (
-            <section className="flex flex-col gap-3">
-                <h3 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
+            <section className="mt-2 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800/70">
+                <h3 className="bg-neutral-100 px-4 pb-4 pt-5 text-base font-semibold tracking-tight text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100 sm:px-5 sm:pb-5 sm:pt-5">
                     {t("analysisResults")}
                 </h3>
-                <p className="text-sm leading-6 text-neutral-500 dark:text-neutral-400" aria-live="polite">
-                    {t("unavailableAnalysis")}
-                </p>
+                <div className="h-176 overflow-auto bg-white dark:bg-neutral-800">
+                    <p className="px-5 py-8 text-sm text-neutral-400 dark:text-neutral-500" aria-live="polite">
+                        {t("unavailableAnalysis")}
+                    </p>
+                </div>
             </section>
         );
     }
@@ -41,8 +43,8 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
     return (
         <>
             {summary.content_rating && (
-                <div className="p-5 mb-6 border rounded-2xl border-(--border) bg-(--surface)">
-                    <h3 className="mb-4 text-xs font-bold tracking-widest uppercase text-(--muted)">
+                <div className="mb-6 rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
+                    <h3 className="mb-4 text-base font-semibold text-neutral-900 dark:text-neutral-100">
                         {t("suggestedRating")}
                     </h3>
 
@@ -52,19 +54,14 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
                     />
 
                     {summary.content_rating.danger_level > 1 && (
-                        <p className="mt-3 text-sm text-(--muted)">
-
-                            <strong>{t("reason")}</strong> {summary.content_rating.trigger_objects.map((label) => getYoloClassLabel(label, i18n.resolvedLanguage ?? i18n.language)).join(", ")}.
+                        <p className="mt-3 text-sm leading-6 text-neutral-600 dark:text-neutral-300">
+                            <strong className="font-semibold text-neutral-800 dark:text-neutral-100">{t("reason")}</strong>{" "}
+                            {summary.content_rating.trigger_objects.map((label) => getYoloClassLabel(label, i18n.resolvedLanguage ?? i18n.language)).join(", ")}.
                         </p>
                     )}
                 </div>
             )}
-            <section className="flex flex-col gap-4">
-                <h3 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-                    {t("analysisResults")}
-                </h3>
-                <AnalysisDetectionTable summary={summary} />
-            </section>
+            <AnalysisDetectionTable summary={summary} heading={t("analysisResults")} />
         </>
     );
 }

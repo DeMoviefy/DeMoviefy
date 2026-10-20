@@ -1,0 +1,28 @@
+export const i18nCadastro = {
+  ptBR: {
+    signupTitle: "Crie sua conta DeMoviefy.",
+    signupDescription: "Salve seus vídeos, análises e transcrições em um só lugar.",
+    name: "Nome",
+    yourName: "Seu nome",
+    confirmPassword: "Confirme sua senha",
+    repeatPassword: "Digite a senha novamente",
+    minPassword: "No mínimo 8 caracteres",
+    hasAccount: "Já tem uma conta?",
+    accountCreated: "Conta criada com sucesso. Você já pode entrar.",
+    signupError: "Não foi possível criar sua conta. Tente novamente.",
+    recaptchaRequired: "Confirme o reCAPTCHA antes de cadastrar.",
+  },
+  en: {
+    signupTitle: "Create your DeMoviefy account.",
+    signupDescription: "Keep your videos, analyses, and transcripts together.",
+    name: "Name",
+    yourName: "Your name",
+    confirmPassword: "Confirm your password",
+    repeatPassword: "Enter your password again",
+    minPassword: "At least 8 characters",
+    hasAccount: "Already have an account?",
+    accountCreated: "Account created. You can now sign in.",
+    signupError: "Could not create your account. Please try again.",
+    recaptchaRequired: "Complete the reCAPTCHA before signing up.",
+  },
+} as const;
