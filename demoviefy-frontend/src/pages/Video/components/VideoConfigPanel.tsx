@@ -79,12 +79,14 @@ export function VideoConfigPanel({
                         modelPath={config.model_path}
                         clipStart={config.clip_start_sec}
                         clipEnd={config.clip_end_sec}
+                        frameStride={config.frame_stride}
                         tasks={tasks}
                         models={models}
                         onTaskChange={(value) => update("task_type", value)}
                         onModelChange={(value) => update("model_path", value)}
                         onClipStartChange={(value) => update("clip_start_sec", value)}
                         onClipEndChange={(value) => update("clip_end_sec", value || null)}
+                        onFrameStrideChange={(value) => update("frame_stride", value)}
                     />
 
                     <div className="mt-8 flex flex-wrap items-center justify-end gap-3">

@@ -13,6 +13,7 @@ type VideoAnalysisConfigProps = {
     modelPath: string
     clipStart: string | number
     clipEnd: string | number | null
+    frameStride: string | number
   
     tasks: {
       task_type: string
@@ -29,6 +30,7 @@ type VideoAnalysisConfigProps = {
     onModelChange: (value: string) => void
     onClipStartChange: (value: string) => void
     onClipEndChange: (value: string) => void
+    onFrameStrideChange: (value: string) => void
   }
   
 export function VideoAnalysisConfig({
@@ -36,12 +38,14 @@ export function VideoAnalysisConfig({
   modelPath,
   clipStart,
   clipEnd,
+  frameStride,
   tasks,
   models,
   onTaskChange,
   onModelChange,
   onClipStartChange,
   onClipEndChange,
+  onFrameStrideChange,
 }: VideoAnalysisConfigProps) {
   const { t } = useTranslation();
   const filteredModels = models.filter(
@@ -64,6 +68,21 @@ export function VideoAnalysisConfig({
         </div>
   
         <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <div>
+            <label htmlFor="video-analysis-frame-stride" className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+              Stride de frames
+            </label>
+            <select
+              id="video-analysis-frame-stride"
+              value={frameStride}
+              onChange={(e) => onFrameStrideChange(e.target.value)}
+              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"
+            >
+              {[1, 8, 24, 30, 60].map((stride) => (
+                <option key={stride} value={stride}>{stride === 1 ? "1 frame (todos os frames)" : `${stride} frames`}</option>
+              ))}
+            </select>
+          </div>
           <div>
             <label
               htmlFor="video-analysis-task"
