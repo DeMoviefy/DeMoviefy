@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { VideoTranscriptionResponse } from "src/core/types/videoTypes";
+import { formatTranscriptionVariantLabel } from "src/pages/Video/utils/transcriptionLabels";
 
 type TranscriptionVariant = NonNullable<VideoTranscriptionResponse["variants"]>[number];
 
@@ -68,7 +69,7 @@ export function TranslateTranscription({
                             disabled={isBusy || !hasTranscription}
                         >
                             {hasTranscription
-                                ? variants.map((variant) => <option key={variant.id} value={variant.id}>{variant.label}</option>)
+                                ? variants.map((variant) => <option key={variant.id} value={variant.id}>{formatTranscriptionVariantLabel(variant, t)}</option>)
                                 : <option value="">{t("noTranscriptionAvailable")}</option>}
                         </select>
                     </label>

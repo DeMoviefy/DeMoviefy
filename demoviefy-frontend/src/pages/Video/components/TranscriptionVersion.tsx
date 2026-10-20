@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import type { VideoTranscriptionResponse } from "src/core/types/videoTypes";
 import { ConfirmationDialog } from "src/core/components/ConfirmationDialog";
+import { formatTranscriptionVariantLabel } from "src/pages/Video/utils/transcriptionLabels";
 
 type TranscriptionVersionProps = {
     variants: NonNullable<VideoTranscriptionResponse["variants"]>;
@@ -35,7 +36,7 @@ export function TranscriptionVersion({
                     >
                         {hasTranscription
                             ? variants.map((variant) => (
-                                <option key={variant.id} value={variant.id}>{variant.label}</option>
+                                <option key={variant.id} value={variant.id}>{formatTranscriptionVariantLabel(variant, t)}</option>
                             ))
                             : <option value="">{t("noTranscriptionAvailable")}</option>}
                     </select>
