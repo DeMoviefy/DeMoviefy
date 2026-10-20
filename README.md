@@ -1,43 +1,62 @@
-﻿# DeMoviefy
+﻿<p align="center">
+  <img src="DeMoviefy-Light.png" alt="demoviefy logo" width="300">
+</p>
+
+# DeMoviefy
 
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-Monorepo para upload, análise e acompanhamento de videos com backend Flask, frontend React e pipeline YOLO.
+O DeMoviefy é uma plataforma automatizada e gratuita para análise, processamento e revisão de arquivos digitais de vídeo. O projeto foi desenvolvido para otimizar o fluxo de moderação de conteúdo em larga escala, integrando inteligência artificial e visão computacional de forma simples, acessível e sem burocracia.
+
+## O que é o projeto e suas funcionalidades
+
+O DeMoviefy combina tecnologias avançadas de processamento de dados para extrair informações úteis de vídeos automaticamente. Suas principais funcionalidades incluem:
+
+* Upload e gerenciamento de vídeos: envio simplificado de arquivos de vídeo compatíveis através de uma interface intuitiva.
+* Análise por inteligência artificial (YOLO): processamento visual para detectar objetos, identificar conteúdos sensíveis (como violência ou linguagem imprópria) e categorizar o material.
+* Transcrição automática de áudio: extração e conversão do áudio do vídeo em texto estruturado com marcações de tempo (timestamps).
+* Tradução local de legendas: suporte à tradução de legendas utilizando ferramentas locais (Argos Translate) para diferentes idiomas.
+* Estimativa de classificação indicativa: sugestão automática de faixa etária e classificação com base nas normas do ministério da justiça e segurança pública (MJSP).
+* Navegação por timestamps: reprodutor interativo que permite saltar diretamente para os momentos marcados como importantes pela análise de IA.
 
 ## Estrutura
 
-- `demoviefy-backend/`: API Flask, persistencia e processamento
+- `demoviefy-backend/`: API Flask, persistência e processamento
 - `demoviefy-frontend/`: interface React para upload, biblioteca e visualização da análise
-- `ai_model/`: modelo YOLO, app de teste e utilitarios de IA
-- `docs/`: instrucoes complementares
-- `uploads/`: videos enviados e arquivos de análise gerados em tempo de execução
+- `ai_model/`: modelo YOLO, app de teste e utilitários de IA
+- `docs/`: instruções complementares
+- `uploads/`: vídeos enviados e arquivos de análise gerados em tempo de execução
 - `setup/main.py`: launcher multiplataforma, capaz de criar ou reparar a `.venv`
 
 ## Onde os arquivos ficam
 
-- Video enviado: `uploads/<nome-do-arquivo>`
+- Vídeo enviado: `uploads/<nome-do-arquivo>`
 - Resumo da análise: `uploads/analysis/video_<id>.json`
 - Banco SQLite local: `demoviefy-backend/instance/demoviefy.db`
 
-O frontend agora mostra esses caminhos diretamente no painel de detalhes, junto com o preview do video e o status do processamento.
+O frontend agora mostra esses caminhos diretamente no painel de detalhes, junto com o preview do vídeo e o status do processamento.
 
 ## Quick Start
 
 ### Com o Launcher (Recomendado)
 
+Abra o PowerShell na pasta raiz do repositório (demoviefy-demoviefy/).
 ```powershell
 python setup/main.py
 ```
 
-No início, responda `Y` à pergunta sobre o proxy da escola se quiser usá-lo.
+No início, responda `Y` à pergunta sobre o proxy da escola se quiser usá-lo (Aperte `N` caso não tenha proxy).
 Na janela, clique em `Setup Environment` na primeira execução e depois em
 `Start All`. Consulte o [Guia do Launcher](docs/LAUNCHER.md) para conhecer todas
 as opções, incluindo iniciar cada serviço separadamente.
 
 ### Execução Manual
 
-**Setup Python:**
+**Passo 1 - Setup Python:**
 
+Abra o terminal na pasta raiz do projeto e execute os comandos para criar o ambiente Python e instalar as dependências da API:
+
+Windows:
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
@@ -45,8 +64,22 @@ python -m pip install --upgrade pip
 pip install -r demoviefy-backend/requirements.txt
 ```
 
-**Backend:**
+Linux:
+```powershell
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -r demoviefy-backend/requirements.txt
+```
 
+(Opcional para suporte completo a transcrição offline via Whisper, instale também as dependências de IA/Transcrição recomendadas):
+```powershell
+pip install -r demoviefy-backend/ai-requirements.txt
+```
+
+**Passo 2 - Backend:**
+
+Em um terminal com o ambiente virtual ativado, navegue até a pasta do backend e execute o servidor:
 ```powershell
 cd demoviefy-backend
 python run.py
@@ -54,8 +87,9 @@ python run.py
 
 Acesse: `http://127.0.0.1:5000`
 
-**Frontend (em outro terminal):**
+**Passo 3 - Frontend (em outro terminal):**
 
+Abra uma nova janela do terminal na raiz do projeto, acesse a pasta do frontend, instale as dependências de pacotes do Node e inicie o ambiente de desenvolvimento:
 ```sh
 cd demoviefy-frontend
 npm install
@@ -66,7 +100,7 @@ Acesse: `http://localhost:5173`
 
 ## Fluxo de Upload
 
-1. Envie o video pela interface
+1. Envie o vídeo pela interface
 2. Backend salva em `uploads/`
 3. Thread de processamento executa análise com YOLO
 4. Resumo final vai para `uploads/analysis/video_<id>.json`
@@ -190,7 +224,7 @@ Frontend React:
 - `demoviefy-frontend/src/layouts/`: estrutura visual da aplicação
 - `demoviefy-frontend/src/services/`: cliente HTTP
 
-## Observacoes
+## Observações
 
 - O backend usa `ai_model/model/yolo26l.pt` automaticamente quando esse arquivo existe.
 - A transcrição automática com timestamps usa Whisper quando instalado; prefira Python 3.11/3.12 para esse recurso.
