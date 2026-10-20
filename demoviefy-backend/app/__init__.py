@@ -1,5 +1,6 @@
 import os
 import secrets
+from dotenv import load_dotenv
 from datetime import timedelta
 from pathlib import Path
 from time import sleep
@@ -20,6 +21,7 @@ from app.config.paths import (
 from app.config.versioning import API_CONTRACT_VERSION, BACKEND_APP_VERSION
 from app.services.metadata_migration_service import migrate_metadata_files
 
+load_dotenv()
 db = SQLAlchemy()
 
 
