@@ -23,7 +23,7 @@ export const AnalysisMetrics = memo(function AnalysisMetrics({
                 <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3">
                     <div>
                         <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                            Modelo
+                            Precisão da análise
                         </span>
                         <strong
                             className="mt-1 block truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100"
