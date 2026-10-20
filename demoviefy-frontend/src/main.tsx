@@ -1,7 +1,6 @@
 import { createRoot, type Root } from "react-dom/client";
 import { ErrorBoundary } from "src/core/components/ErrorBoundary";
 import  App  from "src/app/App"
-import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 
 import "src/index.css";
 import { StrictMode } from "react";
@@ -73,13 +72,9 @@ root.render(
 try {
   root.render(
     <StrictMode>
-      <GoogleReCaptchaProvider
-        reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-      >
         <ErrorBoundary>
           <App />
         </ErrorBoundary>
-      </GoogleReCaptchaProvider>
     </StrictMode>,
   );
 } catch (error) {

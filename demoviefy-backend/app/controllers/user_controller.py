@@ -18,8 +18,9 @@ def verify_recaptcha(token: str) -> tuple[bool, str | None]:
     secret_key = os.environ.get("RECAPTCHA_SECRET_KEY")
 
     if not secret_key:
-        # Falha fechada: nunca libera o cadastro sem a chave.
-        raise RuntimeError("RECAPTCHA_SECRET_KEY não configurada.")
+        raise RuntimeError(
+            "RECAPTCHA_SECRET_KEY não configurada."
+        )
 
     try:
         response = requests.post(
@@ -34,18 +35,13 @@ def verify_recaptcha(token: str) -> tuple[bool, str | None]:
         result = response.json()
 
     except (requests.RequestException, ValueError):
-        # Não permite cadastrar se o Google estiver indisponível.
-        return False, "Não foi possível verificar o reCAPTCHA. Tente novamente."
+        return False, (
+            "Não foi possível verificar o reCAPTCHA. "
+            "Tente novamente."
+        )
 
     if not result.get("success"):
         return False, "Verificação reCAPTCHA inválida."
-
-    if result.get("action") != "cadastro":
-        return False, "Ação do reCAPTCHA inválida."
-
-    score = result.get("score")
-    if not isinstance(score, (int, float)) or score < 0.5:
-        return False, "Atividade suspeita detectada. Tente novamente."
 
     return True, None
 

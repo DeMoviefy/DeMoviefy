@@ -20,12 +20,6 @@ ENV/
 *.log
 app.log
 
-# =========================
-# ENV VARIABLES
-# =========================
-.env
-.env.*
-!.env.example
 
 # =========================
 # UPLOADS / DADOS GERADOS

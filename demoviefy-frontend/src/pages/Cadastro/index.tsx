@@ -1,19 +1,23 @@
+
 import axios from "axios";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import ReCAPTCHA from "react-google-recaptcha";
+import { useTranslation } from "react-i18next";
 
 import { UserService } from "src/core/services/userService";
-import { useTranslation } from "react-i18next";
 
 import "./index.css";
 
 export default function Cadastro() {
   const { t } = useTranslation();
+
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] =
+    useState<string | null>(null);
 
-  const { executeRecaptcha } = useGoogleReCaptcha();
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -22,29 +26,30 @@ export default function Cadastro() {
     const formData = new FormData(form);
 
     setFeedback("");
+
+    if (!recaptchaToken) {
+      setFeedback("Confirme o reCAPTCHA antes de cadastrar.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      // Verifica se o reCAPTCHA já foi carregado
-      if (!executeRecaptcha) {
-        setFeedback("O reCAPTCHA ainda não foi carregado. Tente novamente.");
-        return;
-      }
-
-      // Gera o token do reCAPTCHA
-      const recaptchaToken = await executeRecaptcha("cadastro");
-
-      // Envia os dados para o backend
       await UserService.register({
         nome: String(formData.get("name")).trim(),
         email: String(formData.get("email")).trim(),
         senha: String(formData.get("password")),
-        senha_confirmada: String(formData.get("confirm-password")),
+        senha_confirmada: String(
+          formData.get("confirm-password")
+        ),
         recaptcha_token: recaptchaToken,
       });
 
       setFeedback(t("accountCreated"));
+
       form.reset();
+      setRecaptchaToken(null);
+      recaptchaRef.current?.reset();
 
     } catch (error: unknown) {
       const message = axios.isAxiosError<{ error?: string }>(error)
@@ -52,8 +57,13 @@ export default function Cadastro() {
         : undefined;
 
       setFeedback(
-        message ?? "Não foi possível criar sua conta. Tente novamente."
+        message ??
+          "Não foi possível criar sua conta. Tente novamente."
       );
+
+      // Permite resolver um novo CAPTCHA após uma falha.
+      setRecaptchaToken(null);
+      recaptchaRef.current?.reset();
 
     } finally {
       setIsSubmitting(false);
@@ -63,7 +73,6 @@ export default function Cadastro() {
   return (
     <section className="auth-page signup-page">
       <div className="auth-panel signup-panel">
-
         <div className="auth-intro">
           <span className="auth-kicker">DeMoviefy</span>
 
@@ -73,9 +82,11 @@ export default function Cadastro() {
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
-
           <div className="auth-heading">
-            <span className="auth-kicker">{t("newAccount")}</span>
+            <span className="auth-kicker">
+              {t("newAccount")}
+            </span>
+
             <h2>{t("register")}</h2>
           </div>
 
@@ -87,6 +98,7 @@ export default function Cadastro() {
               name="name"
               placeholder={t("yourName")}
               required
+              disabled={isSubmitting}
             />
           </label>
 
@@ -99,6 +111,7 @@ export default function Cadastro() {
               placeholder="you@example.com"
               required
               type="email"
+              disabled={isSubmitting}
             />
           </label>
 
@@ -112,6 +125,7 @@ export default function Cadastro() {
               placeholder={t("minPassword")}
               required
               type="password"
+              disabled={isSubmitting}
             />
           </label>
 
@@ -125,12 +139,21 @@ export default function Cadastro() {
               placeholder={t("repeatPassword")}
               required
               type="password"
+              disabled={isSubmitting}
             />
           </label>
 
+          <ReCAPTCHA
+            ref={recaptchaRef}
+            sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+            onChange={(token) => setRecaptchaToken(token)}
+            onExpired={() => setRecaptchaToken(null)}
+            onErrored={() => setRecaptchaToken(null)}
+          />
+
           <button
             className="auth-submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !recaptchaToken}
             type="submit"
           >
             {isSubmitting
@@ -152,7 +175,6 @@ export default function Cadastro() {
             {t("hasAccount")}{" "}
             <Link to="/login">{t("login")}</Link>
           </p>
-
         </form>
       </div>
     </section>

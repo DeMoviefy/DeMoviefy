@@ -91,9 +91,14 @@ class SetupManager:
 
                 self.set_state(True, "Installing reCAPTCHA frontend package...")
                 if self.pm.run_sync(
-                    "setup", ["npm", "install", "react-google-recaptcha-v3"], FRONTEND_DIR
+                    "setup", ["npm", "install", "react-google-recaptcha"], FRONTEND_DIR
                 ) != 0:
-                    raise RuntimeError("Failed installing react-google-recaptcha-v3")
+                    raise RuntimeError("Failed installing react-google-recaptcha")
+
+                if self.pm.run_sync(
+                    "setup", ["npm", "install", "-D", "@types/react-google-recaptcha"], FRONTEND_DIR
+                ) != 0:
+                    raise RuntimeError("Failed installing @types/react-google-recaptcha")
 
                 self.log("[setup] environment setup completed successfully.")
                 self.set_state(False, "Ready")
