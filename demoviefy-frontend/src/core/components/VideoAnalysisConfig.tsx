@@ -15,6 +15,7 @@ export const TASK_TRANSLATION_KEYS = {
 
 type VideoAnalysisConfigProps = {
     configCard?: boolean
+    stacked?: boolean
     footer?: ReactNode
     taskType: string
     modelPath: string
@@ -44,6 +45,7 @@ type VideoAnalysisConfigProps = {
   
 export function VideoAnalysisConfig({
   configCard = false,
+  stacked = false,
   footer,
   taskType,
   modelPath,
@@ -118,7 +120,7 @@ export function VideoAnalysisConfig({
 
   return (
     <div className={configCard
-      ? "grid grid-cols-1 gap-6 lg:grid-cols-2"
+      ? stacked ? "flex flex-col gap-6" : "grid grid-cols-1 gap-6 lg:grid-cols-2"
       : "flex flex-col gap-6"}
     >
       <div className={configCard
@@ -137,8 +139,8 @@ export function VideoAnalysisConfig({
           </div>
         </div>
   
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <div>
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <div className="md:col-span-2">
             <label
               htmlFor="video-analysis-task"
               className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
@@ -190,7 +192,7 @@ export function VideoAnalysisConfig({
           )}
 
           <div>
-            <label htmlFor="video-analysis-frame-stride" className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+            <label htmlFor="video-analysis-frame-stride" className="whitespace-nowrap text-sm font-medium text-neutral-700 dark:text-neutral-300">
               {t("analysisFrequency")}
             </label>
             <select
@@ -221,7 +223,7 @@ export function VideoAnalysisConfig({
           onEndChange={onClipEndChange}
         />
       </div>
-      {footer && <div className={configCard ? "flex justify-end lg:col-span-2" : "flex justify-end"}>{footer}</div>}
+      {footer && <div className={configCard ? `flex justify-end${stacked ? "" : " lg:col-span-2"}` : "flex justify-end"}>{footer}</div>}
     </div>
   )
 }

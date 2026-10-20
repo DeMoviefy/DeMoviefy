@@ -164,6 +164,8 @@ export function NewVideoPanel() {
             {file && !guestLimitReached && (
                 <div className="rounded-lg border border-neutral-200 bg-white px-3 py-3 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
                     <VideoAnalysisConfig
+                        configCard
+                        stacked
                         taskType={uploadTask}
                         modelPath={uploadModelPath}
                         clipStart={uploadClipStart}
