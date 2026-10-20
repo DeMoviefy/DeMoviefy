@@ -1,6 +1,7 @@
 export const i18nVideo = {
   ptBR: {
     analysisVideo: "Análise do vídeo",
+    returnToDashboard: "Retornar ao dashboard",
     analysisVersion: "Versão da análise",
     deleteAnalysis: "Excluir análise",
     deleteAnalysisSelectedConfirm: "Tem certeza de que deseja excluir a análise selecionada?",
@@ -108,6 +109,7 @@ export const i18nVideo = {
   },
   en: {
     analysisVideo: "Video analysis",
+    returnToDashboard: "Return to dashboard",
     analysisVersion: "Analysis version",
     deleteAnalysis: "Delete analysis",
     deleteAnalysisSelectedConfirm: "Are you sure you want to delete the selected analysis?",

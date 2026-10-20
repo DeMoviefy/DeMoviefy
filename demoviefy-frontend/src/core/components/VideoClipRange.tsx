@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 type VideoClipRangeProps = {
     boxed?: boolean;
+    className?: string;
     durationSeconds: number | null;
     durationLimitReached: boolean;
     start: string | number;
@@ -106,7 +107,7 @@ function ClipTimeInput({
     );
 }
 
-export function VideoClipRange({ boxed = true, durationSeconds, durationLimitReached, start, end, onStartChange, onEndChange }: VideoClipRangeProps) {
+export function VideoClipRange({ boxed = true, className = "", durationSeconds, durationLimitReached, start, end, onStartChange, onEndChange }: VideoClipRangeProps) {
     const [activeHandle, setActiveHandle] = useState<"start" | "end">("end");
     const maxDuration = durationSeconds !== null && Number.isFinite(durationSeconds)
         ? Math.min(MAX_CLIP_DURATION_SECONDS, Math.max(0, Math.floor(durationSeconds)))
@@ -123,7 +124,7 @@ export function VideoClipRange({ boxed = true, durationSeconds, durationLimitRea
     const endPosition = maxDuration ? (effectiveEnd / maxDuration) * 100 : 100;
 
     return (
-        <div className={boxed ? "rounded-xl border border-neutral-200 bg-neutral-100 p-4 pt-5 dark:border-neutral-700 dark:bg-neutral-900/60 sm:p-5" : ""}>
+        <div className={`${boxed ? "rounded-xl border border-neutral-200 bg-neutral-100 p-4 pt-5 dark:border-neutral-700 dark:bg-neutral-900/60 sm:p-5" : ""} ${className}`}>
             <div className="flex items-start gap-3">
                 <div>
                     <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">Trecho do vídeo</h3>

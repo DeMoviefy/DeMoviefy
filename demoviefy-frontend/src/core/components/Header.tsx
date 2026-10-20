@@ -91,7 +91,7 @@ export default function Header() {
 
   return (
     <header className="top-0 z-50 border-b border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-950/50">
-      <div className="mx-auto flex h-20 w-full items-center justify-between px-4">
+      <div className="mx-auto flex h-20 w-full items-center justify-between px-8">
         <NavLink to="/dashboard">
           <img
             src={theme === "dark" ? demoviefyLight : demoviefyDark}
@@ -100,53 +100,27 @@ export default function Header() {
           />
         </NavLink>
 
-        <nav className="flex items-center">
-          <NavLink
-            to="/dashboard"
-            className={({ isActive }) =>
-              `rounded-md px-4 py-2 text-base transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800 lg:px-6 ${isActive
-                ? "text-neutral-900 dark:text-neutral-100"
-                : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
-              }`
-              
-            }
-          >
-            {t("dashboard")}
-          </NavLink>
+        <nav className="flex items-center gap-4">
           <button
             type="button"
             onClick={toggleTheme}
             aria-label={theme === "light" ? t("darkTheme") : t("lightTheme")}
             title={theme === "light" ? t("darkTheme") : t("lightTheme")}
-            className="mr-2 inline-flex size-9 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
+            className="inline-flex size-9 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
           >
             {theme === "dark" ? <FaMoon aria-hidden="true" /> : <FaSun aria-hidden="true" />}
           </button>
           {isGuest !== false && (
-            <span
-              aria-live="polite"
-              className="mr-2 rounded-md px-3 py-2 text-sm font-medium text-neutral-600 dark:text-neutral-300"
-            >
-              {isGuest === null ? t("checkingSession") : t("guestMode")}
-            </span>
-          )}
-          {isGuest !== false && (
             <>
               <NavLink
                 to="/login"
-                className={({ isActive }) =>
-                  `rounded-md px-4 py-2 text-base font-medium transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800 lg:px-6 ${
-                    isActive
-                      ? "text-neutral-900 dark:text-neutral-100"
-                      : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
-                  }`
-                }
+                className="inline-flex h-9 items-center rounded-md border border-neutral-300 px-3 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
               >
                 {t("login")}
               </NavLink>
               <NavLink
                 to="/cadastro"
-                className="rounded-md bg-blue-600 px-4 py-2 text-base font-medium text-white transition-colors hover:bg-blue-500 dark:bg-blue-800 dark:hover:bg-blue-700 lg:px-6"
+                className="inline-flex h-9 items-center rounded-md bg-blue-600 px-3 text-sm font-medium text-white transition-colors hover:bg-blue-500 dark:bg-blue-800 dark:hover:bg-blue-700"
               >
                 {t("createAccount")}
               </NavLink>

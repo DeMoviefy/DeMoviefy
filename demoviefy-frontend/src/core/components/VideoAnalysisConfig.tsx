@@ -215,6 +215,7 @@ export function VideoAnalysisConfig({
       <div>
         <VideoClipRange
           boxed
+          className={configCard && !stacked ? "h-full" : undefined}
           durationSeconds={durationSeconds}
           durationLimitReached={durationLimitReached}
           start={clipStart}
