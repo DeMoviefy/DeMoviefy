@@ -1,0 +1,26 @@
+export const i18nCadastro = {
+  ptBR: {
+    signupTitle: "Seu próximo filme começa aqui.",
+    signupDescription: "Crie sua conta para organizar e descobrir histórias para assistir.",
+    newAccount: "Nova conta",
+    name: "Nome",
+    yourName: "Seu nome",
+    confirmPassword: "Confirme sua senha",
+    repeatPassword: "Digite a senha novamente",
+    minPassword: "No mínimo 8 caracteres",
+    hasAccount: "Já tem uma conta?",
+    accountCreated: "Conta criada com sucesso. Você já pode entrar.",
+  },
+  en: {
+    signupTitle: "Your next movie starts here.",
+    signupDescription: "Create an account to organize and discover stories to watch.",
+    newAccount: "New account",
+    name: "Name",
+    yourName: "Your name",
+    confirmPassword: "Confirm your password",
+    repeatPassword: "Enter your password again",
+    minPassword: "At least 8 characters",
+    hasAccount: "Already have an account?",
+    accountCreated: "Account created. You can now sign in.",
+  },
+} as const;

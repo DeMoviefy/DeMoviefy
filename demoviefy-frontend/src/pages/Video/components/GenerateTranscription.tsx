@@ -51,6 +51,11 @@ export const GenerateTranscription = memo(function GenerateTranscription({
 }: GenerateTranscriptionProps) {
     const { t } = useTranslation();
     const languageOptions = Array.from(new Set(["auto", "pt", "en", "es", ...availableLanguages]));
+    const languageLabels: Record<string, string> = {
+        pt: t("transcriptionLanguagePortuguese"),
+        en: t("transcriptionLanguageEnglish"),
+        es: t("transcriptionLanguageSpanish"),
+    };
 
     return (
         <section>
@@ -77,7 +82,9 @@ export const GenerateTranscription = memo(function GenerateTranscription({
                         <select value={selectedLanguage || "auto"} onChange={(event) => onLanguageChange(event.target.value)} className={SELECT_CLASS} disabled={isBusy}>
                             {languageOptions.map((language) => (
                                 <option key={language} value={language}>
-                                    {language.toLowerCase() === "auto" ? t("detectAutomatically") : getNativeLanguageName(language)}
+                                    {language.toLowerCase() === "auto"
+                                        ? t("detectAutomatically")
+                                        : languageLabels[language.trim().split(/[-_]/)[0].toLowerCase()] ?? getNativeLanguageName(language)}
                                 </option>
                             ))}
                         </select>

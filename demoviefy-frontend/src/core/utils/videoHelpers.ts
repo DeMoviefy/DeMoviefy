@@ -57,9 +57,22 @@ export function getVideoModelSize(modelName: string): string | undefined {
     const fileName = modelName.split(/[\\/]/).pop() ?? modelName;
     const modelStem = fileName.replace(/\.pt$/i, "");
     return (
-        modelStem.match(/yolo(?:v?\d+)([nsmlx])(?:[-_.]|$)/i)?.[1]?.toLowerCase()
+        modelStem.match(/yolo(?:v?\d+)?([nsmlx])(?:[-_.]|$)/i)?.[1]?.toLowerCase()
         ?? modelStem.match(/(?:^|[-_.])([nsmlx])$/i)?.[1]?.toLowerCase()
     );
+}
+
+export function getVideoModelSizeTranslationKey(modelName: string): string | undefined {
+    const size = getVideoModelSize(modelName);
+    if (!size) return undefined;
+
+    return {
+        n: "videoModelVeryFast",
+        s: "videoModelFast",
+        m: "videoModelBalanced",
+        l: "videoModelPrecise",
+        x: "videoModelVeryPrecise",
+    }[size as "n" | "s" | "m" | "l" | "x"];
 }
 
 export function getVideoModelSizeOrder(modelName: string): number {

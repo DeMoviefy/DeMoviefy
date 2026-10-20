@@ -7,7 +7,7 @@ import { FaRegClock } from "react-icons/fa";
 import { toast } from "sonner";
 
 import { StatusBadge } from "src/core/components/StatusBadge";
-import { formatVideoModelName, getApiErrorMessage } from "src/core/utils/videoHelpers";
+import { formatVideoModelName, getApiErrorMessage, getVideoModelSizeTranslationKey } from "src/core/utils/videoHelpers";
 import { getAnalyzingFrameProgress } from "src/core/utils/videoHelpers";
 import { useProcessingStore } from "src/core/stores/useProcessingStore";
 import { VideoUploadService } from "src/pages/Dashboard/services/videoUploadService";
@@ -15,6 +15,10 @@ import { VideoUploadService } from "src/pages/Dashboard/services/videoUploadServ
 export function ProcessingQueuePanel() {
   const { t } = useTranslation();
   const videos = useProcessingStore((state) => state.videos);
+  const formatModelName = (modelName: string) => {
+    const translationKey = getVideoModelSizeTranslationKey(modelName);
+    return translationKey ? t(translationKey) : formatVideoModelName(modelName);
+  };
 
   const [cancellingVideoId, setCancellingVideoId] = useState<number | null>(
     null
@@ -97,7 +101,7 @@ export function ProcessingQueuePanel() {
                     </div>
 
                     <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs font-medium text-neutral-600 dark:text-neutral-300">
-                      <span>{t("analysis")}: {formatVideoModelName(video.ai_config.model_name)}</span>
+                      <span>{t("analysis")}: {formatModelName(video.ai_config.model_name)}</span>
                     </div>
                   </div>
 

@@ -1,0 +1,26 @@
+export const i18nLogin = {
+  ptBR: {
+    signingIn: "Entrando...",
+    creatingAccount: "Criando conta...",
+    loginWelcome: "Que bom ter você de volta.",
+    loginDescription: "Entre para continuar sua jornada pelo mundo dos filmes.",
+    accountAccess: "Acesse sua conta",
+    email: "E-mail",
+    password: "Senha",
+    yourPassword: "Sua senha",
+    noAccount: "Ainda não tem uma conta?",
+    register: "Cadastre-se",
+  },
+  en: {
+    signingIn: "Signing in...",
+    creatingAccount: "Creating account...",
+    loginWelcome: "Welcome back.",
+    loginDescription: "Sign in to continue your journey through the world of movies.",
+    accountAccess: "Sign in to your account",
+    email: "Email",
+    password: "Password",
+    yourPassword: "Your password",
+    noAccount: "Don't have an account yet?",
+    register: "Sign up",
+  },
+} as const;
