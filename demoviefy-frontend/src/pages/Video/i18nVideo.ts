@@ -1,5 +1,6 @@
 export const i18nVideo = {
   ptBR: {
+    analysis: "Análise",
     analysisVideo: "Análise do vídeo",
     returnToDashboard: "Retornar ao dashboard",
     analysisVersion: "Versão da análise",
@@ -12,6 +13,7 @@ export const i18nVideo = {
     deleteTranscriptionConfirm: "Tem certeza que deseja excluir esta transcrição? Essa ação não pode ser desfeita.",
     transcriptionPlaceholder: "Não há uma transcrição disponível para este vídeo. Gere-a e depois confira-a neste editor.",
     transcriptionPending: "A transcrição ainda está em processamento.",
+    transcriptionPendingRetry: "A transcrição será consultada novamente quando o processamento terminar.",
     noSavedTranscription: "Ainda não existe transcrição salva.",
     transcriptionLoadError: "Não foi possível carregar a transcrição.",
     srtTranscription: "Transcrição no formato SRT",
@@ -108,6 +110,7 @@ export const i18nVideo = {
     noAnalysis: "Nenhuma análise disponível.",
   },
   en: {
+    analysis: "Analysis",
     analysisVideo: "Video analysis",
     returnToDashboard: "Return to dashboard",
     analysisVersion: "Analysis version",
@@ -120,6 +123,7 @@ export const i18nVideo = {
     deleteTranscriptionConfirm: "Are you sure you want to delete this transcription? This action cannot be undone.",
     transcriptionPlaceholder: "No transcription is available for this video. Generate one, then review it here.",
     transcriptionPending: "The transcription is still processing.",
+    transcriptionPendingRetry: "The transcription will be checked again when processing is complete.",
     noSavedTranscription: "There is no saved transcription yet.",
     transcriptionLoadError: "Could not load the transcription.",
     srtTranscription: "SRT transcription",

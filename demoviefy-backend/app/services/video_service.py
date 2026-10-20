@@ -497,7 +497,7 @@ def process_video(flask_app, video_id, *, cancellation_requested=None):
             summary = analyze_video_frames(video_path=str(video_path), model_path=ai_config["model_path"], task_type=ai_config["task_type"], frame_stride=int(ai_config.get("frame_stride") or flask_app.config.get("FRAME_AI_FRAME_STRIDE", 8)), conf_threshold=float(ai_config.get("confidence_threshold") or flask_app.config.get("FRAME_AI_CONFIDENCE", 0.35)), max_frames=int(ai_config.get("max_frames") or flask_app.config.get("FRAME_AI_MAX_FRAMES", 300)), clip_start_sec=float(ai_config.get("clip_start_sec") or 0.0), clip_end_sec=ai_config.get("clip_end_sec"), annotated_output_path=str(annotated_path), progress_callback=report_analysis_progress, cancellation_requested=cancellation_requested, logger=flask_app.logger)
             summary["selected_model"] = ai_config
             analysis_path = save_analysis(video_id, summary)
-            save_processing_state(video_id, progress=100, stage="completed", eta_seconds=0, message="Processamento concluído. Clique em 'Gerar transcrição IA' para transcrição sob demanda.")
+            save_processing_state(video_id, progress=100, stage="completed", eta_seconds=0, message="Processamento concluído.")
             update_status(video, "PROCESSADO")
             flask_app.logger.info("process_video:completed video_id=%s filename=%s analysis=%s", video.id, video.filename, analysis_path)
         except ProcessingCancelled:

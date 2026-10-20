@@ -374,7 +374,7 @@ def get_video_transcription(video_id: int):
                     video,
                     storage,
                     status="pending",
-                    error="A transcrição sera consultada novamente quando o processamento terminar.",
+                    error="A transcrição será consultada novamente quando o processamento terminar.",
                 )
             ), 202
         return jsonify(

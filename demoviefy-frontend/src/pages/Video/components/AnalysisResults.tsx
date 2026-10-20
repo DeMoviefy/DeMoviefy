@@ -14,13 +14,15 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
     const { t, i18n } = useTranslation();
     if (state === "loading" || state === "pending") {
         return (
-            <section className="flex flex-col gap-3 rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800">
-                <h3 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
+            <section className="mt-2 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800/70">
+                <h3 className="bg-neutral-100 px-4 pb-4 pt-5 text-base font-semibold tracking-tight text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100 sm:px-5 sm:pb-5 sm:pt-5">
                     {t("analysisResults")}
                 </h3>
-                <p className="text-sm leading-6 text-neutral-500 dark:text-neutral-400" aria-live="polite">
-                    {t("processingAnalysis")}
-                </p>
+                <div className="flex h-176 items-start overflow-auto bg-white dark:bg-neutral-800">
+                    <p className="px-5 py-8 text-sm leading-6 text-neutral-500 dark:text-neutral-400" aria-live="polite">
+                        {t("processingAnalysis")}
+                    </p>
+                </div>
             </section>
         );
     }

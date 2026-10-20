@@ -65,6 +65,8 @@ export function TranscriptionTextEditor({
     const [srtDraft, setSrtDraft] = useState(() => formatSrt(segments, draft));
     const localizedMessage = message === "Não há uma transcrição disponível para este vídeo. Gere-a e depois confira-a neste editor."
         ? t("transcriptionPlaceholder")
+        : message === "A transcrição será consultada novamente quando o processamento terminar."
+            ? t("transcriptionPendingRetry")
         : message === "A transcrição ainda está em processamento."
             ? t("transcriptionPending")
             : message === "Ainda não existe transcrição salva."

@@ -2,7 +2,7 @@
 
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
-import { getAnalyzingFrameProgress } from "src/core/utils/videoHelpers";
+import { getAnalyzingFrameProgress, getVideoModelSizeTranslationKey } from "src/core/utils/videoHelpers";
 
 type ProcessingProgressProps = {
   modelName: string;
@@ -20,6 +20,8 @@ export const ProcessingProgress = memo(function ProcessingProgress({
   message,
 }: ProcessingProgressProps) {
   const { t } = useTranslation();
+  const modelTranslationKey = getVideoModelSizeTranslationKey(modelName);
+  const localizedModelName = modelTranslationKey ? t(modelTranslationKey) : modelName;
   const stageLabels: Record<string, string> = {
     queued: t("queued"), preparing: t("preparingVideo"), analyzing: t("analyzingVideo"),
     analysis_complete: t("analysisComplete"), transcribing: t("transcribingVideo"),
@@ -27,14 +29,18 @@ export const ProcessingProgress = memo(function ProcessingProgress({
   };
   const safeProgress = Math.max(0, Math.min(progress, 100));
   const frameProgress = getAnalyzingFrameProgress(message);
-  const statusMessage = frameProgress
-    ? t("analyzingFrames", frameProgress)
-    : message || stageLabels[stage] || stage;
+  const statusMessage = stage === "preparing"
+    ? t("preparingVideo")
+    : stage === "completed"
+      ? t("processingCompleted")
+      : frameProgress
+        ? t("analyzingFrames", frameProgress)
+        : message || stageLabels[stage] || stage;
 
   return (
     <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-5 dark:border-neutral-700 dark:bg-neutral-800">
-      <p className="mb-3 truncate text-xs font-medium text-neutral-600 dark:text-neutral-300" title={modelName}>
-        {modelName}
+      <p className="mb-3 truncate text-xs font-medium text-neutral-600 dark:text-neutral-300" title={`${t("analysis")}: ${localizedModelName}`}>
+        {t("analysis")}: {localizedModelName}
       </p>
       <div
         className="h-1.5 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700"
@@ -55,10 +61,16 @@ export const ProcessingProgress = memo(function ProcessingProgress({
           {statusMessage}
         </span>
 
-        <span className="shrink-0 font-semibold tabular-nums text-neutral-700 dark:text-neutral-300">
-          {safeProgress}%
-          {etaSeconds !== null && ` · ~${etaSeconds}s`}
-        </span>
+        <div className="flex shrink-0 items-center gap-3 whitespace-nowrap tabular-nums">
+          <span className="font-semibold text-neutral-700 dark:text-neutral-300">
+            {safeProgress}%
+          </span>
+          {etaSeconds !== null && (
+            <span className="text-neutral-500 dark:text-neutral-400">
+              ~{etaSeconds}s
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

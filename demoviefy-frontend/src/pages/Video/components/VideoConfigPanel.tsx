@@ -97,7 +97,7 @@ export function DeleteVideoButton({ video }: { video: VideoRecord }) {
     }
 
     return (
-        <div className="flex justify-start border-t border-neutral-100 py-4 dark:border-neutral-800">
+        <div className="flex justify-start">
             <ConfirmationDialog
                 title={t("deleteVideo")}
                 message={t("deleteVideoConfirm")}
