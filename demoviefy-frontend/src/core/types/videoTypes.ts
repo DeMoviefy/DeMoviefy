@@ -79,6 +79,11 @@ export type VideoAnalysisSummary = {
   label_counts: Record<string, number>;
   avg_confidence_by_label: Record<string, number>;
   top_labels: string[];
+  content_rating?: {
+    danger_level: number;
+    rating_label: string;
+    trigger_objects: string[];
+  };
 };
 
 export type VideoAnalysisVariant = {

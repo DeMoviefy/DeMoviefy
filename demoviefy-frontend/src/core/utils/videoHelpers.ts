@@ -22,6 +22,12 @@ export function getApiErrorMessage(error: unknown, fallback: string) {
     return axiosError.response?.data?.error ?? axiosError.response?.data?.message ?? fallback;
 }
 
+export function getAnalyzingFrameProgress(message: string | null): { current: number; total: number } | null {
+    const match = message?.match(/^\s*(?:Analisando|Analyzing)\s+frames\s+(\d+)\s*\/\s*(\d+)\.?\s*$/i);
+    if (!match) return null;
+    return { current: Number(match[1]), total: Number(match[2]) };
+}
+
 // Retorna o caminho relativo do diretório para o primeiro modelo encontrado para uma determinada tarefa.
 
 export function chooseFirstModel(models: AIModelOption[], taskType: string): string {

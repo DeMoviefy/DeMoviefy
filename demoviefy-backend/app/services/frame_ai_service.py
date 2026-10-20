@@ -36,6 +36,8 @@ from app.config.paths import ffprobe_path as resolve_ffprobe_path
 
 from app.utils.file_utils import unlink_with_retries, copy_with_retries
 
+from app.services.content_rating_service import estimate_rating
+
 
 # ============================================================================
 # HELPER FUNCTIONS - Model Loading & Compatibility
@@ -150,7 +152,13 @@ def _get_model(model_path: str):
     Raises:
         RuntimeError: If model fails to load
     """
-    from ultralytics import YOLO  # Imported lazily to avoid hard failure at app import time.
+    try:
+        from ultralytics import YOLO  # Imported lazily to avoid hard failure at app import time.
+    except ImportError as exc:
+        raise ProcessingDependencyError(
+            "A análise de vídeo exige Ultralytics e PyTorch. No launcher, execute "
+            "Setup Environment com \"Instalar Pacotes de IA\" selecionado e reinicie o backend."
+        ) from exc
 
     # Ensure compatibility aliases exist before loading
     _ensure_ultralytics_compat()
@@ -446,6 +454,10 @@ class ProcessingCancelled(Exception):
     """Raised when a caller requests cooperative cancellation."""
 
 
+class ProcessingDependencyError(RuntimeError):
+    """Raised when a required video-analysis package is unavailable."""
+
+
 def analyze_video_frames(
     *,
     video_path: str,
@@ -511,8 +523,11 @@ def analyze_video_frames(
     """
     try:
         import cv2
-    except Exception as exc:  # pragma: no cover
-        raise RuntimeError("opencv-python is required for frame analysis.") from exc
+    except ImportError as exc:  # pragma: no cover
+        raise ProcessingDependencyError(
+            "A análise de vídeo exige OpenCV. No launcher, execute Setup Environment "
+            "com \"Instalar Pacotes de IA\" selecionado e reinicie o backend."
+        ) from exc
 
     try:
         model = _get_model(model_path)
@@ -791,6 +806,7 @@ def analyze_video_frames(
     }
     label_counts = dict(labels_counter.most_common())
     top_labels = list(label_counts.keys())[:10]
+    content_rating = estimate_rating(label_counts)
 
     summary = {
         "video_path": video_path,
@@ -808,6 +824,7 @@ def analyze_video_frames(
         "label_counts": label_counts,
         "avg_confidence_by_label": avg_confidence,
         "top_labels": top_labels,
+        "content_rating": content_rating,
         "annotated_video_path": str(finalized_annotated_path) if finalized_annotated_path else None,
         "annotated_frames_written": annotated_frames_written,
     }

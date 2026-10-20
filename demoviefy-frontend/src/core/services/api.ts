@@ -1,11 +1,14 @@
 import axios from "axios";
 
-export const apiBaseUrl = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:5000";
+const defaultApiHost = typeof window === "undefined" ? "127.0.0.1" : window.location.hostname;
+const defaultApiProtocol = typeof window === "undefined" ? "http:" : window.location.protocol;
+export const apiBaseUrl = import.meta.env.VITE_API_URL ?? `${defaultApiProtocol}//${defaultApiHost}:5000`;
 export const frontendAppVersion = "1.3.0";
 export const frontendApiContractVersion = "2026-03-22.1";
 
 export const api = axios.create({
   baseURL: apiBaseUrl,
+  withCredentials: true,
 });
 
 export function toApiUrl(path: string) {

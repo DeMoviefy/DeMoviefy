@@ -1,6 +1,8 @@
 // src/pages/Video/components/AnalysisDetectionTable.tsx
 
 import { memo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { getYoloClassLabel } from "src/core/utils/yoloClassLabels";
 import { FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
 import { formatPercent } from "src/core/utils/videoHelpers";
 import type { VideoAnalysisResponse } from "src/core/types/videoTypes";
@@ -12,6 +14,7 @@ type AnalysisDetectionTableProps = {
 export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
     summary,
 }: AnalysisDetectionTableProps) {
+    const { t, i18n } = useTranslation();
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
     const labels = Object.entries(summary.label_counts).sort(([labelA, countA], [labelB, countB]) => {
         if (countA === countB) return labelA.localeCompare(labelB, "pt-BR");
@@ -24,10 +27,10 @@ export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
                     <thead className="sticky top-0 z-10 bg-neutral-50 text-xs font-semibold tracking-wide text-neutral-500 dark:bg-neutral-900 dark:text-neutral-400">
                         <tr>
                             <th scope="col" className="px-3 py-3.5">
-                                Classe
+                                {t("class")}
                             </th>
                             <th scope="col" className="px-5 py-3.5 text-right">
-                                Confiança média
+                                {t("averageConfidence")}
                             </th>
 
                             <th
@@ -38,11 +41,11 @@ export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
                                 <button
                                     type="button"
                                     className="inline-flex cursor-pointer items-center gap-1.5 text-right transition-colors hover:text-blue-700 dark:hover:text-blue-400"
-                                    aria-label={`Ordenar ocorrências em ordem ${sortDirection === "desc" ? "crescente" : "decrescente"}`}
-                                    title={`Ordenar ocorrências em ordem ${sortDirection === "desc" ? "crescente" : "decrescente"}`}
+                                    aria-label={t("sortOrder", { order: sortDirection === "desc" ? t("ascending") : t("descending") })}
+                                    title={t("sortOrder", { order: sortDirection === "desc" ? t("ascending") : t("descending") })}
                                     onClick={() => setSortDirection((direction) => direction === "desc" ? "asc" : "desc")}
                                 >
-                                    Ocorrências
+                                    {t("occurrences")}
                                     {sortDirection === "desc" ? (
                                         <FaSortAmountDown aria-hidden="true" className="size-3" />
                                     ) : (
@@ -61,7 +64,7 @@ export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
                                     colSpan={3}
                                     className="px-5 py-8 text-center text-sm text-neutral-400 dark:text-neutral-500"
                                 >
-                                    Nenhuma detecção encontrada
+                                    {t("noDetections")}
                                 </td>
                             </tr>
                         ) : (
@@ -71,7 +74,7 @@ export const AnalysisDetectionTable = memo(function AnalysisDetectionTable({
                                         scope="row"
                                         className="px-3 py-3.5 font-medium text-neutral-900 dark:text-neutral-100"
                                     >
-                                        {label}
+                                        {getYoloClassLabel(label, i18n.resolvedLanguage ?? i18n.language)}
                                     </th>
                                     <td className="px-5 py-3.5 text-right tabular-nums">
                                         {formatPercent(summary.avg_confidence_by_label[label])}

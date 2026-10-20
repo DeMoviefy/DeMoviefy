@@ -1,6 +1,7 @@
 // src/core/components/ConfirmationDialog.tsx
 
 import { useState } from "react"
+import { useTranslation } from "react-i18next";
 import { WarningSVG } from 'src/assets/SVG/WarningSVG'
 
 interface ConfirmationDialogProps {
@@ -16,6 +17,7 @@ export function ConfirmationDialog({
   onConfirm,
   children,
 }: ConfirmationDialogProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -38,7 +40,7 @@ export function ConfirmationDialog({
                 className="cursor-pointer rounded-md bg-neutral-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 focus-visible:ring-offset-2"
                 onClick={() => setIsOpen(false)}
               >
-                Cancelar
+                {t("cancel")}
               </button>
 
               <button
@@ -49,7 +51,7 @@ export function ConfirmationDialog({
                   setIsOpen(false)
                 }}
               >
-                Excluir
+                {t("delete")}
               </button>
             </div>
           </div>

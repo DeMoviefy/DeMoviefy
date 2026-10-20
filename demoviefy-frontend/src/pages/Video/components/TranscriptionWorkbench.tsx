@@ -1,4 +1,5 @@
 import type { VideoTranscriptionResponse } from "src/core/types/videoTypes";
+import { useTranslation } from "react-i18next";
 import { GenerateTranscription } from "src/pages/Video/components/GenerateTranscription";
 import { TranscriptionTextEditor } from "src/pages/Video/components/TranscriptionTextEditor";
 import { TranslateTranscription } from "src/pages/Video/components/TranslateTranscription";
@@ -51,15 +52,16 @@ export function TranscriptionWorkbench({
     isTranslating,
     onTranslate,
 }: TranscriptionWorkbenchProps) {
+    const { t } = useTranslation();
     const sourceLanguage = variants.find((variant) => variant.id === selectedVariant)?.language ?? selectedLanguage;
     const isWorking = isBusy || isGenerating || isTranslating;
 
     return (
         <section className="flex min-w-0 flex-col gap-6">
             <div>
-                <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">Editor de transcrição</h3>
+                <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">{t("editorTranscription")}</h3>
                 <p className="mt-1 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-                    Edite a transcrição no formato SRT ou gere e traduza versões.
+                    {t("editorDescription")}
                 </p>
             </div>
 
