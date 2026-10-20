@@ -1,7 +1,7 @@
 // src/pages/Dashboard/components/AnalysisMetrics.tsx
 
 import { memo } from "react"
-import { formatVideoModelName } from "src/core/utils/videoHelpers"
+import { formatVideoModelName, getVideoModelSizeTranslationKey } from "src/core/utils/videoHelpers"
 import { useTranslation } from "react-i18next";
 import type { VideoAnalysisResponse } from "src/core/types/videoTypes"
 
@@ -29,6 +29,8 @@ export const AnalysisMetrics = memo(function AnalysisMetrics({
     modelName,
 }: AnalysisMetricsProps) {
     const { t } = useTranslation();
+    const modelTranslationKey = getVideoModelSizeTranslationKey(modelName);
+    const localizedModelName = modelTranslationKey ? t(modelTranslationKey) : formatVideoModelName(modelName);
     return (
         <div>
             {!summary ? (
@@ -43,9 +45,9 @@ export const AnalysisMetrics = memo(function AnalysisMetrics({
                         </span>
                         <strong
                             className="mt-1 block truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100"
-                            title={formatVideoModelName(modelName)}
+                            title={localizedModelName}
                         >
-                            {formatVideoModelName(modelName)}
+                            {localizedModelName}
                         </strong>
                     </div>
 

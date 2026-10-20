@@ -12,7 +12,7 @@ type VideoClipRangeProps = {
 
 export const MAX_CLIP_DURATION_SECONDS = 3 * 60 * 60;
 
-const INPUT_GROUP_CLASS = "mt-1.5 flex min-h-11 w-full items-center rounded-md border border-neutral-200 bg-white px-3 py-2.5 outline-none transition focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:focus-within:border-blue-400 dark:focus-within:ring-blue-900";
+const INPUT_GROUP_CLASS = "mt-1.5 flex min-h-11 w-full items-center rounded-md border border-neutral-200 bg-white px-3 py-2.5 outline-none transition focus-within:border-neutral-500 focus-within:ring-1 focus-within:ring-neutral-200 dark:border-neutral-700 dark:bg-neutral-900 dark:focus-within:border-neutral-600 dark:focus-within:ring-neutral-700";
 const RANGE_CLASS = "pointer-events-none absolute left-2 right-2 top-0 z-10 h-8 w-auto appearance-none bg-transparent disabled:opacity-50 [&::-webkit-slider-runnable-track]:h-2 [&::-webkit-slider-runnable-track]:bg-transparent [&::-moz-range-track]:h-2 [&::-moz-range-track]:bg-transparent";
 
 function getTimeFormat(durationSeconds: number | null): "seconds" | "minutes" | "hours" {

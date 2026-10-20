@@ -49,7 +49,7 @@ export function ProcessingQueuePanel() {
   }
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="flex flex-col gap-6 rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
       <div>
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">

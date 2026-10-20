@@ -74,7 +74,7 @@ export function NewVideoPanel() {
     };
 
     return (
-        <section className="flex flex-col gap-6">
+        <section className="flex flex-col gap-6 rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
             <div>
                 <h2 className="text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
                     {t("newVideo")}
@@ -84,15 +84,6 @@ export function NewVideoPanel() {
                     {t("newVideoDescription")}
                 </p>
             </div>
-
-            {isGuest && (
-                <p className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-900 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-100">
-                    {t("guestUploadNotice", { limit: guestVideoLimit, count: guestVideoCount })} {t("guestSaveNotice")} {" "}
-                    <Link className="font-semibold underline" to="/login">{t("login")}</Link>
-                    {" "}·{" "}
-                    <Link className="font-semibold underline" to="/cadastro">{t("createAccount")}</Link>
-                </p>
-            )}
 
             {guestLimitReached ? (
                 <div className="rounded-xl border border-amber-200 bg-amber-50 p-6 text-center dark:border-amber-900 dark:bg-amber-950">
@@ -113,7 +104,7 @@ export function NewVideoPanel() {
                 </div>
             ) : (
             <div
-                className={`flex min-h-48 cursor-pointer items-center justify-center rounded-xl border border-dashed px-6 py-8 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${isDragging
+                className={`flex min-h-48 cursor-pointer items-center justify-center rounded-xl border border-dashed px-6 py-8 text-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 ${isDragging
                     ? " bg-blue-100  dark:bg-blue-950"
                     : "border-neutral-200 bg-neutral-50  hover:bg-zinc-200 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700"
                     }`}
@@ -213,13 +204,24 @@ export function NewVideoPanel() {
                                 handleUpload(uploadTask, uploadModelPath);
                             }}
                             disabled={uploading}
-                            className="cursor-pointer rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-800 dark:hover:bg-blue-700 dark:focus-visible:ring-offset-neutral-900"
+                            className="cursor-pointer rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-800 dark:hover:bg-blue-700 dark:focus-visible:ring-offset-neutral-900"
                         >
                             {t("upload")}
                         </button>
                     </div>
                 </div>
             )}
+
+
+            {isGuest && (
+                <p className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-900 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-100">
+                    {t("guestUploadNotice", { limit: guestVideoLimit, count: guestVideoCount })} {t("guestSaveNotice")} {" "}
+                    <Link className="font-semibold underline" to="/login">{t("login")}</Link>
+                    {" "}·{" "}
+                    <Link className="font-semibold underline" to="/cadastro">{t("createAccount")}</Link>
+                </p>
+            )}
+
         </section >
     );
 }

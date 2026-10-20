@@ -31,7 +31,7 @@ export function AnalysisResults({ state, summary }: AnalysisResultsProps) {
                 <h3 className="bg-neutral-100 px-4 pb-4 pt-5 text-base font-semibold tracking-tight text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100 sm:px-5 sm:pb-5 sm:pt-5">
                     {t("analysisResults")}
                 </h3>
-                <div className="h-[44rem] overflow-auto bg-white dark:bg-neutral-800">
+                <div className="h-176 overflow-auto bg-white dark:bg-neutral-800">
                     <p className="px-5 py-8 text-sm text-neutral-400 dark:text-neutral-500" aria-live="polite">
                         {t("unavailableAnalysis")}
                     </p>

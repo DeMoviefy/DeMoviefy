@@ -137,24 +137,7 @@ export function VideoAnalysisConfig({
           </div>
         </div>
   
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <div>
-            <label htmlFor="video-analysis-frame-stride" className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              Stride de frames
-            </label>
-            <select
-              id="video-analysis-frame-stride"
-              value={frameStride}
-              onChange={(e) => onFrameStrideChange(e.target.value)}
-              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"
-            >
-              {[1, 8, 24, 30, 60].map((stride) => (
-                <option key={stride} value={stride}>
-                  {stride === 1 ? t("frameStrideAll") : t("frameStrideCount", { count: stride })}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <div>
             <label
               htmlFor="video-analysis-task"
@@ -167,7 +150,7 @@ export function VideoAnalysisConfig({
               id="video-analysis-task"
               value={taskType}
               onChange={(e) => onTaskChange(e.target.value)}
-              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"
+              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-neutral-500 focus:ring-1 focus:ring-neutral-200 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-neutral-600 dark:focus:ring-neutral-700"
             >
               {tasks.map((task) => (
                 <option key={task.task_type} value={task.task_type}>
@@ -192,7 +175,7 @@ export function VideoAnalysisConfig({
                 id="video-analysis-model"
                 value={modelPath}
                 onChange={(e) => onModelChange(e.target.value)}
-                className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"
+                className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-neutral-500 focus:ring-1 focus:ring-neutral-200 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-neutral-600 dark:focus:ring-neutral-700"
               >
                 {filteredModels.map((model) => {
                   const translationKey = getVideoModelSizeTranslationKey(model.name);
@@ -205,6 +188,24 @@ export function VideoAnalysisConfig({
               </select>
             </div>
           )}
+
+          <div>
+            <label htmlFor="video-analysis-frame-stride" className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+              {t("analysisFrequency")}
+            </label>
+            <select
+              id="video-analysis-frame-stride"
+              value={frameStride}
+              onChange={(e) => onFrameStrideChange(e.target.value)}
+              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-neutral-500 focus:ring-1 focus:ring-neutral-200 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-neutral-600 dark:focus:ring-neutral-700"
+            >
+              {[1, 8, 24, 30, 60].map((stride) => (
+                <option key={stride} value={stride}>
+                  {stride === 1 ? t("frameStrideAll") : t("frameStrideCount", { count: stride })}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 

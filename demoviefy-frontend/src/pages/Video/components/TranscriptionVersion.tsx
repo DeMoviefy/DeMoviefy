@@ -30,7 +30,7 @@ export function TranscriptionVersion({
                     <select
                         value={hasTranscription ? selectedVariant : ""}
                         onChange={(event) => onVariantChange(event.target.value)}
-                        className="max-w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:focus:border-blue-400 dark:focus:bg-neutral-800 dark:focus:ring-blue-900"
+                        className="max-w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700 outline-none transition focus:border-neutral-500 focus:bg-white focus:ring-1 focus:ring-neutral-200 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:focus:border-neutral-600 dark:focus:bg-neutral-800 dark:focus:ring-neutral-700"
                         disabled={disabled || !hasTranscription}
                     >
                         {hasTranscription

@@ -15,7 +15,7 @@ type TranslateTranscriptionProps = {
 };
 
 const LANGUAGES = ["pt", "en", "es"];
-const SELECT_CLASS = "mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-blue-400 dark:focus:ring-blue-900";
+const SELECT_CLASS = "mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-neutral-500 focus:ring-1 focus:ring-neutral-200 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-neutral-600 dark:focus:ring-neutral-700";
 
 function getNativeLanguageName(language: string): string {
     const languageCode = language.trim().split(/[-_]/)[0].toLowerCase();
@@ -91,7 +91,7 @@ export function TranslateTranscription({
                 <div className="mt-4 flex justify-end">
                     <button
                         type="button"
-                        className="cursor-pointer rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-800 dark:hover:bg-blue-700"
+                        className="cursor-pointer rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-800 dark:hover:bg-blue-700"
                         onClick={() => onTranslate(sourceVariant, targetLanguage)}
                         disabled={isBusy || !hasTranscription || !selectedSourceLanguage || selectedSourceLanguage === targetLanguage}
                         title={selectedSourceLanguage === targetLanguage ? t("sameLanguage") : undefined}
