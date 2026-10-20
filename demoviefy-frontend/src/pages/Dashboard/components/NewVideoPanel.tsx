@@ -74,7 +74,7 @@ export function NewVideoPanel() {
     };
 
     return (
-        <section className="flex flex-col gap-6 rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
+        <section className="dashboard-panel flex flex-col gap-6 rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
             <div>
                 <h2 className="text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
                     {t("newVideo")}
@@ -104,7 +104,7 @@ export function NewVideoPanel() {
                 </div>
             ) : (
             <div
-                className={`flex min-h-48 cursor-pointer items-center justify-center rounded-xl border border-dashed px-6 py-8 text-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 ${isDragging
+                className={`dashboard-panel-item flex min-h-48 cursor-pointer items-center justify-center rounded-xl border border-dashed px-6 py-8 text-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 ${isDragging
                     ? " bg-blue-100  dark:bg-blue-950"
                     : "border-neutral-200 bg-neutral-50  hover:bg-zinc-200 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700"
                     }`}

@@ -49,7 +49,7 @@ export function ProcessingQueuePanel() {
   }
 
   return (
-    <section className="flex flex-col gap-6 rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
+    <section className="dashboard-panel flex flex-col gap-6 rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5">
       <div>
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
@@ -63,7 +63,7 @@ export function ProcessingQueuePanel() {
       </div>
 
       {processingVideos.length === 0 ? (
-        <div className="flex min-h-48 flex-col items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 px-6 py-8 text-center dark:border-transparent dark:bg-neutral-800">
+        <div className="dashboard-panel-item flex min-h-48 flex-col items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 px-6 py-8 text-center dark:border-transparent dark:bg-neutral-800">
           <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
             {t("noVideosQueued")}
           </p>
@@ -98,7 +98,7 @@ export function ProcessingQueuePanel() {
               return (
               <div
                 key={video.id}
-                className="flex min-h-48 flex-col justify-between rounded-lg border border-neutral-200 bg-neutral-50 p-5 dark:border-neutral-700 dark:bg-neutral-800"
+                className="dashboard-panel-item flex min-h-48 flex-col justify-between rounded-lg border border-neutral-200 bg-neutral-50 p-5 dark:border-neutral-700 dark:bg-neutral-800"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">

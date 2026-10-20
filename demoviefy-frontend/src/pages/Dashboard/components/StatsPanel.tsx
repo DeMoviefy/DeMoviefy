@@ -16,7 +16,7 @@ export function StatsPanel({
   const { t } = useTranslation();
 
   return (
-    <section className="grid grid-cols-2 gap-3 pb-2 xl:grid-cols-4">
+    <section className="dashboard-panel grid grid-cols-2 gap-3 rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/70 sm:p-5 xl:grid-cols-4">
       <div>
         <span className="flex items-center gap-2 text-xs font-medium text-neutral-500 dark:text-neutral-400 sm:text-sm">
           <span aria-hidden="true" className="size-2 rounded-full bg-neutral-300 dark:bg-neutral-500" />

@@ -17,8 +17,11 @@ export function DashboardSidebar({ isOpen, onToggle }: DashboardSidebarProps) {
     <aside
       className={`flex h-full shrink-0 flex-col overflow-visible transition-[width] duration-200 ease-in-out ${isOpen ? "w-72" : "w-12"}`}
     >
-      <div id="dashboard-video-library" className="flex min-h-0 flex-1 flex-col">
-        <div className={`flex min-h-9 items-center pb-2 ${isOpen ? "justify-between pr-8" : "justify-start"}`}>
+      <div
+        id="dashboard-video-library"
+        className={`flex min-h-0 flex-1 flex-col ${isOpen ? "rounded-xl border border-neutral-200 p-3 dark:border-neutral-700 dark:bg-neutral-800/70" : ""}`}
+      >
+        <div className={`flex min-h-9 items-center pb-2 ${isOpen ? "justify-between" : "justify-start"}`}>
           {isOpen && (
             <h2 className="truncate text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
               {t("library")}

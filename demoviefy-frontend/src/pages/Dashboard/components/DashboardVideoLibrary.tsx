@@ -97,7 +97,7 @@ export const DashboardVideoLibrary = memo(
     }, [page, totalPages]);
 
     return (
-      <section className="flex min-h-0 flex-1 flex-col pr-8 pb-2">
+      <section className="flex min-h-0 flex-1 flex-col pb-2">
         <div className="pb-2">
           <input
             type="search"
@@ -130,7 +130,7 @@ export const DashboardVideoLibrary = memo(
                 <Link
                   key={video.id}
                   to={`/video/${video.id}`}
-                  className="group block rounded-lg border border-transparent px-2 py-3 transition-colors  hover:bg-blue-50 dark:hover:bg-neutral-800"
+                  className="group block rounded-lg border border-transparent bg-neutral-100 px-2 py-3 transition-colors hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700"
                 >
                   <div className="min-w-0">
                     <div className="flex items-start justify-between gap-3">

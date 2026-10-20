@@ -9,7 +9,7 @@ type MainLayoutProps = {
 
 export default function MainLayout({ children }: MainLayoutProps) {
   return (
-    <div className="min-h-dvh bg-white text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100">
+    <div className="app-page-canvas min-h-dvh bg-neutral-100 text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100">
       <div>
         <Header />
             <main className="px-8">{children}</main>

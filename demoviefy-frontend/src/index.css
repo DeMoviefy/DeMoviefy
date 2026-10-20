@@ -52,4 +52,85 @@
 }
 
 
+/* Light theme surfaces follow the same layered hierarchy as the dark theme. */
+:root:not(.dark) {
+  --light-page: #f1f3f5;
+  --light-surface: #ffffff;
+  --light-surface-raised: #e8edf1;
+  --light-surface-strong: #dce3e9;
+  --light-border: #c7d0d8;
+  --light-border-subtle: #d9e0e6;
+  --light-text-primary: #17212b;
+  --light-text-secondary: #465360;
+  --light-text-muted: #5d6b78;
+}
+
+:root:not(.dark) .bg-neutral-100 {
+  background-color: var(--light-surface-raised);
+}
+
+:root:not(.dark) .app-page-canvas {
+  background-color: var(--light-page);
+}
+
+:root:not(.dark) .bg-neutral-50,
+:root:not(.dark) .bg-white {
+  background-color: var(--light-surface);
+}
+
+:root:not(.dark) .app-navbar {
+  background-color: #e1e6eb;
+  border-color: #c7d0d8;
+}
+
+:root:not(.dark) .dashboard-panel {
+  background-color: #e4e9ee;
+}
+
+:root:not(.dark) .dashboard-panel-item {
+  background-color: #f0f3f6;
+}
+
+:root:not(.dark) .dashboard-panel-item.bg-blue-100 {
+  background-color: #dbeafe;
+}
+
+:root:not(.dark) [class~="hover:bg-neutral-100"]:hover,
+:root:not(.dark) [class~="hover:bg-neutral-50"]:hover,
+:root:not(.dark) [class~="hover:bg-white"]:hover,
+:root:not(.dark) [class~="hover:bg-zinc-200"]:hover {
+  background-color: #cbd5df;
+}
+
+:root:not(.dark) .bg-neutral-200 {
+  background-color: var(--light-surface-strong);
+}
+
+:root:not(.dark) .border-neutral-200 {
+  border-color: var(--light-border);
+}
+
+:root:not(.dark) .border-neutral-100,
+:root:not(.dark) .divide-neutral-200 > :not(:last-child) {
+  border-color: var(--light-border-subtle);
+}
+
+:root:not(.dark) .text-neutral-900 {
+  color: var(--light-text-primary);
+}
+
+:root:not(.dark) .text-neutral-800,
+:root:not(.dark) .text-neutral-700 {
+  color: #34414d;
+}
+
+:root:not(.dark) .text-neutral-600 {
+  color: var(--light-text-secondary);
+}
+
+:root:not(.dark) .text-neutral-500,
+:root:not(.dark) .text-neutral-400 {
+  color: var(--light-text-muted);
+}
+
 @custom-variant dark (&:where(.dark, .dark *))
