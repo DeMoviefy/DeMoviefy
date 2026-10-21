@@ -33,8 +33,8 @@ processam os vídeos no computador:
 - **Modelos de IA:** [YOLO, da Ultralytics](https://github.com/ultralytics/ultralytics), analisa os quadros do vídeo localmente para detectar objetos e outros elementos visuais.
 - **Transcrição:** [OpenAI Whisper](https://github.com/openai/whisper) converte o áudio do vídeo em texto com marcações de tempo e oferece transcrição de alta precisão.
 - **Tradução:** [Argos Translate](https://github.com/argosopentech/argos-translate) traduz as legendas localmente.
-- **Frontend:** React e TypeScript constroem as telas usadas para enviar vídeos e acompanhar os resultados.
-- **Backend:** Python e Flask recebem os vídeos, organizam os dados e executam as tarefas de análise.
+
+O frontend foi desenvolvido em React e o backend em Flask.
 
 ## Instalar e iniciar o projeto
 
