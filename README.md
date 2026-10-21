@@ -1,5 +1,5 @@
 ﻿<p align="center">
-  <img src="DeMoviefy-Light.png" alt="demoviefy logo" width="300">
+  <img src="demoviefy-frontend/src/assets/DeMoviefy-Light.png" alt="demoviefy logo" width="300">
 </p>
 
 # DeMoviefy
@@ -7,6 +7,8 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 O DeMoviefy é uma plataforma automatizada e gratuita para análise, processamento e revisão de arquivos digitais de vídeo. O projeto foi desenvolvido para otimizar o fluxo de moderação de conteúdo em larga escala, integrando inteligência artificial e visão computacional de forma simples, acessível e sem burocracia.
+
+Você pode conferir a nossa pesquisa [neste PDF](<docs/Documentação - DeMoviefy.pdf>).
 
 <p align="center">
   <img src="demoviefy-frontend/src/pages/Home/assets/Imagem1/Imagem1-POR-Dark.png" alt="Tela inicial do DeMoviefy em português, tema escuro" width="100%">

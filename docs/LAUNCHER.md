@@ -119,8 +119,6 @@ argumento. O processo roda em segundo plano e suas mensagens são registradas no
   do frontend.
 - **Dependências Python ausentes:** execute **Setup Environment** e confira se
   a instalação terminou com `Ready`.
-- **Proxy/rede:** responda `Y` à pergunta inicial para usar o proxy da escola
-  nas operações com pip/npm do launcher.
 - **Setup falhou:** veja a primeira mensagem de erro no **Activity log**,
   confirme acesso à rede e espaço em disco e tente novamente após corrigir a
   causa.

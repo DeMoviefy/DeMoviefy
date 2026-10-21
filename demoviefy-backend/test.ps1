@@ -7,7 +7,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$repositoryRoot = $PSScriptRoot
+$backendRoot = $PSScriptRoot
+$repositoryRoot = Split-Path -Parent $backendRoot
 $python = Join-Path $repositoryRoot ".venv\Scripts\python.exe"
 
 if (-not (Test-Path $python)) {
@@ -17,7 +18,7 @@ if (-not (Test-Path $python)) {
 function Invoke-TestPlan {
     param([string]$Scenario)
 
-    Push-Location (Join-Path $repositoryRoot "demoviefy-backend")
+    Push-Location $backendRoot
     try {
         if ($Scenario) {
             Write-Host "Running $Scenario..." -ForegroundColor Cyan
