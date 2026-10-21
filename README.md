@@ -8,6 +8,11 @@
 
 O DeMoviefy é uma plataforma automatizada e gratuita para análise, processamento e revisão de arquivos digitais de vídeo. O projeto foi desenvolvido para otimizar o fluxo de moderação de conteúdo em larga escala, integrando inteligência artificial e visão computacional de forma simples, acessível e sem burocracia.
 
+<p align="center">
+  <img src="demoviefy-frontend/src/pages/Home/assets/Imagem1/Imagem1-POR-Dark.png" alt="Tela inicial do DeMoviefy em português, tema escuro" width="100%">
+</p>
+
+
 ## O que é o projeto e suas funcionalidades
 
 O DeMoviefy combina tecnologias avançadas de processamento de dados para extrair informações úteis de vídeos automaticamente. Suas principais funcionalidades incluem:
@@ -19,218 +24,60 @@ O DeMoviefy combina tecnologias avançadas de processamento de dados para extrai
 * Estimativa de classificação indicativa: sugestão automática de faixa etária e classificação com base nas normas do ministério da justiça e segurança pública (MJSP).
 * Navegação por timestamps: reprodutor interativo que permite saltar diretamente para os momentos marcados como importantes pela análise de IA.
 
-## Estrutura
 
-- `demoviefy-backend/`: API Flask, persistência e processamento
-- `demoviefy-frontend/`: interface React para upload, biblioteca e visualização da análise
-- `ai_model/`: modelo YOLO, app de teste e utilitários de IA
-- `docs/`: instruções complementares
-- `uploads/`: vídeos enviados e arquivos de análise gerados em tempo de execução
-- `setup/main.py`: launcher multiplataforma, capaz de criar ou reparar a `.venv`
+## Tecnologias utilizadas
 
-## Onde os arquivos ficam
+O DeMoviefy combina modelos de IA com uma interface web e serviços que
+processam os vídeos no computador:
 
-- Vídeo enviado: `uploads/<nome-do-arquivo>`
-- Resumo da análise: `uploads/analysis/video_<id>.json`
-- Banco SQLite local: `demoviefy-backend/instance/demoviefy.db`
+- **Modelos de IA:** [YOLO, da Ultralytics](https://github.com/ultralytics/ultralytics), analisa os quadros do vídeo localmente para detectar objetos e outros elementos visuais.
+- **Transcrição:** [OpenAI Whisper](https://github.com/openai/whisper) converte o áudio do vídeo em texto com marcações de tempo e oferece transcrição de alta precisão.
+- **Tradução:** [Argos Translate](https://github.com/argosopentech/argos-translate) traduz as legendas localmente.
+- **Frontend:** React e TypeScript constroem as telas usadas para enviar vídeos e acompanhar os resultados.
+- **Backend:** Python e Flask recebem os vídeos, organizam os dados e executam as tarefas de análise.
 
-O frontend agora mostra esses caminhos diretamente no painel de detalhes, junto com o preview do vídeo e o status do processamento.
+## Instalar e iniciar o projeto
 
-## Quick Start
+O launcher prepara automaticamente o ambiente virtual, instalando as dependências do projeto. Na primeira
+execução, abra um terminal na pasta principal do projeto e rode:
 
-### Com o Launcher (Recomendado)
-
-Abra o PowerShell na pasta raiz do repositório (demoviefy-demoviefy/).
-```powershell
+```sh
 python setup/main.py
 ```
+Na janela que abrir, clique em **Setup
+Environment** para instalar as dependências do frontend e do backend. 
 
-No início, responda `Y` à pergunta sobre o proxy da escola se quiser usá-lo (Aperte `N` caso não tenha proxy).
-Na janela, clique em `Setup Environment` na primeira execução e depois em
-`Start All`. Consulte o [Guia do Launcher](docs/LAUNCHER.md) para conhecer todas
-as opções, incluindo iniciar cada serviço separadamente.
+Marque a opção **Instalar Pacotes de IA** para instalar os modelos de IA que transcrevem e analisam os vídeos. 
 
-Para um início completo com todas as funcionalidades é recomendado ao configurar o ambiente virtual selecionar `Instalar Pacotes de IA`, além de instalar o FFmpeg em `install FFmpeg`.
+Quando
+a instalação terminar, clique em **Start All** para iniciar a aplicação.
 
-### Execução Manual
+### Requisitos do launcher
 
-**Passo 1 - Setup Python:**
+| Ferramenta | Versão recomendada                                      |
+|------------|----------------------------------------------------------|
+| Node.js    | LTS 20 ou superior, necessário para o frontend           |
+| npm        | Incluso no Node.js                                       |
+| Python     | Python 3                                                 |
+| pip        | Incluso no Python; atualizado pelo launcher durante setup |
 
-Abra o terminal na pasta raiz do projeto e execute os comandos para criar o ambiente Python e instalar as dependências da API:
+É necessário acesso à internet durante a instalação para baixar os componentes e
+os modelos de tradução e IA. Essa etapa pode demorar, especialmente ao baixar os
+modelos. O launcher também oferece a instalação do FFmpeg, usado no processamento
+de vídeo.
 
-Windows:
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-pip install -r demoviefy-backend/requirements.txt
-```
+### Configurar o reCAPTCHA
 
-Linux:
-```powershell
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-pip install -r demoviefy-backend/requirements.txt
-```
+O cadastro de usuários oferece proteção com reCAPTCHA, que vem desativada por padrão. Para habilitá-la, gere
+suas próprias chaves no Google reCAPTCHA e configure os arquivos `.env` disponíveis em `demoviefy-frontend/.env` e `demoviefy-backend/.env`.
 
-(Opcional para suporte completo a transcrição offline via Whisper, instale também as dependências de IA/Transcrição recomendadas):
-```powershell
-pip install -r demoviefy-backend/ai-requirements.txt
-```
+Consulte o [guia completo do launcher](docs/LAUNCHER.md) para opções de setup,
+serviços e solução de problemas.
 
-**Passo 2 - Backend:**
+## Execução manual
 
-Em um terminal com o ambiente virtual ativado, navegue até a pasta do backend e execute o servidor:
-```powershell
-cd demoviefy-backend
-python run.py
-```
+Se preferir não usar o launcher, consulte os seguintes arquivos:
 
-Acesse: `http://127.0.0.1:5000`
+- [Guia manual do frontend](demoviefy-frontend/README.md)
+- [Guia manual do backend](demoviefy-backend/README.md)
 
-**Passo 3 - Frontend (em outro terminal):**
-
-Abra uma nova janela do terminal na raiz do projeto, acesse a pasta do frontend, instale as dependências de pacotes do Node e inicie o ambiente de desenvolvimento:
-```sh
-cd demoviefy-frontend
-npm install
-npm install react-google-recaptcha 
-npm run dev
-```
-
-Acesse: `http://localhost:5173`
-
-## Fluxo de Upload
-
-1. Envie o vídeo pela interface
-2. Backend salva em `uploads/`
-3. Thread de processamento executa análise com YOLO
-4. Resumo final vai para `uploads/analysis/video_<id>.json`
-5. Preview anotado vai para `uploads/annotated/video_<id>.mp4`
-6. Interface mostra preview, status e caminhos dos artefatos
-
-## Configurações
-
-- `PROXY_URL`: proxy HTTP/HTTPS para pip, npm e subprocessos
-- `FRAME_AI_MODEL`: caminho alternativo para modelo YOLO
-- `FRAME_AI_FRAME_STRIDE`: intervalo de frames amostrados
-- `FRAME_AI_CONFIDENCE`: confianca minima da detecção
-- `FRAME_AI_MAX_FRAMES`: limite de frames processados
-
-## Transcrição Automática
-
-O sistema gera transcrição automática com timestamps apos processamento. Recomendado:
-
-```powershell
-.\.venv\Scripts\python -m pip install -r demoviefy-backend/requirements-transcription.txt
-```
-
-Na tela do vídeo, use **Gerar transcrição por IA** para escolher o idioma e o nível
-de precisão do Whisper. A transcrição automática fica habilitada por padrão; para
-desabilitá-la explicitamente, defina `AUTO_TRANSCRIPTION_ENABLED=false`.
-
-O fluxo correto é:
-
-1. Gere a transcrição no idioma original do áudio.
-2. Clique em **Traduzir**, escolha outro idioma e aguarde a nova versão aparecer
-   no seletor **Versão**.
-3. Se o idioma de origem e o destino forem iguais, a tradução fica bloqueada e
-   nenhuma chamada de tradução é feita.
-4. Clique no timestamp azul de um segmento para levar o vídeo àquele momento.
-5. Use **Editar transcrição** para alterar texto, início e fim dos segmentos, e
-   depois clique em **Salvar transcrição**.
-
-A tradução nunca é executada automaticamente durante a geração da transcrição.
-A tradução usa **Argos Translate localmente**, com suporte a português (`pt`),
-inglês (`en`) e espanhol (`es`). O setup instala os modelos `en → pt`, `pt → en`,
-`en → es` e `es → en`. Português e espanhol podem usar inglês como intermediário,
-com possível perda de qualidade.
-
-Execute **Setup Environment** no launcher para preparar os modelos. Para atualizar
-somente a tradução, execute na raiz do projeto (PowerShell):
-
-```powershell
-.venv/Scripts/python.exe -m pip install argostranslate==1.11.0
-.venv/Scripts/python.exe demoviefy-backend/scripts/install_translation_models.py
-```
-
-O download inicial precisa de internet e respeita o proxy configurado no launcher.
-O script reutiliza modelos existentes e valida as seis direções de tradução.
-Depois do setup, reinicie o backend. A tradução roda na CPU por padrão, sem
-chamadas ao Google, chave de API ou limites externos de requisições.
-Os modelos ficam em `uploads/argos/packages`; `ARGOS_PACKAGES_DIR` permite mudar
-esse caminho (use o mesmo valor no setup e no backend).
-
-Cada segmento concluído é salvo em `uploads/translation_cache.sqlite3`.
-`TRANSLATION_CACHE_PATH` permite mudar o caminho. O cache inclui idiomas, texto,
-versão do Argos e versões dos modelos. Resultados antigos do Google são
-preservados em sua tabela original e não são reutilizados pelo Argos.
-O cache contém texto e tradução e não é removido ao excluir um vídeo.
-As variáveis antigas `TRANSLATION_REQUEST_INTERVAL` e `TRANSLATION_MAX_RETRIES`
-não são mais utilizadas, pois a inferência é local.
-
-A origem deve ter um idioma definido; não há detecção automática no tradutor.
-Modelos ausentes e idiomas não suportados geram mensagens específicas. A versão
-original e os timestamps são preservados. A tradução continua síncrona e vídeos
-longos podem atingir o timeout HTTP; uma nova tentativa aproveita o cache.
-
-> **Importante**: Manter `torch==2.11.0` e `torchvision==0.26.0` para compatibilidade.
-
-## Documentação Adicional
-
-- [Guia do Launcher](docs/LAUNCHER.md) - Como iniciar o launcher e usar todas as suas funcionalidades
-- [Organização de Código](CODE_ORGANIZATION_GUIDE.md) - Arquitetura MVC do backend e frontend
-- [Guia de Contribuição](CONTRIBUTING.md) - Como contribuir com o projeto
-- [IA & Frame Processing](docs/FRAME_AI.md) - Detalhes do pipeline de IA
-- [Treinamento de Modelos](docs/TRAINING_MODELS.md) - Como treinar novos modelos YOLO
-
-O launcher pode ser iniciado com o Python do sistema, mesmo sem `.venv`. Ao clicar em `Setup Environment`, ele cria ou repara o ambiente automaticamente.
-
-### Execução manual
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-pip install -r demoviefy-backend/requirements.txt
-```
-
-Frontend:
-
-```sh
-cd demoviefy-frontend
-npm install
-npm run dev
-```
-
-Backend:
-
-```powershell
-cd demoviefy-backend
-python run.py
-```
-
-## Organização interna
-
-Backend Flask:
-
-- `demoviefy-backend/app/controllers/`: entrada HTTP
-- `demoviefy-backend/app/services/`: regras de negocio e IA
-- `demoviefy-backend/app/repositories/`: acesso a dados
-- `demoviefy-backend/app/config/`: configuracoes e paths compartilhados
-
-Frontend React:
-
-- `demoviefy-frontend/src/features/videos/`: fluxo principal de upload e inspeção
-- `demoviefy-frontend/src/components/`: cabecalho e rodape
-- `demoviefy-frontend/src/layouts/`: estrutura visual da aplicação
-- `demoviefy-frontend/src/services/`: cliente HTTP
-
-## Observações
-
-- O backend usa `ai_model/model/yolo26l.pt` automaticamente quando esse arquivo existe.
-- A transcrição automática com timestamps usa Whisper quando instalado; prefira Python 3.11/3.12 para esse recurso.
-- Para evitar conflitos de dependencias, o `demoviefy-backend/requirements-transcription.txt` usa `torch==2.11.0` e o launcher faz um ajustamento de `torchvision` quando necessario.
-- Se o launcher for iniciado dentro de um debugger, ele remove variaveis de debug dos subprocessos para evitar o erro de `__firstlineno__` no SQLAlchemy.
-- `docs/RUN_INSTRUCTIONS.md`, `docs/FRAME_AI.md` e `docs/TRAINING_MODELS.md` continuam como referencia de execução e da pipeline de IA.

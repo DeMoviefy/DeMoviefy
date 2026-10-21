@@ -1,6 +1,6 @@
 # Guia do Launcher
 
-O launcher oferece uma interface para preparar o ambiente, iniciar os serviços
+O launcher oferece uma interface multisistema para preparar o ambiente, iniciar os serviços
 do DeMoviefy e acompanhar suas mensagens de execução. Ele é feito com Tkinter e
 pode ser iniciado com o Python do sistema, mesmo antes da criação da `.venv`.
 
@@ -29,16 +29,6 @@ Em sistemas nos quais o executável se chama `python3`, use:
 ```sh
 python3 setup/main.py
 ```
-
-Antes de abrir a janela, o terminal pergunta:
-
-```text
-Aplicar proxy da escola? (Y/n)
-```
-
-Digite `Y` para usar `http://proxy.spo.ifsp.edu.br:3128` nas operações de
-subprocessos do launcher, como instalações com pip e npm. Qualquer outra
-resposta inicia sem esse proxy.
 
 ## Preparar o ambiente
 
