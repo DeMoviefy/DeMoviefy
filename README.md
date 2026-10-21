@@ -23,7 +23,7 @@ O DeMoviefy combina tecnologias avançadas de processamento de dados para extrai
 
 * Upload e gerenciamento de vídeos: envio simplificado de arquivos de vídeo através de uma interface intuitiva.
 * Análise por inteligência artificial: processamento visual para detectar objetos, identificar conteúdos sensíveis (como armas) e categorizar o material.
-* Transcrição automática de áudio: extração e conversão do áudio do vídeo em texto estruturado no formato SRT.
+* Transcrição automática de áudio: extração e conversão do áudio do vídeo em texto estruturado no formato [SRT](https://pt.wikipedia.org/wiki/SubRip).
 * Tradução local de legendas: suporte à tradução de legendas utilizando ferramentas locais para português, inglês e espanhol.
 * Estimativa de classificação indicativa: sugestão automática de faixa etária e classificação com base nas normas do ministério da justiça e segurança pública (MJSP).
 
