@@ -34,7 +34,7 @@ processam os vídeos no computador:
 - **Transcrição:** [OpenAI Whisper](https://github.com/openai/whisper) converte o áudio do vídeo em texto com marcações de tempo e oferece transcrição de alta precisão.
 - **Tradução:** [Argos Translate](https://github.com/argosopentech/argos-translate) traduz as legendas localmente.
 
-O frontend foi desenvolvido em React e o backend em Flask.
+O frontend foi desenvolvido em [React](https://react.dev/) e o backend em [Flask](https://flask.palletsprojects.com/en/stable/).
 
 ## Instalar e iniciar o projeto
 
@@ -48,6 +48,8 @@ Na janela que abrir, clique em **Setup
 Environment** para instalar as dependências do frontend e do backend. 
 
 Marque a opção **Instalar Pacotes de IA** para instalar os modelos de IA que transcrevem e analisam os vídeos. 
+
+O launcher também oferece a instalação do [FFmpeg](https://www.ffmpeg.org/), usado na análise dos vídeos e extração de áudio.
 
 Quando
 a instalação terminar, clique em **Start All** para iniciar a aplicação.
@@ -63,13 +65,12 @@ a instalação terminar, clique em **Start All** para iniciar a aplicação.
 
 É necessário acesso à internet durante a instalação para baixar os componentes e
 os modelos de tradução e IA. Essa etapa pode demorar, especialmente ao baixar os
-modelos. O launcher também oferece a instalação do FFmpeg, usado no processamento
-de vídeo.
+modelos. 
 
 ### Configurar o reCAPTCHA
 
 O cadastro de usuários oferece proteção com reCAPTCHA, que vem desativada por padrão. Para habilitá-la, gere
-suas próprias chaves no Google reCAPTCHA e configure os arquivos `.env` disponíveis em `demoviefy-frontend/.env` e `demoviefy-backend/.env`.
+suas próprias chaves no [Google reCAPTCHA](https://developers.google.com/recaptcha/intro) e configure os arquivos `.env` disponíveis em `demoviefy-frontend/.env` e `demoviefy-backend/.env`.
 
 Consulte o [guia completo do launcher](docs/LAUNCHER.md) para opções de setup,
 serviços e solução de problemas.
