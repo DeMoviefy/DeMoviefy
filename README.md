@@ -11,7 +11,7 @@ O DeMoviefy é uma plataforma automatizada e gratuita para análise, processamen
 <p align="center">
   <img src="demoviefy-frontend/src/pages/Home/assets/Imagem1/Imagem1-POR-Dark.png" alt="Tela inicial do DeMoviefy em português, tema escuro" width="100%">
   <br>
-  <sub>Fonte da imagem: <a href="https://www.youtube.com/watch?v=f03Re9q-KDk">Nick's Kitchen</a>.</sub>
+  <sub>Fonte do vídeo utlizado: <a href="https://www.youtube.com/watch?v=f03Re9q-KDk">Nick's Kitchen</a>.</sub>
 </p>
 
 
