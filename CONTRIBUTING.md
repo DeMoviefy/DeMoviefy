@@ -2,9 +2,4 @@
 
 Obrigado por considerar contribuir com o projeto!
 
-## Como contribuir
-
-1. Faça um fork do repositório
-2. Crie uma branch para sua feature:
-   ```bash
-   git checkout -b minha-feature
+Por ser um trabalho acadêmico, não aceitaríamos pull requests neste repositório. Contudo, sinta-se livre para trabalhar sobre ele, conforme a licença MIT do projeto.

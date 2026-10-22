@@ -1,8 +1,8 @@
 """Automated acceptance tests derived from the official DeMoviefy test plan.
 
 Tips:
-* Run all scenarios from the repository root with ``.\\test.ps1 -All``.
-* Run one scenario with ``.\\test.ps1 -Test CT03``.
+* Run all scenarios from the repository root with ``.\\demoviefy-backend\\test.ps1 -All``.
+* Run one scenario with ``.\\demoviefy-backend\\test.ps1 -Test CT03``.
 * These tests validate HTTP contracts and workflow states. They deliberately do
   not run Whisper or YOLO, which keeps the suite fast and deterministic.
 * When adding a scenario, use the CT identifier in the test name so it appears

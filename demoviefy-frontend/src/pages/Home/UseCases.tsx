@@ -1,7 +1,32 @@
 import { useTranslation } from "react-i18next";
+import { useThemeStore } from "src/core/stores/useThemeStore";
+
+import imagem2EngDark from "src/pages/Home/assets/Imagem2/Imagem2-ENG-Dark.png";
+import imagem2EngLight from "src/pages/Home/assets/Imagem2/Imagem2-ENG-Light.png";
+import imagem2PorDark from "src/pages/Home/assets/Imagem2/Imagem2-POR-Dark.png";
+import imagem2PorLight from "src/pages/Home/assets/Imagem2/Imagem2-POR-Light.png";
+import imagem3EngDark from "src/pages/Home/assets/Imagem3/Imagem3-ENG-Dark.png";
+import imagem3EngLight from "src/pages/Home/assets/Imagem3/Imagem3-ENG-Light.png";
+import imagem3PorDark from "src/pages/Home/assets/Imagem3/Imagem3-POR-Dark.png";
+import imagem3PorLight from "src/pages/Home/assets/Imagem3/Imagem3-POR-Light.png";
+import imagem4EngDark from "src/pages/Home/assets/Imagem4/Imagem4-ENG-Dark.png";
+import imagem4EngLight from "src/pages/Home/assets/Imagem4/Imagem4-ENG-Light.png";
+import imagem4PorDark from "src/pages/Home/assets/Imagem4/Imagem4-POR-Dark.png";
+import imagem4PorLight from "src/pages/Home/assets/Imagem4/Imagem4-POR-Light.png";
 
 export default function UseCases() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const theme = useThemeStore((state) => state.theme);
+  const isPortuguese = i18n.resolvedLanguage?.toLowerCase().startsWith("pt") ?? false;
+  const analysisScreenshot = isPortuguese
+    ? theme === "dark" ? imagem2PorDark : imagem2PorLight
+    : theme === "dark" ? imagem2EngDark : imagem2EngLight;
+  const transcriptionScreenshot = isPortuguese
+    ? theme === "dark" ? imagem3PorDark : imagem3PorLight
+    : theme === "dark" ? imagem3EngDark : imagem3EngLight;
+  const ratingScreenshot = isPortuguese
+    ? theme === "dark" ? imagem4PorDark : imagem4PorLight
+    : theme === "dark" ? imagem4EngDark : imagem4EngLight;
 
     return (
         <section className="w-full pb-20 pt-4 lg:pb-20 lg:pt-8">
@@ -18,9 +43,9 @@ export default function UseCases() {
             <div className="mt-16 grid gap-8 md:grid-cols-3 lg:mt-20">
 
                 <div>
-                    <div className="overflow-hidden rounded-lg">
+                    <div className="overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-700">
                         <img
-                            src="src/assets/DeMoviefy-Demo.png"
+                            src={analysisScreenshot}
                             alt={t("analysis")}
                             className="w-full"
                         />
@@ -36,9 +61,9 @@ export default function UseCases() {
                 </div>
 
                 <div>
-                    <div className="overflow-hidden rounded-lg">
+                    <div className="overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-700">
                         <img
-                            src="src/assets/DeMoviefy-Demo.png"
+                            src={transcriptionScreenshot}
                             alt={t("transcription")}
                             className="w-full"
                         />
@@ -56,20 +81,20 @@ export default function UseCases() {
 
 
                 <div>
-                    <div className="overflow-hidden rounded-lg">
+                    <div className="overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-700">
                         <img
-                            src="src/assets/DeMoviefy-Demo.png"
-                            alt={t("futureFeaturesAlt")}
+                            src={ratingScreenshot}
+                            alt={t("rating")}
                             className="w-full"
                         />
                     </div>
 
                     <h3 className="mt-5 text-xl font-semibold tracking-tight">
-                        {t("moreComing")}
+                        {t("rating")}
                     </h3>
 
                     <p className="mt-3 text-base leading-7 text-neutral-400">
-                        {t("moreFeaturesDescription")}
+                        {t("ratingDescription")}
                     </p>
                 </div>
             </div>

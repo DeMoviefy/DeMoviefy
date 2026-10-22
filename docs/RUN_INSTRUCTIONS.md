@@ -8,8 +8,7 @@ Na raiz do repositório, inicie o launcher:
 python setup/main.py
 ```
 
-Se o comando do Python for `python3`, use `python3 setup/main.py`. Responda `Y`
-ao prompt inicial para aplicar o proxy da escola. Na janela, use **Setup
+Se o comando do Python for `python3`, use `python3 setup/main.py`. Na janela, use **Setup
 Environment** na primeira execução e **Start All** para iniciar os serviços.
 
 Consulte o [Guia do Launcher](LAUNCHER.md) para ver o passo a passo de todas as
@@ -119,10 +118,10 @@ Na raiz do repositório, com o ambiente `.venv` instalado:
 
 ```powershell
 # Guest limit, guest-session isolation, cleanup and ownership acceptance cases
-.\test.ps1 -Test CT12
-.\test.ps1 -Test CT13
-.\test.ps1 -Test CT14
-.\test.ps1 -Test SEC05
+.\demoviefy-backend\test.ps1 -Test CT12
+.\demoviefy-backend\test.ps1 -Test CT13
+.\demoviefy-backend\test.ps1 -Test CT14
+.\demoviefy-backend\test.ps1 -Test SEC05
 
 # Cookie attributes, expiration, configurable Secure flag, login and transfer
 Push-Location .\demoviefy-backend
@@ -130,7 +129,7 @@ Push-Location .\demoviefy-backend
 Pop-Location
 
 # Full backend acceptance suite
-.\test.ps1 -All
+.\demoviefy-backend\test.ps1 -All
 ```
 
 Os testes automatizados verificam os atributos e a duração configurada do cookie sem esperar 30 minutos reais. CK03–CK05 verificam o comportamento real de expiração e HTTPS no navegador.

@@ -2,10 +2,13 @@ from gui.main_window import LauncherForm
 
 def main():
 
-    if (input("Aplicar proxy da escola? (Y/n) ").lower() == "y"):
-        proxy = "http://proxy.spo.ifsp.edu.br:3128"
-    else:
-        proxy = None
+
+    """ if (input("Aplicar proxy da escola? (Y/n) ").lower() == "y"):
+            proxy = "http://proxy.spo.ifsp.edu.br:3128"
+        else:
+            proxy = None """
+
+    proxy = None
 
     app = LauncherForm(proxy_url=proxy)
     app.mainloop()

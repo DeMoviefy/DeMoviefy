@@ -1,38 +1,39 @@
-# Testing DeMoviefy
+# Testes do DeMoviefy
 
-Open the simple test menu from the repository root:
-
-```powershell
-.\test.ps1
-```
-
-Choose one of the following:
-
-1. Run all functional and security scenarios (CT01-CT14 and SEC01-SEC05).
-2. Run one scenario, such as CT03.
-3. Run all scenarios and build the frontend.
-
-For non-interactive use, run all tests directly:
+Abra o menu de testes a partir da raiz do repositório:
 
 ```powershell
-.\test.ps1 -All
+.\demoviefy-backend\test.ps1
 ```
 
-Run one scenario directly:
+Escolha uma das opções:
+
+1. Executar todos os cenários funcionais e de segurança (CT01-CT14 e SEC01-SEC05).
+2. Executar um cenário, como CT03.
+3. Executar todos os cenários e compilar o frontend.
+
+Para executar todos os testes sem abrir o menu:
 
 ```powershell
-.\test.ps1 -Test CT03
+.\demoviefy-backend\test.ps1 -All
 ```
 
-To also verify that the frontend builds successfully:
+Para executar um cenário específico:
 
 ```powershell
-.\test.ps1 -Frontend
+.\demoviefy-backend\test.ps1 -Test CT03
 ```
 
-The script uses the project's `.venv` and runs the acceptance scenarios in
-`demoviefy-backend/tests/test_test_plan.py`. To run every backend test module,
-including registration, session, and artifact-cleanup tests:
+Para também verificar se o frontend compila corretamente:
+
+```powershell
+.\demoviefy-backend\test.ps1 -Frontend
+```
+
+O script usa o ambiente `.venv` do projeto e executa os cenários de aceitação em
+`demoviefy-backend/tests/test_test_plan.py`. Para executar todos os módulos de
+teste do backend, incluindo os testes de cadastro, sessão e limpeza de arquivos
+gerados:
 
 ```powershell
 Push-Location .\demoviefy-backend
@@ -40,51 +41,52 @@ Push-Location .\demoviefy-backend
 Pop-Location
 ```
 
-## What is covered
+## O que é verificado
 
-`test_test_plan.py` implements the scenarios from the official test plan:
+`test_test_plan.py` implementa os cenários do plano oficial de testes:
 
-| ID | Automated check |
+| ID | Verificação automatizada |
 | --- | --- |
-| CT01 | A supported video upload is saved and queued. |
-| CT02 | Unsupported file types are rejected before processing. |
-| CT03 | A completed transcription is returned to the client. |
-| CT04 | Low-quality audio results do not break the transcription flow. |
-| CT05 | Sensitive-content labels and critical timestamps are returned. |
-| CT06 | Partial analysis and transcription results return `202` while processing. |
-| CT07 | Manual transcription updates are allowed; AI analysis updates are rejected. |
-| CT08 | Multiple uploads are accepted and each one is queued. |
-| CT09 | Duplicate filenames are stored in separate files. |
-| CT10 | Video deletion cleans its associated artifacts and database record. |
-| CT11 | A failed artifact cleanup preserves the video database record. |
-| CT12 | Video visibility is limited to its owner and configured administrators. |
-| CT13 | Guest upload limits and per-session video isolation are enforced. |
-| CT14 | Guest videos and artifacts are removed when the backend restarts. |
+| CT01 | Um vídeo compatível é salvo e adicionado à fila de processamento. |
+| CT02 | Tipos de arquivo incompatíveis são rejeitados antes do processamento. |
+| CT03 | Uma transcrição concluída é retornada ao cliente. |
+| CT04 | Resultados de áudio de baixa qualidade não interrompem o fluxo de transcrição. |
+| CT05 | São retornados rótulos de conteúdo sensível e timestamps relevantes. |
+| CT06 | Resultados parciais de análise e transcrição retornam `202` enquanto o processamento continua. |
+| CT07 | Atualizações manuais da transcrição são permitidas; atualizações da análise por IA são rejeitadas. |
+| CT08 | Vários uploads são aceitos e cada vídeo é adicionado à fila. |
+| CT09 | Arquivos com nomes duplicados são armazenados separadamente. |
+| CT10 | A exclusão de um vídeo remove seus arquivos associados e o registro no banco de dados. |
+| CT11 | Uma falha ao limpar os arquivos preserva o registro do vídeo no banco de dados. |
+| CT12 | A visibilidade dos vídeos é limitada ao proprietário e aos administradores configurados. |
+| CT13 | Os limites de upload de convidados e o isolamento de vídeos por sessão são aplicados. |
+| CT14 | Vídeos de convidados e seus arquivos são removidos quando o backend reinicia. |
 
-Security scenarios are also available individually:
+Os cenários de segurança também podem ser executados individualmente:
 
-| ID | Automated check |
+| ID | Verificação automatizada |
 | --- | --- |
-| SEC01 | Traversal-style filenames are sanitized and stay inside storage. |
-| SEC02 | Invalid frame, confidence, and clip parameters are rejected. |
-| SEC03 | Unknown video statuses are rejected without changing state. |
-| SEC04 | Unknown video IDs do not expose resources. |
-| SEC05 | Private guest video sessions are isolated. |
+| SEC01 | Nomes de arquivo com tentativa de travessia de diretórios são sanitizados e permanecem dentro do armazenamento. |
+| SEC02 | Parâmetros inválidos de frame, confiança e trecho são rejeitados. |
+| SEC03 | Status de vídeo desconhecidos são rejeitados sem alterar o estado. |
+| SEC04 | IDs de vídeo desconhecidos não expõem recursos. |
+| SEC05 | Sessões privadas de vídeos de convidados são isoladas. |
 
-An additional regression check verifies that the session cookie continues to
-authorize transcription generation and editing, video reprocessing, and video
-deletion after an authenticated upload.
+Uma verificação de regressão adicional confirma que, após um upload autenticado,
+o cookie de sessão continua autorizando a geração e edição de transcrições, o
+reprocessamento e a exclusão de vídeos.
 
-## Important scope note
+## Limites dos testes
 
-These are fast, repeatable acceptance tests. They use temporary files and a
-temporary SQLite database, and simulate AI artifacts instead of downloading or
-running Whisper/YOLO models.
+Estes testes de aceitação são rápidos e reproduzíveis. Eles usam arquivos
+temporários e um banco de dados SQLite temporário, e simulam os resultados da IA
+em vez de baixar ou executar os modelos Whisper/YOLO.
 
-The full infrastructure part of CT08 still needs a separate load test against
-the deployed Nginx + Flask environment, because Nginx is outside the Flask test
-process.
-Optional security checks for a development environment:
+A parte de infraestrutura do CT08 ainda precisa de um teste de carga separado
+no ambiente implantado com Nginx e Flask, pois o Nginx não faz parte do processo
+de testes do Flask.
+
+Verificações de segurança opcionais para um ambiente de desenvolvimento:
 
 ```powershell
 python -m pip install bandit pip-audit ruff
